@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TaskManager.Modules.Users.Models;
 
-namespace TaskManager.Models
+namespace TaskManager.Modules.Gamification.Models
 {
     public class Badge
     {

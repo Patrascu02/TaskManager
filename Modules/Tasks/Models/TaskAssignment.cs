@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TaskManager.Modules.Security.Models;
+using TaskManager.Modules.Users.Models;
+using TaskManager.Modules.Gamification.Models;
+using TaskManager.Modules.Tasks.Models;
 
-namespace TaskManager.Models
+namespace TaskManager.Modules.Tasks.Models
 {
     public class TaskAssignment
     {

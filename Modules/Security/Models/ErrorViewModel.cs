@@ -1,4 +1,4 @@
-namespace TaskManager.Models
+namespace TaskManager.Modules.Security.Models
 {
     public class ErrorViewModel
     {

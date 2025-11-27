@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Data;
-using TaskManager.Models;
+using TaskManager.Modules.Users.Models;
 
 namespace TaskManager
 {
@@ -19,11 +19,16 @@ namespace TaskManager
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+            builder.Services.AddDefaultIdentity<ApplicationUser>(options =>//rută specială pentru view-uri în Modules 
                 options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews()
+                  .AddRazorOptions(options =>
+                  {
+                      options.ViewLocationFormats.Add("/Modules/{1}/Views/{0}.cshtml");
+                      options.ViewLocationFormats.Add("/Modules/Shared/Views/{0}.cshtml");
+                  });
 
             var app = builder.Build();
 
@@ -46,6 +51,11 @@ namespace TaskManager
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapControllerRoute(//rutarea paginilor
+                name: "modules",
+                pattern: "{controller}/{action}/{id?}");
+
             app.MapRazorPages();
 
             app.Run();

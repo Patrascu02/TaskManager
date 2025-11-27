@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using TaskManager.Modules.Gamification.Models;
+using TaskManager.Modules.Tasks.Models;
 
-namespace TaskManager.Models
+namespace TaskManager.Modules.Users.Models
 {
     public class ApplicationUser : IdentityUser
     {

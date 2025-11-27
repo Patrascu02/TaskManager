@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using TaskManager.Models;
+using TaskManager.Modules.Users.Models;
+using TaskManager.Modules.Security.Models;
 
 namespace TaskManager.Controllers
 {

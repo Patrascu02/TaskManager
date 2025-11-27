@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using TaskManager.Models;
+using TaskManager.Modules.Gamification.Models;
+using TaskManager.Modules.Tasks.Models;
+using TaskManager.Modules.Users.Models;
 
 namespace TaskManager.Data
 {

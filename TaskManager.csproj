@@ -18,11 +18,10 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
-    <Folder Include="Modules\Gamification\" />
-    <Folder Include="Modules\Security\" />
-    <Folder Include="Modules\Tasks\" />
-    <Folder Include="Modules\Users\" />
-    <Folder Include="Services\" />
+    <Folder Include="Modules\Gamification\Services\" />
+    <Folder Include="Modules\Security\Services\" />
+    <Folder Include="Modules\Tasks\Services\" />
+    <Folder Include="Modules\Users\Services\" />
   </ItemGroup>
 
 </Project>
