@@ -1,0 +1,47 @@
+﻿@* Views/Shared/_Navbar.cshtml *@
+<link rel="stylesheet" href="~/css/navbar.css" />
+
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow-sm custom-navbar">
+    <div class="container-fluid">
+
+        <!-- Brand -->
+        <a class="navbar-brand brand-glow" asp-controller="Home" asp-action="Index">
+            TaskManager
+        </a>
+
+        <!-- Toggle for mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarContent" aria-controls="navbarContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between" id="navbarContent">
+
+            <!-- Left Menu -->
+            <ul class="navbar-nav flex-grow-1 custom-nav-links">
+
+                <li class="nav-item">
+                    <a class="nav-link cool-link" asp-controller="Tasks" asp-action="Index">Tasks</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link cool-link" asp-controller="Users" asp-action="Index">Users</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link cool-link" asp-controller="Gamification" asp-action="Index">Gamification</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link cool-link" asp-controller="Security" asp-action="Index">Security</a>
+                </li>
+
+            </ul>
+
+            <!-- Login Partial -->
+            <partial name="_LoginPartial" />
+
+        </div>
+    </div>
+</nav>

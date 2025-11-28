@@ -10,30 +10,17 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    TaskManager
-                </a>
-
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" asp-controller="Tasks" asp-action="Index">Tasks</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index">Users</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Gamification" asp-action="Index">Gamification</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Security" asp-action="Index">Security</a></li>
-                </ul>
-
-                <partial name="_LoginPartial" />
-            </div>
-        </nav>
+        <partial name="_Navbar" />
     </header>
 
-    <div class="container mt-3">
-        @RenderBody()
-    </div>
+    <main class="flex-grow-1">
+        <div class="container mt-3">
+            @RenderBody()
+        </div>
+    </main>
 
-    <footer class="bg-light border-top mt-4 p-2 text-center text-muted">
-        © @DateTime.Now.Year - TaskManager
+    <footer>
+        <partial name="_Footer" />
     </footer>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

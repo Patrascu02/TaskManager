@@ -1,8 +1,35 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="home-wrapper d-flex flex-column justify-content-center align-items-center text-center">
+
+    <h1 class="display-3 fw-bold mb-3 fade-in">
+        Welcome to <span class="text-primary">TaskManager</span>
+    </h1>
+
+    <div class="alert alert-warning alert-dismissible fade show fade-in-delay-2" role="alert">
+        <strong>Attention!</strong> You are not logged in. Some features are limited.
+    </div>
+
+    <p class="lead text-muted mb-4 fade-in-delay-3">
+        Explore a preview of the application and see how tasks, users, and gamification are organized.
+    </p>
+
+    <div class="preview-box shadow-sm mt-5 p-4 rounded fade-in-delay-4">
+        <h4 class="fw-semibold mb-3">Application Preview</h4>
+        <p class="text-muted small">
+            You can view the structure, see badges, levels, and leaderboard mockups without logging in.
+        </p>
+    </div>
+
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".fade-in, .fade-in-delay-2, .fade-in-delay-3, .fade-in-delay-4")
+                .forEach(el => el.classList.add("visible"));
+        });
+    </script>
+}

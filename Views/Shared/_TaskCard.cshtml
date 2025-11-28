@@ -1,0 +1,10 @@
+﻿@model TaskManager.Modules.Tasks.Models.UserTask
+
+<div class="card mb-2">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Title</h5>
+        <p class="card-text">@Model.Description</p>
+        <p class="card-text"><small class="text-muted">Priority: @Model.Priority</small></p>
+        <a asp-controller="Tasks" asp-action="Details" asp-route-id="@Model.TaskId" class="btn btn-primary btn-sm">View</a>
+    </div>
+</div>
