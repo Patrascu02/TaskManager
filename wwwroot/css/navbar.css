@@ -1,60 +1,36 @@
-﻿/* Navbar effect styles */
-
+﻿/* navbar.css */
 .custom-navbar {
-    padding: 0.7rem 1rem;
-    backdrop-filter: blur(5px);
+    background-color: #1c1c1c;
 }
 
-/* Brand glow animation */
 .brand-glow {
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: color 0.3s, text-shadow 0.3s;
+    font-weight: bold;
+    color: #0d6efd;
+    text-shadow: 0 0 5px rgba(13,110,253,0.7);
+    transition: 0.3s;
 }
 
     .brand-glow:hover {
-        color: #00c8ff;
-        text-shadow: 0px 0px 10px #00c8ff;
+        color: #0a58ca;
+        text-decoration: none;
     }
 
-/* Left menu links */
-.custom-nav-links .nav-link {
-    font-size: 1rem;
-    padding: 0.6rem 1rem !important;
-    color: #dcdcdc;
-    position: relative;
-    transition: color 0.25s ease-in-out;
+.cool-link {
+    color: #fff;
+    transition: all 0.3s;
 }
 
-/* Hover underline animation */
-.cool-link::after {
-    content: "";
-    position: absolute;
-    width: 0%;
-    height: 2px;
-    background-color: #00c8ff;
-    left: 0;
-    bottom: 3px;
-    transition: 0.25s;
-}
-
-.cool-link:hover {
-    color: #ffffff;
-}
-
-    .cool-link:hover::after {
-        width: 100%;
+    .cool-link:hover {
+        color: #0d6efd;
+        text-decoration: underline;
     }
 
-/* Login partial area */
-.navbar-nav .nav-link {
-    color: #e0e0e0 !important; /* Vizibil */
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    transition: color 0.25s ease-in-out;
+.navbar-nav .nav-item {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 }
 
-    /* Hover pentru login/register/logout */
-    .navbar-nav .nav-link:hover {
-        color: #00c8ff !important; 
-    }
+/* Asigură că linkurile sunt clickabile */
+.navbar a.nav-link {
+    pointer-events: auto;
+}

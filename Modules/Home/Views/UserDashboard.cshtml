@@ -1,0 +1,40 @@
+﻿@* /Modules/Home/Views/UserDashboard.cshtml *@
+<div class="dashboard-wrapper container mt-4">
+    <h2 class="mb-4">Welcome, @User.Identity.Name!</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm hover-effect">
+                <div class="card-body text-center">
+                    <h5 class="card-title">My Tasks</h5>
+                    <p class="card-text">View and complete your tasks assigned by managers.</p>
+                    <a asp-controller="Tasks" asp-action="Index" class="btn btn-primary">Go</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm hover-effect">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Vote Difficulty</h5>
+                    <p class="card-text">Vote the difficulty of tasks received and provide feedback.</p>
+                    <a asp-controller="Tasks" asp-action="DifficultyVote" class="btn btn-primary">Vote</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm hover-effect">
+                <div class="card-body text-center">
+                    <h5 class="card-title">XP Progress</h5>
+                    <p class="card-text">Check your accumulated points and level progress.</p>
+                    <a asp-controller="Gamification" asp-action="MyProgress" class="btn btn-primary">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-effect:hover {
+        transform: translateY(-5px);
+        transition: 0.3s;
+    }
+</style>

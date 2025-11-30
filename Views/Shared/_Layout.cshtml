@@ -1,16 +1,41 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using TaskManager.Modules.Users.Models
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TaskManager</title>
-
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
     <header>
-        <partial name="_Navbar" />
+        @* Navbar în funcție de rol *@
+        @if (SignInManager.IsSignedIn(User))
+        {
+            var currentUser = await UserManager.GetUserAsync(User);
+
+            if (await UserManager.IsInRoleAsync(currentUser, "Admin"))
+            {
+                @await Html.PartialAsync("_NavbarAdmin")
+            }
+            else if (await UserManager.IsInRoleAsync(currentUser, "Manager"))
+            {
+                @await Html.PartialAsync("_NavbarManager")
+            }
+            else
+            {
+                @await Html.PartialAsync("_NavbarUser")
+            }
+        }
+        else
+        {
+            @await Html.PartialAsync("_NavbarGuest")
+        }
     </header>
 
     <main class="flex-grow-1">
@@ -19,7 +44,7 @@
         </div>
     </main>
 
-    <footer>
+    <footer class="bg-light border-top text-center p-3 mt-4">
         <partial name="_Footer" />
     </footer>
 

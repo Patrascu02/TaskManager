@@ -1,0 +1,39 @@
+﻿<div class="dashboard-wrapper container mt-4">
+    <h2 class="mb-4">Manager Dashboard - @User.Identity.Name</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm hover-effect">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Create Task</h5>
+                    <p class="card-text">Create and assign tasks to your team members.</p>
+                    <a asp-controller="Tasks" asp-action="Create" class="btn btn-success">Create</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm hover-effect">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Manage Tasks</h5>
+                    <p class="card-text">Edit or delete tasks and track team progress.</p>
+                    <a asp-controller="Tasks" asp-action="Index" class="btn btn-success">Manage</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm hover-effect">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Leaderboard</h5>
+                    <p class="card-text">Monitor user achievements and XP rankings.</p>
+                    <a asp-controller="Gamification" asp-action="Leaderboard" class="btn btn-success">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-effect:hover {
+        transform: translateY(-5px);
+        transition: 0.3s;
+    }
+</style>
