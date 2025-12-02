@@ -4,15 +4,13 @@
 
         <ul class="navbar-nav me-auto">
             <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index">Manage Users</a></li>
-            <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Managers">Manage Managers</a></li>
             <li class="nav-item"><a class="nav-link" asp-controller="Tasks" asp-action="Categories">Task Categories</a></li>
             <li class="nav-item"><a class="nav-link" asp-controller="Tasks" asp-action="Priorities">Priorities</a></li>
             <li class="nav-item"><a class="nav-link" asp-controller="Security" asp-action="SystemStatus">System Status</a></li>
         </ul>
 
-        <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-flex">
+        <form id="logoutForm" asp-area="Identity" asp-page="/Account/Logout" method="post">
             <button class="btn btn-outline-light">Logout</button>
         </form>
-
     </div>
 </nav>

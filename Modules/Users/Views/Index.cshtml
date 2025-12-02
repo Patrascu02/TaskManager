@@ -1,6 +1,106 @@
-﻿@{
+﻿@model TaskManager.Modules.Users.Models.UserListViewModel
+@{
     ViewData["Title"] = "Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Users Module</h1>
-<p>Aici vor apărea acțiunile pentru utilizatori.</p>
+<h2>Users</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Info"] != null)
+{
+    <div class="alert alert-info">@TempData["Info"]</div>
+}
+
+<!-- Filtrare / sortare -->
+<form class="row g-2 mb-3" method="get" asp-controller="Users" asp-action="Index">
+    <div class="col-auto">
+        <input class="form-control" name="search" value="@Model.Search" placeholder="Caută username, email, nume..." />
+    </div>
+
+    <div class="col-auto">
+        <select class="form-select" name="sort">
+            <option value="username" @(Model.Sort == "username" ? "selected" : "")>Username ↑</option>
+            <option value="username_desc" @(Model.Sort == "username_desc" ? "selected" : "")>Username ↓</option>
+            <option value="email" @(Model.Sort == "email" ? "selected" : "")>Email ↑</option>
+            <option value="email_desc" @(Model.Sort == "email_desc" ? "selected" : "")>Email ↓</option>
+        </select>
+    </div>
+
+    <div class="col-auto">
+        <button class="btn btn-primary" type="submit">Caută</button>
+
+        <!-- Reset Search -->
+        <a asp-controller="Users" asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+    </div>
+</form>
+
+<a asp-controller="Users" asp-action="Create" class="btn btn-success mb-3">Creează user</a>
+
+
+<!-- Tabel utilizatori -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>FullName</th>
+            <th>Roles</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model.Users)
+        {
+            <tr>
+                <td>@u.UserName</td>
+                <td>@u.Email</td>
+                <td>@u.FullName</td>
+                <td>@string.Join(", ", u.Roles)</td>
+                <td>
+                    <!-- Edit -->
+                    <a asp-controller="Users" asp-action="Edit" asp-route-id="@u.Id" class="btn btn-sm btn-primary">Edit</a>
+
+                    <!-- Delete -->
+                    <form asp-controller="Users" asp-action="Delete" asp-route-id="@u.Id"
+                          method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+
+
+                    <!-- Reset Password -->
+                    <form asp-controller="Users" asp-action="ResetPassword" asp-route-id="@u.Id"
+                          method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-warning">Reset Password</button>
+                    </form>
+
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
+}
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == Model.Page ? "active" : "")">
+                <a class="page-link" asp-controller="Users" asp-action="Index" asp-route-page="@i" asp-route-search="@Model.Search" asp-route-sort="@Model.Sort">@i</a>
+            </li>
+        }
+    </ul>
+</nav>

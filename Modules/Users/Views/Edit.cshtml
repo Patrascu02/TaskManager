@@ -1,0 +1,39 @@
+﻿@model TaskManager.Modules.Users.Models.UserEditViewModel
+@{
+    ViewData["Title"] = "Edit User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Edit User</h2>
+
+<form asp-controller="Users" asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FullName"></label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Role"></label>
+        <select asp-for="Role" class="form-select" asp-items="@(new SelectList(Model.AvailableRoles))">
+            <option value="">(no role)</option>
+        </select>
+        <small class="form-text text-muted">Current: @string.Join(", ", Model.CurrentRoles)</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-controller="Users" asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
