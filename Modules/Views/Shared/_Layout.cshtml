@@ -14,27 +14,25 @@
 </head>
 <body>
     <header>
-        @* Navbar în funcție de rol *@
         @if (SignInManager.IsSignedIn(User))
         {
             var currentUser = await UserManager.GetUserAsync(User);
-
             if (await UserManager.IsInRoleAsync(currentUser, "Admin"))
             {
-                @await Html.PartialAsync("_NavbarAdmin")
+                @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarAdmin.cshtml")
             }
             else if (await UserManager.IsInRoleAsync(currentUser, "Manager"))
             {
-                @await Html.PartialAsync("_NavbarManager")
+                @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarManager.cshtml")
             }
             else
             {
-                @await Html.PartialAsync("_NavbarUser")
+                @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarUser.cshtml")
             }
         }
         else
         {
-            @await Html.PartialAsync("_NavbarGuest")
+            @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarGuest.cshtml")
         }
     </header>
 
@@ -45,7 +43,7 @@
     </main>
 
     <footer class="bg-light border-top text-center p-3 mt-4">
-        <partial name="_Footer" />
+        <partial name="~/Modules/Views/Shared/_Footer.cshtml" />
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

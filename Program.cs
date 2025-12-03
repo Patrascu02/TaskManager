@@ -25,13 +25,27 @@ namespace TaskManager
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             builder.Services.AddControllersWithViews()
-                  .AddRazorOptions(options =>
-                  {
-                      options.ViewLocationFormats.Add("/Modules/{1}/Views/{0}.cshtml");
-                      options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
-                      options.ViewLocationFormats.Add("/Areas/Identity/Pages/Account/{0}.cshtml");
-                      options.ViewLocationFormats.Add("/Areas/Identity/Pages/{0}.cshtml");
-                  });
+        .AddRazorOptions(options =>
+        {
+            // 1. View-uri specifice modulelor (ex: Modules/Users/Views/Index.cshtml)
+            options.ViewLocationFormats.Add("/Modules/{1}/Views/{0}.cshtml");
+
+            // 2. View-uri mutate în folderul central Modules (ex: Modules/Views/Home/Index.cshtml)
+            options.ViewLocationFormats.Add("/Modules/Views/{1}/{0}.cshtml");
+
+            // 3. IMPORTANT: View-uri Shared (Navbar, Layout) pentru Controller-e
+            options.ViewLocationFormats.Add("/Modules/Views/Shared/{0}.cshtml");
+
+            // 4. IMPORTANT: Aceasta permite paginilor Identity să vadă folderul Shared din Modules
+            options.PageViewLocationFormats.Add("/Modules/Views/Shared/{0}.cshtml");
+
+            // Păstrează fallback-ul pe vechiul folder
+            options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+
+            // Configurare Identity
+            options.ViewLocationFormats.Add("/Areas/Identity/Pages/Account/{0}.cshtml");
+            options.ViewLocationFormats.Add("/Areas/Identity/Pages/{0}.cshtml");
+        });
 
             var app = builder.Build();
 
