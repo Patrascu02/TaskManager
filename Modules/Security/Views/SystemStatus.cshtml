@@ -1,0 +1,101 @@
+﻿@{
+    ViewData["Title"] = "System Status";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-speedometer2 text-danger"></i> System Status Monitor</h2>
+        <span class="badge bg-light text-dark border">Last Update: @ViewBag.ServerTime</span>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 shadow">
+                <div class="card-header">Server Status</div>
+                <div class="card-body text-center">
+                    <h1 class="display-4"><i class="bi bi-hdd-rack-fill"></i></h1>
+                    <h5 class="card-title">ONLINE</h5>
+                    <p class="card-text">All services operational.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-dark bg-info bg-opacity-10 border-info mb-3 shadow">
+                <div class="card-header text-info fw-bold">Database Connection</div>
+                <div class="card-body text-center">
+                    <h1 class="display-4 text-info"><i class="bi bi-database-check"></i></h1>
+                    <h5 class="card-title">Connected</h5>
+                    <p class="card-text text-muted">SQL Server is responding.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-dark bg-warning bg-opacity-10 border-warning mb-3 shadow">
+                <div class="card-header text-warning fw-bold">Security Level</div>
+                <div class="card-body text-center">
+                    <h1 class="display-4 text-warning"><i class="bi bi-shield-lock-fill"></i></h1>
+                    <h5 class="card-title">Enforced</h5>
+                    <p class="card-text text-muted">Role-Based Access Control Active.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3 text-secondary">Live Data Statistics</h4>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-primary text-uppercase">Total Users</h6>
+                    <h2 class="display-6 fw-bold">@ViewBag.TotalUsers</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-primary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-primary text-uppercase">Total Tasks Created</h6>
+                    <h2 class="display-6 fw-bold">@ViewBag.TotalTasks</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-success text-uppercase">Active Tasks</h6>
+                    <h2 class="display-6 fw-bold">@ViewBag.ActiveTasks</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-secondary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-secondary text-uppercase">Modules Loaded</h6>
+                    <h2 class="display-6 fw-bold">4</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            Technical Environment
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Operating System:</strong> @ViewBag.OSDescription</p>
+                    <p><strong>Framework:</strong> @ViewBag.Framework</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>App Version:</strong> v1.0.0-Beta</p>
+                    <p><strong>Environment:</strong> Production / Release</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-end">
+        <a asp-controller="Home" asp-action="AdminDashboard" class="btn btn-secondary">Înapoi la Dashboard</a>
+    </div>
+</div>

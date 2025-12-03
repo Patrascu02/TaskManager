@@ -3,48 +3,78 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold"><i class="bi bi-speedometer2 text-danger"></i> Admin Dashboard</h2>
+            <p class="text-muted">Monitorizare în timp real și administrare sistem.</p>
+        </div>
+        <span class="badge bg-light text-dark border p-2">
+            <i class="bi bi-clock"></i> Server Time: @ViewBag.ServerTime
+        </span>
+    </div>
 
-<div class="container my-5">
-    <h1 class="mb-4 text-center">Admin Dashboard</h1>
-
-    <div class="row g-4">
-        <!-- Card-based dashboard, stilizat ca înainte -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card dashboard-card shadow-sm h-100">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <h5 class="card-title">Manage Users</h5>
-                    <p class="card-text">Add, edit, or remove users and managers.</p>
-                    <a asp-controller="Users" asp-action="Index" class="btn btn-primary mt-auto">Go</a>
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 shadow h-100">
+                <div class="card-header bg-transparent border-0">Server Status</div>
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h1 class="display-4"><i class="bi bi-hdd-rack-fill"></i></h1>
+                    <h5 class="card-title">ONLINE</h5>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-6 col-lg-3">
-            <div class="card dashboard-card shadow-sm h-100">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <h5 class="card-title">Manage Tasks</h5>
-                    <p class="card-text">View or edit all tasks in the system.</p>
-                    <a asp-controller="Tasks" asp-action="Index" class="btn btn-primary mt-auto">Go</a>
+        <div class="col-md-4">
+            <div class="card text-dark bg-info bg-opacity-10 border-info mb-3 shadow h-100">
+                <div class="card-header border-info text-info fw-bold">Database</div>
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h1 class="display-4 text-info"><i class="bi bi-database-check"></i></h1>
+                    <h5 class="card-title">Connected</h5>
+                    <small class="text-muted">SQL Server Active</small>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-6 col-lg-3">
-            <div class="card dashboard-card shadow-sm h-100">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <h5 class="card-title">Levels & Categories</h5>
-                    <p class="card-text">Create or manage XP levels and task categories.</p>
-                    <a asp-controller="Gamification" asp-action="Index" class="btn btn-primary mt-auto">Manage</a>
+        <div class="col-md-4">
+            <div class="card text-dark bg-warning bg-opacity-10 border-warning mb-3 shadow h-100">
+                <div class="card-header border-warning text-warning fw-bold">Security</div>
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h1 class="display-4 text-warning"><i class="bi bi-shield-lock-fill"></i></h1>
+                    <h5 class="card-title">Secured</h5>
+                    <small class="text-muted">RBAC Role System</small>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-6 col-lg-3">
-            <div class="card dashboard-card shadow-sm h-100">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <h5 class="card-title">System Overview</h5>
-                    <p class="card-text">Monitor system activity and reports.</p>
-                    <a asp-controller="Security" asp-action="Index" class="btn btn-primary mt-auto">View</a>
+    <h4 class="mb-3 text-secondary">Statistici Platformă</h4>
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-primary text-uppercase">Total Utilizatori</h6>
+                    <h2 class="display-5 fw-bold text-dark">@ViewBag.TotalUsers</h2>
+                    <a asp-controller="Users" asp-action="Index" class="btn btn-sm btn-outline-primary mt-2">Gestionează Useri</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-success text-uppercase">Total Task-uri</h6>
+                    <h2 class="display-5 fw-bold text-dark">@ViewBag.TotalTasks</h2>
+                    <p class="mb-0 text-muted">Active: <strong>@ViewBag.ActiveTasks</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-secondary shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-secondary text-uppercase mb-3">Environment Info</h6>
+                    <ul class="list-unstyled small text-muted">
+                        <li class="mb-2"><strong>OS:</strong> @ViewBag.OSDescription</li>
+                        <li class="mb-2"><strong>Framework:</strong> @ViewBag.Framework</li>
+                        <li><strong>App Version:</strong> v1.0.0 (Licență)</li>
+                    </ul>
                 </div>
             </div>
         </div>

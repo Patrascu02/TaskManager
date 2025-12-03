@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Task Priorities";
+}
+
+<div class="container">
+    <h2 class="mb-4">Niveluri de Prioritate (System Default)</h2>
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        Aceste niveluri sunt predefinite în sistem pentru a asigura consistența raportării.
+    </div>
+
+    <table class="table table-bordered table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Nivel (ID)</th>
+                <th>Denumire</th>
+                <th>Culoare Vizuală</th>
+                <th>Descriere</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><strong>Low</strong></td>
+                <td><span class="badge bg-success">Verde</span></td>
+                <td>Sarcini de rutină, fără termen limită critic.</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><strong>Medium</strong></td>
+                <td><span class="badge bg-warning text-dark">Galben</span></td>
+                <td>Sarcini standard, care trebuie finalizate în ritm normal.</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><strong>High</strong></td>
+                <td><span class="badge bg-danger">Roșu</span></td>
+                <td>Urgențe sau sarcini critice care blochează alte procese.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a asp-controller="Home" asp-action="AdminDashboard" class="btn btn-secondary mt-3">Înapoi la Dashboard</a>
+</div>

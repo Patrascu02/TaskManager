@@ -8,5 +8,15 @@ namespace TaskManager.Modules.Tasks.Controllers
         {
             return View();
         }
+    
+
+
+
+    // GET: Tasks/Priorities
+        public IActionResult Priorities()
+        {
+            // Returnăm o listă simplă, statică, pentru informare
+            return View();
+        }
     }
 }

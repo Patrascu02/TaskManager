@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore; // Necesar pentru CountAsync
+using TaskManager.Data; // Necesar pentru ApplicationDbContext
 using TaskManager.Modules.Users.Models;
 using TaskManager.Modules.Security.Models;
 
@@ -10,27 +12,25 @@ namespace TaskManager.Modules.Home.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _db; // Adăugat pentru acces la baza de date
 
         public HomeController(ILogger<HomeController> logger,
-                              UserManager<ApplicationUser> userManager)
+                              UserManager<ApplicationUser> userManager,
+                              ApplicationDbContext db) // Injectăm DB
         {
             _logger = logger;
             _userManager = userManager;
+            _db = db;
         }
 
         public async Task<IActionResult> Index()
         {
-            // Daca utilizatorul NU este logat → pagina publica
             if (!User.Identity.IsAuthenticated)
                 return View();
 
-            // Daca este logat → aflam cine este
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return View();
 
-            if (user == null)
-                return View();
-
-            // Redirect in functie de rol
             if (await _userManager.IsInRoleAsync(user, "Admin"))
                 return RedirectToAction("AdminDashboard");
 
@@ -42,8 +42,23 @@ namespace TaskManager.Modules.Home.Controllers
 
         // ==== DASHBOARD-URI ====
 
-        public IActionResult AdminDashboard()
+        public async Task<IActionResult> AdminDashboard()
         {
+            // --- LOGICA MUTATĂ DIN SECURITY CONTROLLER ---
+
+            // 1. Colectăm statistici reale
+            var totalUsers = await _userManager.Users.CountAsync();
+            var totalTasks = await _db.UserTasks.CountAsync();
+            var activeTasks = await _db.UserTasks.CountAsync(t => t.IsActive);
+
+            // 2. Trimitem datele către View
+            ViewBag.TotalUsers = totalUsers;
+            ViewBag.TotalTasks = totalTasks;
+            ViewBag.ActiveTasks = activeTasks;
+            ViewBag.ServerTime = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+            ViewBag.OSDescription = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
+            ViewBag.Framework = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+
             return View();
         }
 
@@ -56,8 +71,6 @@ namespace TaskManager.Modules.Home.Controllers
         {
             return View();
         }
-
-        // ==== ALTE METODE EXISTENTE ====
 
         public IActionResult Privacy()
         {

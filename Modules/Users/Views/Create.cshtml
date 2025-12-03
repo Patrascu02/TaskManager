@@ -1,7 +1,6 @@
 ﻿@model TaskManager.Modules.Users.Models.UserCreateViewModel
 @{
     ViewData["Title"] = "Create User";
-    //Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Create User</h2>
@@ -9,6 +8,7 @@
 <form asp-controller="Users" asp-action="Create" method="post">
     @Html.AntiForgeryToken()
 
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
     <div class="mb-3">
         <label asp-for="Email"></label>
         <input asp-for="Email" class="form-control" />

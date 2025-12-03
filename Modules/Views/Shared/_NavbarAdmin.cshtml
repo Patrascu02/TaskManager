@@ -1,16 +1,35 @@
-﻿<nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-lg">
+﻿@using Microsoft.AspNetCore.Identity
+@using TaskManager.Modules.Users.Models
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+    var displayName = currentUser?.FullName ?? User.Identity?.Name; // Afișează Numele Complet sau Email-ul dacă numele lipsește
+}
+
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-lg">
     <div class="container">
         <a class="navbar-brand fw-bold" href="/">Admin Panel</a>
 
         <ul class="navbar-nav me-auto">
             <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index">Manage Users</a></li>
-            <li class="nav-item"><a class="nav-link" asp-controller="Tasks" asp-action="Categories">Task Categories</a></li>
-            <li class="nav-item"><a class="nav-link" asp-controller="Tasks" asp-action="Priorities">Priorities</a></li>
-            <li class="nav-item"><a class="nav-link" asp-controller="Security" asp-action="SystemStatus">System Status</a></li>
+            <li class="nav-item"><a class="nav-link" asp-controller="Tasks" asp-action="Priorities">Task Priorities</a></li>
         </ul>
 
-        <form id="logoutForm" asp-area="Identity" asp-page="/Account/Logout" method="post">
-            <button class="btn btn-outline-light">Logout</button>
-        </form>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+                <a class="nav-link text-light fw-bold" asp-area="Identity" asp-page="/Account/Manage/Index" title="Vezi profilul">
+                    Salut, @displayName!
+                </a>
+            </li>
+            <li class="nav-item">
+                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="nav-link btn btn-link text-light border-0">Logout</button>
+                </form>
+            </li>
+        </ul>
     </div>
 </nav>
