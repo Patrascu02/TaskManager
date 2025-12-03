@@ -26,11 +26,11 @@
     </div>
 
     <div class="col-auto">
-        <select class="form-select" name="sort">
-            <option value="username" @(Model.Sort == "username" ? "selected" : "")>Username ↑</option>
-            <option value="username_desc" @(Model.Sort == "username_desc" ? "selected" : "")>Username ↓</option>
-            <option value="email" @(Model.Sort == "email" ? "selected" : "")>Email ↑</option>
-            <option value="email_desc" @(Model.Sort == "email_desc" ? "selected" : "")>Email ↓</option>
+        <select class="form-select" asp-for="Sort" name="sort" onchange="this.form.submit()">
+            <option value="username">Username ↑</option>
+            <option value="username_desc">Username ↓</option>
+            <option value="email">Email ↑</option>
+            <option value="email_desc">Email ↓</option>
         </select>
     </div>
 
