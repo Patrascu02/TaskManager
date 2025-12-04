@@ -1,0 +1,41 @@
+﻿@model IEnumerable<TaskManager.Modules.Users.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Team Overview";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">👥 Echipa Mea</h2>
+
+    <div class="row">
+        @foreach (var user in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <span class="fs-3">👤</span>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold">@user.FullName</h5>
+                        <p class="text-muted small">@user.Email</p>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-around">
+                            <div>
+                                <small class="text-muted">Level</small>
+                                <h6 class="fw-bold text-primary">@user.LevelId</h6>
+                            </div>
+                            <div>
+                                <small class="text-muted">XP</small>
+                                <h6 class="fw-bold text-success">@user.TotalXp</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

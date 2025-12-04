@@ -1,0 +1,102 @@
+﻿@model TaskManager.Modules.Tasks.Models.TaskCreateViewModel
+
+@{
+    ViewData["Title"] = "Alocă Task";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-success text-white py-3">
+            <h3 class="mb-0"><i class="bi bi-person-plus-fill"></i> Alocă Task Nou</h3>
+            <p class="mb-0 small text-white-50">Creează o sarcină și distribuie-o membrilor echipei.</p>
+        </div>
+
+        <div class="card-body p-4">
+            <form asp-action="Assign" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-7 border-end">
+                        <h5 class="text-success mb-3"><i class="bi bi-card-text"></i> Detalii Sarcină</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label fw-bold"></label>
+                            <input asp-for="Title" class="form-control form-control-lg" placeholder="Ex: Implementare modul rapoarte" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-bold"></label>
+                            <textarea asp-for="Description" class="form-control" rows="5" placeholder="Descrie cerințele specifice..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DueDate" class="form-label fw-bold"></label>
+                                <input asp-for="DueDate" class="form-control" />
+                                <span asp-validation-for="DueDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Priority" class="form-label fw-bold"></label>
+                                <select asp-for="Priority" class="form-select">
+                                    <option value="1"> Low (Scăzută)</option>
+                                    <option value="2" selected> Medium (Medie)</option>
+                                    <option value="3">High (Critică)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5 ps-md-4">
+                        <h5 class="text-success mb-3"><i class="bi bi-people-fill"></i> Selectează Executanți</h5>
+                        <div class="alert alert-light border small text-muted">
+                            <i class="bi bi-info-circle"></i> Bifează utilizatorii care vor primi acest task. Poți selecta mai mulți.
+                        </div>
+
+                        <div class="card bg-light border-0">
+                            <div class="card-body" style="max-height: 350px; overflow-y: auto;">
+                                @if (Model.UsersList != null && Model.UsersList.Any())
+                                {
+                                    @foreach (var user in Model.UsersList)
+                                    {
+                                        <div class="form-check custom-checkbox mb-2 p-2 bg-white rounded border">
+                                            <input class="form-check-input ms-1" type="checkbox"
+                                                   name="SelectedUserIds"
+                                                   value="@user.Value"
+                                                   id="user_@user.Value"
+                                                   @(user.Selected ? "checked" : "")>
+                                            <label class="form-check-label ms-2 fw-bold w-100" style="cursor:pointer" for="user_@user.Value">
+                                                @user.Text
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-center text-muted py-3">
+                                        <em>Nu există utilizatori cu rolul 'User' disponibili.</em>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <span asp-validation-for="SelectedUserIds" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-controller="Tasks" asp-action="Index" class="btn btn-secondary px-4">Anulează</a>
+                    <button type="submit" class="btn btn-success btn-lg px-5 shadow-sm">
+                        <i class="bi bi-send-check"></i> Alocă Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

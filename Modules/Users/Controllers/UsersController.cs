@@ -7,7 +7,8 @@ using TaskManager.Modules.Users.Models;
 
 namespace TaskManager.Modules.Users.Controllers
 {
-    [Authorize(Roles = "Admin")] // doar Admin poate accesa
+    // 1. MODIFICARE: Permitem accesul și Managerilor în acest controller
+    [Authorize(Roles = "Admin,Manager")]
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -25,8 +26,21 @@ namespace TaskManager.Modules.Users.Controllers
         }
 
         // ====================================
-        // INDEX: listare + cautare + sort + paginare
+        // METODA TEAM (Pentru Manageri)
         // ====================================
+        // Aceasta este metoda nouă pe care probabil ai adăugat-o
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> Team()
+        {
+            // Managerul vede doar Userii, nu și Adminii
+            var users = await _userManager.GetUsersInRoleAsync("User");
+            return View(users);
+        }
+
+        // ====================================
+        // INDEX: Doar Adminul vede TOATĂ lista și poate căuta
+        // ====================================
+        [Authorize(Roles = "Admin")] // <--- 2. IMPORTANT: Restricționăm specific
         public async Task<IActionResult> Index(string search, string sort = "username", int page = 1, int pageSize = 10)
         {
             var q = _userManager.Users.AsQueryable();
@@ -75,8 +89,9 @@ namespace TaskManager.Modules.Users.Controllers
         }
 
         // ====================================
-        // GET: Create
+        // CREATE: Doar Admin
         // ====================================
+        [Authorize(Roles = "Admin")] // <--- Restricție
         public async Task<IActionResult> Create()
         {
             var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
@@ -87,11 +102,9 @@ namespace TaskManager.Modules.Users.Controllers
             return View(vm);
         }
 
-        // ====================================
-        // POST: Create
-        // ====================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")] // <--- Restricție
         public async Task<IActionResult> Create(UserCreateViewModel model)
         {
             if (!ModelState.IsValid)
@@ -129,8 +142,9 @@ namespace TaskManager.Modules.Users.Controllers
         }
 
         // ====================================
-        // GET: Edit
+        // EDIT: Doar Admin
         // ====================================
+        [Authorize(Roles = "Admin")] // <--- Restricție
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) return NotFound();
@@ -153,11 +167,9 @@ namespace TaskManager.Modules.Users.Controllers
             return View(vm);
         }
 
-        // ====================================
-        // POST: Edit
-        // ====================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")] // <--- Restricție
         public async Task<IActionResult> Edit(UserEditViewModel model)
         {
             if (!ModelState.IsValid)
@@ -181,7 +193,6 @@ namespace TaskManager.Modules.Users.Controllers
                 return View(model);
             }
 
-            // Actualizare roluri
             var existingRoles = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, existingRoles);
 
@@ -198,10 +209,11 @@ namespace TaskManager.Modules.Users.Controllers
         }
 
         // ====================================
-        // POST: Delete
+        // DELETE: Doar Admin
         // ====================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")] // <--- Restricție
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) return BadRequest();
@@ -221,10 +233,11 @@ namespace TaskManager.Modules.Users.Controllers
         }
 
         // ====================================
-        // POST: ResetPassword
+        // RESET PASSWORD: Doar Admin
         // ====================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")] // <--- Restricție
         public async Task<IActionResult> ResetPassword(string id)
         {
             if (id == null) return BadRequest();
