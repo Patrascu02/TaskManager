@@ -21,12 +21,16 @@ namespace TaskManager.Modules.Gamification.Controllers
 
         public async Task<IActionResult> Leaderboard()
         {
-            // Luăm userii, îi sortăm după XP descrescător
-            var users = await _userManager.Users
-                                .OrderByDescending(u => u.TotalXp)
-                                .Take(10) // Top 10
-                                .ToListAsync();
-            return View(users);
+            // 1. Luăm doar utilizatorii cu rolul de "User" (Angajații)
+            var employees = await _userManager.GetUsersInRoleAsync("User");
+
+            // 2. Îi sortăm în memorie (Memory Sort) după XP și luăm Top 10
+            var leaderboard = employees
+                                .OrderByDescending(u => u.TotalXp ?? 0) // Tratăm null ca 0
+                                .Take(10)
+                                .ToList();
+
+            return View(leaderboard);
         }
     }
 }

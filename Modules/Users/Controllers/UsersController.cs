@@ -28,7 +28,7 @@ namespace TaskManager.Modules.Users.Controllers
         // ====================================
         // METODA TEAM (Pentru Manageri)
         // ====================================
-        // Aceasta este metoda nouă pe care probabil ai adăugat-o
+        
         [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Team()
         {

@@ -88,6 +88,12 @@ namespace TaskManager.Modules.Tasks.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Tasks/Priorities
+        public IActionResult Priorities()
+        {
+            return View();
+        }
+
         // 3. DELETE TASK
         [HttpPost]
         [ValidateAntiForgeryToken]
