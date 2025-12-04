@@ -1,0 +1,36 @@
+﻿@model TaskManager.Modules.Tasks.Models.TaskAssignment
+@{
+    ViewData["Title"] = "Votează Dificultatea";
+}
+
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            Pasul 1: Evaluare Inițială
+        </div>
+        <div class="card-body text-center">
+            <h4>@Model.Task.Title</h4>
+            <p class="text-muted">Înainte de a începe, cât de greu crezi că va fi acest task?</p>
+
+            <form asp-action="SubmitVote" method="post">
+                <input type="hidden" name="assignmentId" value="@Model.TaskAssignmentId" />
+
+                <div class="btn-group w-100 my-4" role="group">
+                    <input type="radio" class="btn-check" name="difficultyScore" id="d1" value="1" required>
+                    <label class="btn btn-outline-success" for="d1">Ușor (1)</label>
+
+                    <input type="radio" class="btn-check" name="difficultyScore" id="d2" value="2">
+                    <label class="btn btn-outline-success" for="d2">Mediu (2)</label>
+
+                    <input type="radio" class="btn-check" name="difficultyScore" id="d3" value="3">
+                    <label class="btn btn-outline-warning" for="d3">Greu (3)</label>
+
+                    <input type="radio" class="btn-check" name="difficultyScore" id="d4" value="4">
+                    <label class="btn btn-outline-danger" for="d4">Foarte Greu (4)</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Confirmă și Începe Lucrul</button>
+            </form>
+        </div>
+    </div>
+</div>

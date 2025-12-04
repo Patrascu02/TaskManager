@@ -7,7 +7,7 @@ using TaskManager.Modules.Users.Models;
 
 namespace TaskManager.Modules.Users.Controllers
 {
-    // 1. MODIFICARE: Permitem accesul și Managerilor în acest controller
+    
     [Authorize(Roles = "Admin,Manager")]
     public class UsersController : Controller
     {
@@ -40,7 +40,7 @@ namespace TaskManager.Modules.Users.Controllers
         // ====================================
         // INDEX: Doar Adminul vede TOATĂ lista și poate căuta
         // ====================================
-        [Authorize(Roles = "Admin")] // <--- 2. IMPORTANT: Restricționăm specific
+        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> Index(string search, string sort = "username", int page = 1, int pageSize = 10)
         {
             var q = _userManager.Users.AsQueryable();
@@ -91,7 +91,7 @@ namespace TaskManager.Modules.Users.Controllers
         // ====================================
         // CREATE: Doar Admin
         // ====================================
-        [Authorize(Roles = "Admin")] // <--- Restricție
+        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> Create()
         {
             var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
@@ -104,7 +104,7 @@ namespace TaskManager.Modules.Users.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] // <--- Restricție
+        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> Create(UserCreateViewModel model)
         {
             if (!ModelState.IsValid)
@@ -144,7 +144,7 @@ namespace TaskManager.Modules.Users.Controllers
         // ====================================
         // EDIT: Doar Admin
         // ====================================
-        [Authorize(Roles = "Admin")] // <--- Restricție
+        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) return NotFound();
@@ -169,7 +169,7 @@ namespace TaskManager.Modules.Users.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] // <--- Restricție
+        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> Edit(UserEditViewModel model)
         {
             if (!ModelState.IsValid)
@@ -213,7 +213,7 @@ namespace TaskManager.Modules.Users.Controllers
         // ====================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] // <--- Restricție
+        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null) return BadRequest();
@@ -237,7 +237,7 @@ namespace TaskManager.Modules.Users.Controllers
         // ====================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] // <--- Restricție
+        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> ResetPassword(string id)
         {
             if (id == null) return BadRequest();

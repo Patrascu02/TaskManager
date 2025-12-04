@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore; // Necesar pentru CountAsync
 using TaskManager.Data; // Necesar pentru ApplicationDbContext
 using TaskManager.Modules.Users.Models;
 using TaskManager.Modules.Security.Models;
+using TaskManager.Modules.Tasks.Models;
 
 namespace TaskManager.Modules.Home.Controllers
 {
@@ -12,11 +13,11 @@ namespace TaskManager.Modules.Home.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ApplicationDbContext _db; // Adăugat pentru acces la baza de date
+        private readonly ApplicationDbContext _db; // Adaugat pentru acces la baza de date
 
         public HomeController(ILogger<HomeController> logger,
                               UserManager<ApplicationUser> userManager,
-                              ApplicationDbContext db) // Injectăm DB
+                              ApplicationDbContext db) // Injectam DB
         {
             _logger = logger;
             _userManager = userManager;
@@ -35,7 +36,7 @@ namespace TaskManager.Modules.Home.Controllers
                 return RedirectToAction("AdminDashboard");
 
             if (await _userManager.IsInRoleAsync(user, "Manager"))
-                return RedirectToAction("ManagerDashboard");
+                return RedirectToAction("Leaderboard", "Gamification");
 
             return RedirectToAction("UserDashboard");
         }
@@ -44,7 +45,6 @@ namespace TaskManager.Modules.Home.Controllers
 
         public async Task<IActionResult> AdminDashboard()
         {
-            // --- LOGICA MUTATĂ DIN SECURITY CONTROLLER ---
 
             // 1. Colectăm statistici reale
             var totalUsers = await _userManager.Users.CountAsync();
@@ -62,14 +62,31 @@ namespace TaskManager.Modules.Home.Controllers
             return View();
         }
 
+
+
         public IActionResult ManagerDashboard()
         {
             return View();
         }
 
-        public IActionResult UserDashboard()
+        public async Task<IActionResult> UserDashboard()
         {
-            return View();
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Index");
+
+            // 1. Luăm task-urile asignate acestui user care NU sunt finalizate încă
+            // Status 0 = Assigned, 1 = In Progress, 2 = Completed (Presupunem 2 e finalizat)
+            var myTasks = await _db.TaskAssignments
+                                   .Include(ta => ta.Task) // Încărcăm detaliile task-ului
+                                   .Where(ta => ta.UserId == user.Id && ta.Status != 2)
+                                   .OrderBy(ta => ta.Task.DueDate)
+                                   .ToListAsync();
+
+            // 2. Putem trimite și date despre XP
+            ViewBag.CurrentXp = user.TotalXp;
+            ViewBag.CurrentLevel = user.LevelId ?? 1;
+
+            return View(myTasks);
         }
 
         public IActionResult Privacy()

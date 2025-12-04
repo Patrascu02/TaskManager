@@ -1,40 +1,78 @@
-﻿@* /Modules/Home/Views/UserDashboard.cshtml *@
-<div class="dashboard-wrapper container mt-4">
-    <h2 class="mb-4">Welcome, @User.Identity.Name!</h2>
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card shadow-sm hover-effect">
-                <div class="card-body text-center">
-                    <h5 class="card-title">My Tasks</h5>
-                    <p class="card-text">View and complete your tasks assigned by managers.</p>
-                    <a asp-controller="Tasks" asp-action="Index" class="btn btn-primary">Go</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm hover-effect">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Vote Difficulty</h5>
-                    <p class="card-text">Vote the difficulty of tasks received and provide feedback.</p>
-                    <a asp-controller="Tasks" asp-action="DifficultyVote" class="btn btn-primary">Vote</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm hover-effect">
-                <div class="card-body text-center">
-                    <h5 class="card-title">XP Progress</h5>
-                    <p class="card-text">Check your accumulated points and level progress.</p>
-                    <a asp-controller="Gamification" asp-action="MyProgress" class="btn btn-primary">View</a>
+﻿@model IEnumerable<TaskManager.Modules.Tasks.Models.TaskAssignment>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="mb-0">Salut, @User.Identity.Name!</h2>
+                        <p class="mb-0">Ai <strong>@Model.Count()</strong> sarcini active.</p>
+                    </div>
+                    <div class="text-end">
+                        <h3 class="mb-0">Level @ViewBag.CurrentLevel</h3>
+                        <small>XP: @ViewBag.CurrentXp</small>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<style>
-    .hover-effect:hover {
-        transform: translateY(-5px);
-        transition: 0.3s;
+    <h3 class="mb-3">Sarcinile Mele</h3>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Nu ai nicio sarcină activă momentan. Relaxează-te! ☕</div>
     }
-</style>
+    else
+    {
+        <div class="row">
+            @foreach (var assignment in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm border-start border-5 @(assignment.Task.Priority == 3 ? "border-danger" : assignment.Task.Priority == 2 ? "border-warning" : "border-success")">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <span class="badge bg-light text-dark mb-2">Deadline: @assignment.Task.DueDate?.ToString("dd MMM")</span>
+                                @if (assignment.Status == 0)
+                                {
+                                    <span class="badge bg-secondary">Nou</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-info text-dark">În Lucru</span>
+                                }
+                            </div>
+
+                            <h5 class="card-title fw-bold">@assignment.Task.Title</h5>
+                            <p class="card-text text-muted small">@assignment.Task.Description</p>
+
+                            <hr />
+
+                            <div class="d-grid gap-2">
+                                @if (assignment.Status == 0)
+                                {
+                                    <a asp-controller="Tasks" asp-action="VoteDifficulty" asp-route-id="@assignment.TaskAssignmentId" class="btn btn-outline-primary">
+                                        <i class="bi bi-bar-chart-fill"></i> Votează Dificultatea
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Tasks" asp-action="CompleteTask" asp-route-id="@assignment.TaskAssignmentId" class="btn btn-success">
+                                        <i class="bi bi-check-circle-fill"></i> Finalizează & Feedback
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

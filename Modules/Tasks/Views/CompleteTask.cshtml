@@ -1,0 +1,37 @@
+﻿@model TaskManager.Modules.Tasks.Models.TaskAssignment
+@{
+    ViewData["Title"] = "Finalizare Task";
+}
+
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            Pasul 2: Finalizare & Feedback
+        </div>
+        <div class="card-body">
+            <h4>@Model.Task.Title</h4>
+            <p class="text-muted">Felicitări pentru finalizare! Cum a fost în realitate?</p>
+
+            <form asp-action="SubmitCompletion" method="post">
+                <input type="hidden" name="assignmentId" value="@Model.TaskAssignmentId" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Dificultate Reală (Post-Task):</label>
+                    <select name="finalDifficulty" class="form-select">
+                        <option value="1">1 - A fost mult mai ușor decât credeam</option>
+                        <option value="2">2 - A fost rezonabil</option>
+                        <option value="3">3 - A fost dificil</option>
+                        <option value="4">4 - A fost extrem de greu</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Feedback (Comparativ cu votul inițial):</label>
+                    <textarea name="feedbackText" class="form-control" rows="3" placeholder="Ex: Am crezut că e ușor, dar baza de date a complicat lucrurile..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 btn-lg">Marchează ca Finalizat (+XP)</button>
+            </form>
+        </div>
+    </div>
+</div>

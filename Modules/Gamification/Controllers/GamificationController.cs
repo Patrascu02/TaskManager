@@ -19,18 +19,36 @@ namespace TaskManager.Modules.Gamification.Controllers
             _userManager = userManager;
         }
 
+        // ==========================================
+        // LEADERBOARD (Top utilizatori)
+        // ==========================================
         public async Task<IActionResult> Leaderboard()
         {
-            // 1. Luăm doar utilizatorii cu rolul de "User" (Angajații)
             var employees = await _userManager.GetUsersInRoleAsync("User");
-
-            // 2. Îi sortăm în memorie (Memory Sort) după XP și luăm Top 10
             var leaderboard = employees
-                                .OrderByDescending(u => u.TotalXp ?? 0) // Tratăm null ca 0
+                                .OrderByDescending(u => u.TotalXp ?? 0)
                                 .Take(10)
                                 .ToList();
-
             return View(leaderboard);
+        }
+
+        // ==========================================
+        // MY PROGRESS (Profilul de Gamification)
+        // ==========================================
+        public async Task<IActionResult> MyProgress()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Index", "Home");
+
+            // Încărcăm utilizatorul cu tot cu istoricul de XP și Insigne
+            // Folosim _db.Users pentru a putea da Include la relații
+            var userData = await _db.Users
+                                    .Include(u => u.XpHistories)
+                                    .Include(u => u.Badges)
+                                        .ThenInclude(ub => ub.Badge)
+                                    .FirstOrDefaultAsync(u => u.Id == user.Id);
+
+            return View(userData);
         }
     }
 }
