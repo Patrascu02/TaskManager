@@ -174,9 +174,14 @@ namespace TaskManager.Modules.Tasks.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> SubmitCompletion(int assignmentId, string feedbackText, int finalDifficulty)
         {
-            var assignment = await _db.TaskAssignments.FindAsync(assignmentId);
+            // 1. Încărcăm assignment-ul curent și părintele Task
+            var assignment = await _db.TaskAssignments
+                                      .Include(a => a.Task)
+                                      .FirstOrDefaultAsync(a => a.TaskAssignmentId == assignmentId);
+
             if (assignment == null) return NotFound();
 
+            // --- LOGICA DE XP ȘI FEEDBACK (Rămâne la fel) ---
             var initialVotes = await _db.DifficultyVotes
                                         .Where(v => v.TaskAssignmentId == assignmentId)
                                         .Select(v => (int)v.VoteValue)
@@ -198,21 +203,50 @@ namespace TaskManager.Modules.Tasks.Controllers
                 XpFinal = xpFinal,
                 CreatedAt = DateTime.Now
             };
-
             _db.CompletionFeedbacks.Add(feedback);
 
+            // --- ACTUALIZARE STATUS (MODIFICAT AICI) ---
+
+            // 1. Marcam assignment-ul ACESTUI user ca terminat
             assignment.Status = 2; // Completed
             assignment.CompletedAt = DateTime.Now;
 
+            // 2. VERIFICĂM DACĂ MAI SUNT ALȚII CARE LUCREAZĂ
+            // Căutăm alte assignment-uri pe același TaskId care NU sunt completate (Status != 2)
+            bool areOthersWorking = await _db.TaskAssignments
+                .AnyAsync(ta => ta.TaskId == assignment.TaskId && ta.Status != 2);
+
+            // 3. Dacă NU mai lucrează nimeni (toți au terminat), abia atunci închidem task-ul mare
+            if (!areOthersWorking && assignment.Task != null)
+            {
+                assignment.Task.IsActive = false;
+            }
+
+            // --- ACORDARE XP ---
             var user = await _userManager.FindByIdAsync(assignment.UserId);
             if (user != null)
             {
                 user.TotalXp = (user.TotalXp ?? 0) + xpFinal;
+
+                // Adăugare Istoric
+                var historyEntry = new UserXpHistory
+                {
+                    UserId = user.Id,
+                    ChangeAmount = xpFinal,
+                    Reason = $"Finalizare: {assignment.Task?.Title}",
+                    CreatedAt = DateTime.Now
+                };
+                _db.UserXpHistories.Add(historyEntry);
+
+                // Level Up Check
                 int newLevel = (user.TotalXp.Value / 100) + 1;
+                // Verificăm dacă nivelul calculat există în baza de date (Max 10)
+                if (newLevel > 10) newLevel = 10;
+
                 if (newLevel > (user.LevelId ?? 1))
                 {
                     user.LevelId = newLevel;
-                    TempData["Info"] = $" Level Up! Ai ajuns la nivelul {newLevel}!";
+                    TempData["Info"] = $"🎉 Level Up! Ai ajuns la nivelul {newLevel}!";
                 }
             }
 

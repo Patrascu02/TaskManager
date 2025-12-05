@@ -186,6 +186,20 @@ namespace TaskManager.Data
                       .HasForeignKey(l => l.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
+
+            // Generăm automat 10 niveluri
+            var levels = new List<Level>();
+            for (int i = 1; i <= 100; i++)
+            {
+                levels.Add(new Level
+                {
+                    LevelId = i,
+                    LevelName = $"Level {i}",
+                    MinXp = (i - 1) * 100,
+                    MaxXp = (i * 100) - 1
+                });
+            }
+            modelBuilder.Entity<Level>().HasData(levels);
         }
     }
 }
