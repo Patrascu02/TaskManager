@@ -43,17 +43,17 @@ Aplicație de management al sarcinilor dezvoltată în **ASP.NET Core MVC (.NET 
 
 ---
 
-### 🏆 Sprint 3: Sistem de Recompense (Obiectiv 3)
-**Focus:** XP, Nivele, Insigne.
+### 🏆 Sprint 3: Sistem de Recompense & Gamification (Obiectiv 3)
+**Focus:** XP Dinamic, Nivele, Insigne.
 
 #### a) Acordarea automată de XP
 - [x] **Model XP:** Proprietăți `TotalXp` și istoric `UserXpHistory` implementate.
-- [ ] **Logica Calcul:** Implementarea serviciului care adaugă XP la acțiunea "Complete Task".
+- [x] **Logica Calcul:** Implementată în `TasksController`. Se acordă **50 XP de bază**, ajustați dinamic în funcție de feedback-ul utilizatorului la finalizare (Factor de corecție +/- 10% per punct de diferență față de estimarea inițială).
+- [x] **Actualizare DB:** XP-ul se salvează tranzacțional odată cu închiderea task-ului.
 
 #### b) Sistem de Gamificare
-- [x] **Nivele:** Tabela `Levels` cu intervale Min/Max XP.
-- [x] **Insigne:** Structura de date pentru `Badge` și `UserBadge`.
-- [ ] **Logica Level-Up:** Serviciu automat pentru verificare level-up și acordare insigne.
+- [x] **Level Up:** Calcul automat la fiecare finalizare de task (`TotalXp / 100 + 1`). Utilizatorul primește notificare "🎉 Level Up!" prin TempData.
+- [x] **Insigne:** Structura de date pentru `Badge` și `UserBadge` este pregătită.
 
 ---
 
