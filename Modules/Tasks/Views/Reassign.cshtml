@@ -1,0 +1,16 @@
+﻿@model TaskManager.Modules.Tasks.Models.TaskAssignment
+
+<h2>Reasignare Task: @Model.Task.Title</h2>
+<p>Utilizator curent: <strong>@Model.User.FullName</strong></p>
+
+<form asp-action="Reassign" method="post">
+    <input type="hidden" name="id" value="@Model.TaskAssignmentId" />
+
+    <div class="mb-3">
+        <label class="form-label">Alege noul responsabil:</label>
+        <select name="newUserId" class="form-select" asp-items="ViewBag.Users"></select>
+    </div>
+
+    <button type="submit" class="btn btn-warning">Reasignează Task</button>
+    <a asp-action="Index" class="btn btn-secondary">Anulează</a>
+</form>

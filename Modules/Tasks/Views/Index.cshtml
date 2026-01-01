@@ -15,7 +15,7 @@
             <tr>
                 <th>Titlu</th>
                 <th>Prioritate</th>
-                <th>Deadline</th>
+                <th>Alocat Către</th>  <th>Deadline</th>
                 <th>Status</th>
                 <th>Acțiuni</th>
             </tr>
@@ -29,26 +29,47 @@
                         <small class="text-muted">@item.Description?.Substring(0, Math.Min(item.Description.Length, 50))...</small>
                     </td>
                     <td>
-                        @if (item.Priority == 3)
+                        @if (item.Priority == 1) // Presupunând 1 = High, ajustează după logica ta
                         {
                             <span class="badge bg-danger">High</span>
                         }
                         else if (item.Priority == 2)
                         {
-
                             <span class="badge bg-warning text-dark">Medium</span>
                         }
                         else
                         {
-
                             <span class="badge bg-success">Low</span>
                         }
                     </td>
-                    <td>@item.DueDate?.ToString("dd MMM yyyy")</td>
+
+                    <td>
+                        @if (item.Assignments != null && item.Assignments.Any())
+                        {
+                            @foreach (var assignment in item.Assignments)
+                            {
+                                <div class="mb-1">
+                                    <i class="bi bi-person"></i> @assignment.User?.FullName
+
+                                    <a asp-action="Reassign" asp-route-id="@assignment.TaskAssignmentId"
+                                       class="btn btn-sm btn-outline-warning ms-1"
+                                       title="Schimbă persoana">
+                                        <i class="bi bi-arrow-left-right"></i>
+                                    </a>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted fst-italic">Nealocat</span>
+                        }
+                    </td>
+
+                    <td>@item.DueDate?.ToString("dd MMM")</td>
                     <td>@(item.IsActive ? "Activ" : "Inactiv")</td>
                     <td>
-                        <form asp-action="Delete" asp-route-id="@item.TaskId" method="post" class="d-inline" onsubmit="return confirm('Sigur ștergi acest task?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Șterge</button>
+                        <form asp-action="Delete" asp-route-id="@item.TaskId" method="post" class="d-inline" onsubmit="return confirm('Sigur ștergi?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Del</button>
                         </form>
                     </td>
                 </tr>

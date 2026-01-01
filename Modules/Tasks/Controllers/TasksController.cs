@@ -26,10 +26,12 @@ namespace TaskManager.Modules.Tasks.Controllers
         // ZONA MANAGER & ADMIN (Index, Create, Delete, Priorities)
         // =========================================================
 
-        [Authorize(Roles = "Manager,Admin")] 
+        [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Index()
         {
             var tasks = await _db.UserTasks
+                                 .Include(t => t.Assignments) // <--- CRUCIAL: Încarcă asignările
+                                    .ThenInclude(ta => ta.User)   // <--- CRUCIAL: Încarcă numele utilizatorului
                                  .OrderByDescending(t => t.DueDate)
                                  .ToListAsync();
             return View(tasks);
@@ -109,6 +111,48 @@ namespace TaskManager.Modules.Tasks.Controllers
         public IActionResult Priorities()
         {
             return View();
+        }
+
+
+        // GET: Afișează formularul de reasignare
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> Reassign(int id)
+        {
+            // Căutăm asignarea existentă
+            var assignment = await _db.TaskAssignments
+                                      .Include(t => t.Task)
+                                      .Include(u => u.User)
+                                      .FirstOrDefaultAsync(a => a.TaskAssignmentId == id);
+
+            if (assignment == null) return NotFound();
+
+            // Luăm lista de useri eligibili (rol User)
+            var users = await _userManager.GetUsersInRoleAsync("User");
+
+            // Trimitem datele către View
+            ViewBag.Users = new SelectList(users, "Id", "FullName", assignment.UserId);
+            return View(assignment);
+        }
+
+        // POST: Salvează noul user
+        [HttpPost]
+        [Authorize(Roles = "Manager,Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reassign(int id, string newUserId)
+        {
+            var assignment = await _db.TaskAssignments.FindAsync(id);
+            if (assignment == null) return NotFound();
+
+            // Logica de reasignare
+            assignment.UserId = newUserId;
+            assignment.Status = 0; // Resetăm statusul la "Alocat" (sau îl lăsăm 1 dacă vrei să continue direct)
+            assignment.AssignedAt = DateTime.Now; // Resetăm data alocării
+
+            _db.Update(assignment);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Task-ul a fost reasignat cu succes!";
+            return RedirectToAction(nameof(Index)); // Înapoi la lista de task-uri
         }
 
         // =========================================================

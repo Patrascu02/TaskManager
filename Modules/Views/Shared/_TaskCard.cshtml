@@ -1,10 +1,28 @@
-﻿@model TaskManager.Modules.Tasks.Models.UserTask
+﻿@{
+    // Verificăm întâi dacă există un DueDate
+    string badgeClass = "bg-secondary";
+    string timeText = "Fără termen";
 
-<div class="card mb-2">
-    <div class="card-body">
-        <h5 class="card-title">@Model.Title</h5>
-        <p class="card-text">@Model.Description</p>
-        <p class="card-text"><small class="text-muted">Priority: @Model.Priority</small></p>
-        <a asp-controller="Tasks" asp-action="Details" asp-route-id="@Model.TaskId" class="btn btn-primary btn-sm">View</a>
-    </div>
-</div>
+    if (Model.DueDate.HasValue)
+    {
+        // Folosim .Value pentru a obține data reală
+        var timeRemaining = Model.DueDate.Value - DateTime.Now;
+
+        timeText = $"{timeRemaining.Days} zile, {timeRemaining.Hours} ore";
+
+        if (timeRemaining.TotalHours < 0)
+        {
+            badgeClass = "bg-danger"; // Expirat
+            timeText = "Termen depășit!";
+        }
+        else if (timeRemaining.TotalDays < 1)
+        {
+            badgeClass = "bg-warning text-dark"; // Urgent
+            timeText = "Urgent: " + timeText;
+        }
+        else
+        {
+            badgeClass = "bg-success"; // Ok
+        }
+    }
+}
