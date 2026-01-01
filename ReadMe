@@ -1,127 +1,64 @@
-# 🚀 TaskManager - Gamified Productivity Platform
+# TaskManager - Gamified Task Management System
 
-**TaskManager** este o aplicație web inovatoare destinată îmbunătățirii organizării și productivității în cadrul echipelor. Mai mult decât un simplu *to-do list*, platforma integrează elemente de **gamification** (puncte, niveluri, clasamente) pentru a transforma activitatea zilnică într-o experiență motivantă și competitivă într-un mod pozitiv.
-
----
-
-## 📖 Despre Aplicație
-
-**Misiunea TaskManager** este de a oferi o metodă modernă, clară și motivantă de gestionare a activităților într-un cadru organizațional sau educațional. Prin îmbinarea mecanismelor de joc cu managementul sarcinilor, contribuim la creșterea motivației individuale și la consolidarea spiritului de echipă.
-
-### 🎯 Scop și Obiective
-* **Creșterea Productivității:** Monitorizarea eficientă a activităților zilnice.
-* **Gamification:** Stimularea implicării prin recompensarea progresului (XP, Niveluri).
-* **Transparență:** Vizibilitate asupra progresului individual și al echipei.
-* **Securitate:** Mediu securizat pentru datele organizației.
+Aplicație de management al sarcinilor dezvoltată în **ASP.NET Core MVC (.NET 8)**, care integrează elemente de gamification (XP, Nivele, Insigne) pentru a motiva utilizatorii. Proiectul utilizează o arhitectură modulară și Entity Framework Core cu SQL Server.
 
 ---
 
-## 👥 Roluri și Funcționalități
+## 📅 Status Implementare (Roadmap)
 
-Aplicația este structurată pe trei roluri principale, fiecare având responsabilități specifice:
+### 🚀 Sprint 1: Mediu Organizat & Arhitectură (Obiectiv 1)
+**Focus:** Structura MVC, Baza de date, Configurare inițială.
 
-### 1. 👤 Utilizator (Angajat/Student)
-Rolul principal în execuția sarcinilor.
-* **Vizualizare Sarcini:** Primește sarcini alocate de Manager.
-* **Interacțiune:** Poate vota dificultatea unui task la primire și oferă feedback la finalizare.
-* **Progres:** Acumulează puncte (XP) și avansează în nivel pe baza activității.
+#### a) Cod organizat conform arhitecturii MVC
+- [x] **Inițializarea proiectului:** Configurat pe .NET Core 8.
+- [x] **Structura Modulară:** Organizare avansată pe module (`Modules/Users`, `Modules/Tasks`, `Modules/Gamification`) configurată în `Program.cs`.
+- [x] **Modele Inițiale:** `ApplicationUser`, `UserTask`, `IdentityRole`.
+- [x] **Layout & UI:** Implementat cu Bootstrap (`_Layout.cshtml`, Navbars condiționale pe roluri).
 
-### 2. 👔 Manager
-Responsabil de coordonarea echipei.
-* **Management Sarcini:** Creează, editează, alocă și șterge sarcini.
-* **Monitorizare:** Urmărește progresul membrilor echipei prin rapoarte.
-* **Gamification:** Gestionează clasamentele și validează performanța.
+#### b) Bază de date extensibilă
+- [x] **SQL Server & EF Core:** `ApplicationDbContext` configurat.
+- [x] **Tabele Gamification:** `Levels`, `Badges`, `UserBadges`, `UserXpHistories`.
+- [x] **Relații:** Configurate relațiile 1-n și n-n (Users <-> Tasks, Users <-> Badges).
 
-### 3. 🛡️ Administrator
-Responsabil de configurarea și supravegherea sistemului.
-* **User Management:** Gestionează conturile utilizatorilor și managerilor.
-* **Configurare:** Definește categoriile de task-uri și nivelurile de prioritate.
-* **Supervizare:** Stabilește regulile generale de funcționare ale aplicației.
+#### c) Sistem documentat
+- [x] **Convenții:** Naming conventions C# standard și structură de foldere clară.
 
 ---
 
-## 🛠️ Arhitectură și Tehnologii
+### 🛡️ Sprint 2: Mediu Secure & Securitate (Obiectiv 2)
+**Focus:** Roluri, Criptare, Izolarea datelor.
 
-Proiectul este construit pe o arhitectură solidă, modulară, urmând principiile **MVC (Model-View-Controller)**.
+#### a) Acces pe bază de rol
+- [x] **Sistem de Roluri:** Rolurile `Admin`, `Manager`, `User` sunt create automat la pornire (`SeedDataAsync`).
+- [x] **Permisiuni:** `[Authorize(Roles = "Admin")]` implementat pe `UsersController`.
+- [x] **Panouri Dedicate:** Redirectare automată către `AdminDashboard`, `ManagerDashboard` sau `UserDashboard` la login.
 
-* **Framework:** ASP.NET Core MVC.
-* **Bază de date:** SQL Server + Entity Framework Core.
-* **Arhitectură:** Modulară (Foldere separate pentru Users, Tasks, Gamification, Security).
-* **Frontend:** Razor Views, Bootstrap 5, jQuery.
+#### b) Securitate Date
+- [x] **Criptare Parole:** Utilizare `ASP.NET Core Identity` (PBKDF2 hashing).
+- [x] **Protecție CSRF:** Validare Anti-Forgery Token pe formulare.
 
----
-
-## 📅 Planificarea Dezvoltării (Specificații de Proiectare)
-
-Această secțiune detaliază specificațiile funcționale și tehnice, descompuse în obiective de dezvoltare (Sprints).
-
-### 1. Specificații de proiectare pentru arhitectură & organizarea codului
-> *"Ca dezvoltator, vreau ca aplicația să fie structurată pe arhitectura MVC, astfel încât codul să fie ușor de întreținut, extins și testat."*
-
-**Descompunere:**
-* [x] Crearea proiectului ASP.NET MVC cu structura standard (Models/Views/Controllers).
-* [x] Organizarea folderelor pe module (Users, Tasks, Gamification, Security).
-* [x] Introducerea unui layout general și a componentelor UI reutilizabile.
-* [ ] Crearea serviciilor (Services) pentru separarea logicii de controllere.
-
-### 2. Specificații de proiectare pentru securitate
-> *"Ca administrator, vreau ca accesul utilizatorilor la funcționalități să fie controlat pe roluri, pentru a preveni accesul neautorizat."*
-
-**Descompunere:**
-* [x] Implementarea modelului de roluri (Admin, Manager, User).
-* [x] Atribuirea rolurilor în baza de date.
-* [ ] Protejarea endpoint-urilor cu Authorize Attributes.
-* [ ] Separarea dashboard-urilor în funcție de rol.
-
-### 3. Specificații de proiectare pentru sistemul de recompense
-> *"Ca utilizator, vreau să primesc XP la finalizarea unui task, pentru a fi motivat să-l finalizez."*
-
-**Descompunere:**
-* [ ] Model XP cu valori de bază + calcul dinamic.
-* [ ] Logica de acordare XP în momentul finalizării taskului.
-* [ ] Actualizarea nivelului în funcție de XP acumulat.
-
-### 4. Specificații de proiectare pentru transparență și vizibilitate
-> *"Ca utilizator, vreau să văd nivelul meu și progresul către următorul nivel."*
-
-**Descompunere:**
-* [ ] Afișarea XP curent și XP necesar pentru nivel următor.
-* [ ] Bară grafică de progres.
-* [ ] Component UI integrat în dashboard.
-
-### 5. Specificații de proiectare pentru feedback
-> *"Ca utilizator, vreau să văd o bară de progres pentru fiecare task, pentru a mă orienta vizual."*
-
-**Descompunere:**
-* [ ] Progress bar per task.
-* [ ] Calcul dinamic (To Do / In Progress / Done).
-* [ ] Integrare în dashboard.
-
-### 6. Specificații de proiectare pentru vizualizarea datelor
-> *"Ca utilizator, vreau o interfață modernă și responsive, astfel încât aplicația să fie ușor de folosit pe orice dispozitiv."*
-
-**Descompunere:**
-* [ ] Redesign complet UI în stil modern.
-* [ ] Compatibilitate mobil/tabletă/desktop.
-* [ ] Testare pe diferite rezoluții.
-* [ ] Optimizare performanță UI.
+#### c) Izolarea Datelor
+- [ ] **Acces Exclusiv:** Filtrarea task-urilor doar pentru utilizatorul logat (necesită implementare în `TasksController.Index`).
+- [ ] **Protecție Endpoint-uri:** Adăugarea atributului `[Authorize]` pe `TasksController` și `GamificationController`.
 
 ---
 
-## 🚀 Instalare și Rulare
+### 🏆 Sprint 3: Sistem de Recompense & Gamification (Obiectiv 3)
+**Focus:** XP Dinamic, Nivele, Insigne.
 
-1.  **Clonează repository-ul:**
-    ```bash
-    git clone [https://github.com/user/TaskManager.git](https://github.com/user/TaskManager.git)
-    ```
-2.  **Configurează Baza de Date:**
-    * Actualizează `appsettings.json` cu Connection String-ul tău.
-    * Rulează migrațiile:
-    ```powershell
-    Update-Database
-    ```
-3.  **Rulează aplicația:**
-    * Deschide soluția în Visual Studio.
-    * Apasă `F5` sau `Run`.
+#### a) Acordarea automată de XP
+- [x] **Model XP:** Proprietăți `TotalXp` și istoric `UserXpHistory` implementate.
+- [x] **Logica Calcul:** Implementată în `TasksController`. Se acordă **50 XP de bază**, ajustați dinamic în funcție de feedback-ul utilizatorului la finalizare (Factor de corecție +/- 10% per punct de diferență față de estimarea inițială).
+- [x] **Actualizare DB:** XP-ul se salvează tranzacțional odată cu închiderea task-ului.
+
+#### b) Sistem de Gamificare
+- [x] **Level Up:** Calcul automat la fiecare finalizare de task (`TotalXp / 100 + 1`). Utilizatorul primește notificare "🎉 Level Up!" prin TempData.
+- [x] **Insigne:** Structura de date pentru `Badge` și `UserBadge` este pregătită.
 
 ---
+
+## ⚙️ Instrucțiuni de Instalare și Rulare
+
+1. **Clonare Repository:**
+   ```bash
+   git clone <repo_url>
