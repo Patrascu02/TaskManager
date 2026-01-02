@@ -34,6 +34,23 @@
         <div class="row">
             @foreach (var assignment in Model)
             {
+
+
+                var timeRemaining = assignment.Task.DueDate.HasValue
+                ? assignment.Task.DueDate.Value - DateTime.Now
+                : TimeSpan.Zero;
+
+                string timerClass = "bg-success";
+                string timerText = assignment.Task.DueDate.HasValue
+                ? $"{timeRemaining.Days}z, {timeRemaining.Hours}h"
+                : "Fără termen";
+
+                if (assignment.Task.DueDate.HasValue)
+                {
+                    if (timeRemaining.TotalHours < 0) { timerClass = "bg-danger"; timerText = "Expirat"; }
+                    else if (timeRemaining.TotalDays < 1) { timerClass = "bg-warning text-dark"; timerText = "Urgent: " + timerText; }
+                }
+
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100 shadow-sm border-start border-5 @(assignment.Task.Priority == 3 ? "border-danger" : assignment.Task.Priority == 2 ? "border-warning" : "border-success")">
                         <div class="card-body">

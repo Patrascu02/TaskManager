@@ -6,7 +6,7 @@
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2> Manage Tasks</h2>
+        <h2><i class="bi bi-list-task"></i> Manage Tasks</h2>
         <a asp-action="Assign" class="btn btn-success"><i class="bi bi-plus-lg"></i> Alocă Task Nou</a>
     </div>
 
@@ -15,21 +15,49 @@
             <tr>
                 <th>Titlu</th>
                 <th>Prioritate</th>
-                <th>Alocat Către</th>  <th>Deadline</th>
-                <th>Status</th>
+                <th>Alocat Către</th>
+                <th>Deadline & Status Timp</th>
+                <th>Status Task</th>
                 <th>Acțiuni</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
+                // --- LOGICĂ CALCUL TIMER ---
+                string timerClass = "bg-secondary";
+                string timeText = "Fără termen";
+
+                if (item.DueDate.HasValue)
+                {
+                    var timeRemaining = item.DueDate.Value - DateTime.Now;
+
+                    if (timeRemaining.TotalHours < 0)
+                    {
+                        timerClass = "bg-danger";
+                        timeText = "Termen depășit!";
+                    }
+                    else if (timeRemaining.TotalDays < 1)
+                    {
+                        timerClass = "bg-warning text-dark";
+                        timeText = $"Urgent: {timeRemaining.Hours}h {timeRemaining.Minutes}m";
+                    }
+                    else
+                    {
+                        timerClass = "bg-success";
+                        timeText = $"{timeRemaining.Days}z {timeRemaining.Hours}h rămase";
+                    }
+                }
+
                 <tr>
                     <td>
                         <strong>@item.Title</strong><br />
-                        <small class="text-muted">@item.Description?.Substring(0, Math.Min(item.Description.Length, 50))...</small>
+                        <small class="text-muted">
+                            @(item.Description?.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)
+                        </small>
                     </td>
                     <td>
-                        @if (item.Priority == 1) // Presupunând 1 = High, ajustează după logica ta
+                        @if (item.Priority == 1)
                         {
                             <span class="badge bg-danger">High</span>
                         }
@@ -48,13 +76,13 @@
                         {
                             @foreach (var assignment in item.Assignments)
                             {
-                                <div class="mb-1">
-                                    <i class="bi bi-person"></i> @assignment.User?.FullName
+                                <div class="mb-1 d-flex align-items-center">
+                                    <span class="me-2"><i class="bi bi-person-circle"></i> @assignment.User?.FullName</span>
 
                                     <a asp-action="Reassign" asp-route-id="@assignment.TaskAssignmentId"
-                                       class="btn btn-sm btn-outline-warning ms-1"
-                                       title="Schimbă persoana">
-                                        <i class="bi bi-arrow-left-right"></i>
+                                       class="btn btn-sm btn-outline-warning"
+                                       title="Reasignează acest task">
+                                        <i class="bi bi-person-gear"></i>
                                     </a>
                                 </div>
                             }
@@ -65,12 +93,29 @@
                         }
                     </td>
 
-                    <td>@item.DueDate?.ToString("dd MMM")</td>
-                    <td>@(item.IsActive ? "Activ" : "Inactiv")</td>
                     <td>
-                        <form asp-action="Delete" asp-route-id="@item.TaskId" method="post" class="d-inline" onsubmit="return confirm('Sigur ștergi?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Del</button>
-                        </form>
+                        <div class="d-flex flex-column">
+                            <span class="small fw-bold">@(item.DueDate.HasValue? item.DueDate.Value.ToString("dd MMM yyyy") : "N/A")</span>
+                            <span class="badge @timerClass" style="font-size: 0.85em;">
+                                <i class="bi bi-clock"></i> @timeText
+                            </span>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="badge @(item.IsActive ? "bg-primary" : "bg-dark")">
+                            @(item.IsActive ? "Activ" : "Inactiv")
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="btn-group">
+                            <form asp-action="Delete" asp-route-id="@item.TaskId" method="post" onsubmit="return confirm('Sigur ștergi acest task?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Del
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             }
