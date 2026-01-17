@@ -1,127 +1,80 @@
-﻿@using TaskManager.Modules.Home.Models
-@model AdminDashboardViewModel
-
-@{
-    ViewData["Title"] = "Admin Dashboard";
+﻿@{
     Layout = "_Layout";
+    ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container-fluid py-5">
-    <div class="d-flex justify-content-between align-items-center mb-5 fade-in-up">
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1 text-gradient" style="font-size: 2.5rem;">
-                <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
-            </h2>
-            <p class="text-muted fw-medium fs-5">Monitorizare sistem & utilizatori</p>
+            <h2 class="fw-bold"><i class="bi bi-speedometer2 text-danger"></i> Admin Dashboard</h2>
+            <p class="text-muted">Monitorizare în timp real și administrare sistem.</p>
         </div>
-        <div>
-            <a asp-controller="Users" asp-action="Index" class="btn btn-light bg-white text-primary shadow-sm hover-lift">
-                <i class="bi bi-people-fill me-2"></i>Gestionează Useri
-            </a>
-        </div>
+        <span class="badge bg-light text-dark border p-2">
+            <i class="bi bi-clock"></i> Server Time: @ViewBag.ServerTime
+        </span>
     </div>
 
-    <div class="row g-4 mb-5">
-        <div class="col-xl-3 col-md-6 fade-in-up" style="animation-delay: 0.1s">
-            <div class="card stat-card bg-admin-primary h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-uppercase text-white-50 fw-bold mb-2">Utilizatori</h6>
-                            <h2 class="display-4 fw-bold mb-0 text-white">@Model.TotalUsers</h2>
-                        </div>
-                    </div>
-                    <i class="bi bi-people-fill"></i>
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 shadow h-100">
+                <div class="card-header bg-transparent border-0">Server Status</div>
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h1 class="display-4"><i class="bi bi-hdd-rack-fill"></i></h1>
+                    <h5 class="card-title">ONLINE</h5>
                 </div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6 fade-in-up" style="animation-delay: 0.2s">
-            <div class="card stat-card bg-admin-light h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-uppercase text-white-50 fw-bold mb-2">Total Sarcini</h6>
-                            <h2 class="display-4 fw-bold mb-0 text-white">@Model.TotalTasks</h2>
-                        </div>
-                    </div>
-                    <i class="bi bi-list-task"></i>
+        <div class="col-md-4">
+            <div class="card text-dark bg-info bg-opacity-10 border-info mb-3 shadow h-100">
+                <div class="card-header border-info text-info fw-bold">Database</div>
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h1 class="display-4 text-info"><i class="bi bi-database-check"></i></h1>
+                    <h5 class="card-title">Connected</h5>
+                    <small class="text-muted">SQL Server Active</small>
                 </div>
             </div>
         </div>
-
-        <div class="col-xl-3 col-md-6 fade-in-up" style="animation-delay: 0.3s">
-            <div class="card stat-card bg-admin-accent h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="text-uppercase text-white-50 fw-bold mb-2">XP Acordat</h6>
-                            <h2 class="display-4 fw-bold mb-0 text-white">@Model.TotalXpAwarded</h2>
-                        </div>
-                    </div>
-                    <i class="bi bi-trophy-fill"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-3 col-md-6 fade-in-up" style="animation-delay: 0.4s">
-            <div class="card h-100 bg-white border-0 shadow-sm">
-                <div class="card-body p-4 position-relative">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                            <h6 class="text-muted text-uppercase fw-bold small">CPU Load</h6>
-                            <h2 class="display-5 fw-bold mb-0 text-dark">@Model.CpuUsagePercent%</h2>
-                        </div>
-                        <i class="bi bi-cpu fs-1 text-primary opacity-25"></i>
-                    </div>
-                    <div class="progress" style="height: 6px;">
-                        <div class="progress-bar bg-primary" role="progressbar" style="width: @Model.CpuUsagePercent%"></div>
-                    </div>
+        <div class="col-md-4">
+            <div class="card text-dark bg-warning bg-opacity-10 border-warning mb-3 shadow h-100">
+                <div class="card-header border-warning text-warning fw-bold">Security</div>
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h1 class="display-4 text-warning"><i class="bi bi-shield-lock-fill"></i></h1>
+                    <h5 class="card-title">Secured</h5>
+                    <small class="text-muted">RBAC Role System</small>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row fade-in-up" style="animation-delay: 0.5s">
-        <div class="col-12">
-            <div class="card border-0 shadow-lg">
-                <div class="card-body p-5">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-primary text-white rounded-circle p-3 me-3 shadow">
-                            <i class="bi bi-hdd-network-fill fs-3"></i>
-                        </div>
-                        <div>
-                            <h4 class="fw-bold mb-0 text-dark">Stare Server</h4>
-                            <small class="text-muted">Monitorizare resurse live</small>
-                        </div>
-                        <div class="ms-auto">
-                            <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm">ONLINE</span>
-                        </div>
-                    </div>
-
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="p-4 rounded-3 bg-light border border-light">
-                                <h6 class="text-muted mb-3 text-uppercase fw-bold small">Memorie RAM</h6>
-                                <div class="d-flex justify-content-between align-items-end mb-2">
-                                    <h3 class="fw-bold text-dark mb-0">@Model.RamUsageMb MB</h3>
-                                    <span class="text-muted small">/ @Model.RamTotalMb MB</span>
-                                </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-success" role="progressbar" style="width: @Model.RamPercentage%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="p-4 rounded-3 bg-light border border-light">
-                                <h6 class="text-muted mb-3 text-uppercase fw-bold small">Sesiuni Active</h6>
-                                <div class="d-flex align-items-center">
-                                    <h3 class="fw-bold text-dark mb-0 me-3">@Model.ActiveSessions</h3>
-                                    <span class="badge bg-info bg-opacity-10 text-info">Users Online</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <h4 class="mb-3 text-secondary">Statistici Platformă</h4>
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-primary text-uppercase">Total Utilizatori</h6>
+                    <h2 class="display-5 fw-bold text-dark">@ViewBag.TotalUsers</h2>
+                    <a asp-controller="Users" asp-action="Index" class="btn btn-sm btn-outline-primary mt-2">Gestionează Useri</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-success text-uppercase">Total Task-uri</h6>
+                    <h2 class="display-5 fw-bold text-dark">@ViewBag.TotalTasks</h2>
+                    <p class="mb-0 text-muted">Active: <strong>@ViewBag.ActiveTasks</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-secondary shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-secondary text-uppercase mb-3">Environment Info</h6>
+                    <ul class="list-unstyled small text-muted">
+                        <li class="mb-2"><strong>OS:</strong> @ViewBag.OSDescription</li>
+                        <li class="mb-2"><strong>Framework:</strong> @ViewBag.Framework</li>
+                        <li><strong>App Version:</strong> v1.0.0 (Licență)</li>
+                    </ul>
                 </div>
             </div>
         </div>

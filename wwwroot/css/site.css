@@ -1,189 +1,104 @@
-﻿:root {
-    /* Culori de bază */
-    --primary-color: #2563eb;
-    --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    --secondary-color: #f59e0b;
-    --bg-body: #edf2f9;
-    /* Variabile pentru efectul GLASS (Sticlă) */
-    --glass-bg: rgba(255, 255, 255, 0.85);
-    --glass-border: 1px solid rgba(255, 255, 255, 0.6);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-    --glass-blur: blur(12px);
-    /* Efecte 3D */
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-    --shadow-3d: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.1);
-    --shadow-hover: 0 20px 40px rgba(0,0,0,0.15), 0 10px 10px rgba(0,0,0,0.1);
+﻿html {
+  font-size: 14px;
 }
 
-/* === FUNDAL ANIMAT (Aurora Effect) === */
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
 body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(-45deg, #e0e7ff, #c7d2fe, #bae6fd, #f0f9ff);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-    color: #334155;
-    min-height: 100vh;
+  margin-bottom: 60px;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/*------------------------------------------------------- Flexbox layout to push footer to bottom---------------------------- */
+
+body {
     display: flex;
     flex-direction: column;
 }
 
-@keyframes gradientBG {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
+main {
+    flex: 1;
 }
 
-/* === NAVBAR 3D GLASS === */
-.navbar {
-    background: rgba(13, 71, 161, 0.85) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1rem 2rem;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+footer {
+    margin-top: auto;
 }
 
-.navbar-brand {
-    font-weight: 800;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    font-size: 1.6rem;
-    color: white !important;
+/*--------------------------------home page stiles*-----------------------------------------------------------------------------------/
+
+.home-wrapper {
+    padding-top: 80px;
+    padding-bottom: 80px;
 }
 
-.nav-link {
-    font-weight: 500;
-    color: rgba(255,255,255,0.9) !important;
-    border-radius: 8px;
-    padding: 0.5rem 1.2rem !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Fade-in animation */
+.fade-in,
+.fade-in-delay-2,
+.fade-in-delay-3,
+.fade-in-delay-4 {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: 0.6s ease-out;
 }
 
-    .nav-link:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        color: #fff !important;
-        text-shadow: 0 0 8px rgba(255,255,255,0.6);
-    }
-
-/* === CARDURI 3D STICLOASE === */
-.card {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: var(--glass-border);
-    background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 100%);
-    border-radius: 20px;
-    box-shadow: var(--shadow-3d);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    overflow: hidden;
-}
-
-    .card:hover {
-        transform: translateY(-10px) scale(1.01);
-        box-shadow: var(--shadow-hover);
-        border-color: rgba(255, 255, 255, 1);
-        z-index: 10;
-    }
-
-/* Carduri Statistici */
-.stat-card {
-    color: white !important;
-    border: none;
-    position: relative;
-    overflow: hidden;
-}
-
-.bg-admin-primary {
-    background: linear-gradient(135deg, rgba(13, 71, 161, 0.9), rgba(25, 118, 210, 0.8));
-}
-
-.bg-admin-light {
-    background: linear-gradient(135deg, rgba(21, 101, 192, 0.9), rgba(33, 150, 243, 0.8));
-}
-
-.bg-admin-accent {
-    background: linear-gradient(135deg, rgba(2, 119, 189, 0.9), rgba(3, 169, 244, 0.8));
-}
-
-.stat-card i {
-    position: absolute;
-    right: 15px;
-    bottom: 15px;
-    font-size: 3.5rem;
-    opacity: 0.2;
-    transform: rotate(-15deg);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.stat-card:hover i {
-    transform: rotate(0deg) scale(1.1);
-    opacity: 0.4;
-    right: 20px;
-    bottom: 20px;
-}
-
-/* === BUTOANE 3D === */
-.btn {
-    border-radius: 12px;
-    padding: 0.7rem 1.5rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 0.85rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    border: none;
-}
-
-.btn-primary {
-    background: var(--primary-gradient);
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-    color: white;
-}
-
-    .btn-primary:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
-    }
-
-/* === TEXT GRADIENT === */
-.text-gradient {
-    background: linear-gradient(to right, #2563eb, #9333ea);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 800;
-}
-
-/* Utilitare */
-.fade-in-up {
-    animation: fadeInUp 0.8s ease-out backwards;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
+    .fade-in.visible,
+    .fade-in-delay-2.visible,
+    .fade-in-delay-3.visible,
+    .fade-in-delay-4.visible {
         opacity: 1;
         transform: translateY(0);
     }
+
+/* Alert styling */
+.alert {
+    font-size: 1.1rem;
 }
 
-.hover-lift:hover {
-    transform: translateY(-3px);
+/* Preview box */
+.preview-box {
+    background: #f8f9fa;
+    border-left: 4px solid #0d6efd;
 }
+
+
+.dashboard-card {
+    border-radius: 12px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .dashboard-card h5 {
+        font-weight: 600;
+        color: #0d6efd;
+    }
+
+    .dashboard-card p {
+        color: #6c757d;
+    }
+
+    .dashboard-card .btn {
+        width: 100%;
+    }
+
+
