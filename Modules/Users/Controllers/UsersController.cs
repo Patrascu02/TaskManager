@@ -1,260 +1,176 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TaskManager.Data;
+using Microsoft.AspNetCore.Authorization;
 using TaskManager.Modules.Users.Models;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace TaskManager.Modules.Users.Controllers
 {
-    
     [Authorize(Roles = "Admin,Manager")]
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly ApplicationDbContext _db;
 
-        public UsersController(
-            UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            ApplicationDbContext db)
+        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _db = db;
         }
 
-        // ====================================
-        // METODA TEAM (Pentru Manageri)
-        // ====================================
-        
-        [Authorize(Roles = "Manager,Admin")]
-        public async Task<IActionResult> Team()
+        // 1. INDEX (LISTA)
+        public async Task<IActionResult> Index()
         {
-            // Managerul vede doar Userii, nu și Adminii
-            var users = await _userManager.GetUsersInRoleAsync("User");
-            return View(users);
-        }
+            var users = await _userManager.Users.ToListAsync();
+            var modelList = new List<UserViewModel>();
 
-        // ====================================
-        // INDEX: Doar Adminul vede TOATĂ lista și poate căuta
-        // ====================================
-        [Authorize(Roles = "Admin")] 
-        public async Task<IActionResult> Index(string search, string sort = "username", int page = 1, int pageSize = 10)
-        {
-            var q = _userManager.Users.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(search))
+            foreach (var user in users)
             {
-                q = q.Where(u => u.UserName.Contains(search) || u.Email.Contains(search) || u.FullName.Contains(search));
-            }
-
-            q = sort switch
-            {
-                "email" => q.OrderBy(u => u.Email),
-                "email_desc" => q.OrderByDescending(u => u.Email),
-                "username_desc" => q.OrderByDescending(u => u.UserName),
-                _ => q.OrderBy(u => u.UserName)
-            };
-
-            var total = await q.CountAsync();
-            var users = await q.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-
-            var items = new List<UserListItemViewModel>();
-            foreach (var u in users)
-            {
-                var roles = await _userManager.GetRolesAsync(u);
-                items.Add(new UserListItemViewModel
+                var roles = await _userManager.GetRolesAsync(user);
+                modelList.Add(new UserViewModel
                 {
-                    Id = u.Id,
-                    UserName = u.UserName,
-                    Email = u.Email,
-                    FullName = u.FullName,
-                    Roles = roles.ToArray()
+                    Id = user.Id,
+                    FirstName = user.FirstName ?? "",
+                    LastName = user.LastName ?? "",
+                    Email = user.Email,
+                    Role = roles.FirstOrDefault() ?? "User",
+                    Password = "Hidden" // Nu afișăm parola
                 });
             }
-
-            var vm = new UserListViewModel
-            {
-                Users = items,
-                Search = search,
-                Sort = sort,
-                Page = page,
-                PageSize = pageSize,
-                TotalCount = total
-            };
-
-            return View(vm);
+            return View(modelList);
         }
 
-        // ====================================
-        // CREATE: Doar Admin
-        // ====================================
-        [Authorize(Roles = "Admin")] 
-        public async Task<IActionResult> Create()
+        // 2. CREATE (GET)
+        public IActionResult Create()
         {
-            var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
-            var vm = new UserCreateViewModel
-            {
-                AvailableRoles = roles
-            };
-            return View(vm);
+            return View();
         }
 
+        // 3. CREATE (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] 
-        public async Task<IActionResult> Create(UserCreateViewModel model)
+        public async Task<IActionResult> Create(UserViewModel model)
         {
-            if (!ModelState.IsValid)
+            ModelState.Remove("Id"); // Id-ul nu e necesar la creare
+
+            if (ModelState.IsValid)
             {
-                model.AvailableRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
-                return View(model);
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    FullName = $"{model.FirstName} {model.LastName}",
+                    LevelId = 1,
+                    TotalXp = 0
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    if (!await _roleManager.RoleExistsAsync(model.Role))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(model.Role));
+                    }
+                    await _userManager.AddToRoleAsync(user, model.Role);
+                    TempData["Success"] = "User creat cu succes!";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
-
-            var user = new ApplicationUser
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                FullName = model.FullName,
-                EmailConfirmed = true
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-            {
-                foreach (var e in result.Errors) ModelState.AddModelError("", e.Description);
-                model.AvailableRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
-                return View(model);
-            }
-
-            if (!string.IsNullOrEmpty(model.Role))
-            {
-                if (!await _roleManager.RoleExistsAsync(model.Role))
-                    await _roleManager.CreateAsync(new IdentityRole(model.Role));
-
-                await _userManager.AddToRoleAsync(user, model.Role);
-            }
-
-            TempData["Success"] = "User creat cu succes.";
-            return RedirectToAction(nameof(Index));
+            return View(model);
         }
 
-        // ====================================
-        // EDIT: Doar Admin
-        // ====================================
-        [Authorize(Roles = "Admin")] 
+        // 4. EDIT (GET)
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null) return NotFound();
-
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
 
-            var roles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
-            var userRoles = await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
 
-            var vm = new UserEditViewModel
+            var model = new UserEditViewModel
             {
                 Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
                 Email = user.Email,
-                FullName = user.FullName,
-                AvailableRoles = roles,
-                CurrentRoles = userRoles.ToArray()
+                Role = roles.FirstOrDefault() ?? "User"
             };
-
-            return View(vm);
+            return View(model);
         }
 
+        // 5. EDIT (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] 
-        public async Task<IActionResult> Edit(UserEditViewModel model)
+        public async Task<IActionResult> Edit(string id, UserEditViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (id != model.Id) return NotFound();
+
+            if (ModelState.IsValid)
             {
-                model.AvailableRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
-                return View(model);
-            }
+                var user = await _userManager.FindByIdAsync(id);
+                if (user == null) return NotFound();
 
-            var user = await _userManager.FindByIdAsync(model.Id);
-            if (user == null) return NotFound();
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.FullName = $"{model.FirstName} {model.LastName}";
+                user.Email = model.Email;
+                user.UserName = model.Email;
 
-            user.Email = model.Email;
-            user.UserName = model.Email;
-            user.FullName = model.FullName;
+                if (!string.IsNullOrEmpty(model.Password))
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var resultPass = await _userManager.ResetPasswordAsync(user, token, model.Password);
+                    if (!resultPass.Succeeded)
+                    {
+                        foreach (var error in resultPass.Errors) ModelState.AddModelError("", error.Description);
+                        return View(model);
+                    }
+                }
 
-            var updateResult = await _userManager.UpdateAsync(user);
-            if (!updateResult.Succeeded)
-            {
-                foreach (var e in updateResult.Errors) ModelState.AddModelError("", e.Description);
-                model.AvailableRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
-                return View(model);
-            }
+                var roles = await _userManager.GetRolesAsync(user);
+                await _userManager.RemoveFromRolesAsync(user, roles);
 
-            var existingRoles = await _userManager.GetRolesAsync(user);
-            await _userManager.RemoveFromRolesAsync(user, existingRoles);
-
-            if (!string.IsNullOrEmpty(model.Role))
-            {
                 if (!await _roleManager.RoleExistsAsync(model.Role))
                     await _roleManager.CreateAsync(new IdentityRole(model.Role));
 
                 await _userManager.AddToRoleAsync(user, model.Role);
-            }
+                await _userManager.UpdateAsync(user);
 
-            TempData["Success"] = "Modificările au fost salvate.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        // ====================================
-        // DELETE: Doar Admin
-        // ====================================
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] 
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null) return BadRequest();
-
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
-
-            var res = await _userManager.DeleteAsync(user);
-            if (!res.Succeeded)
-            {
-                TempData["Error"] = "Ștergere eșuată.";
+                TempData["Success"] = "User actualizat!";
                 return RedirectToAction(nameof(Index));
             }
+            return View(model);
+        }
 
-            TempData["Success"] = "User șters.";
+        // 6. DELETE
+        [HttpPost]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user != null) await _userManager.DeleteAsync(user);
             return RedirectToAction(nameof(Index));
         }
 
-        // ====================================
-        // RESET PASSWORD: Doar Admin
-        // ====================================
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] 
-        public async Task<IActionResult> ResetPassword(string id)
+        // 7. VALIDARE LIVE
+        [AcceptVerbs("GET", "POST")]
+        [AllowAnonymous]
+        public async Task<IActionResult> IsEmailAvailable(string email)
         {
-            if (id == null) return BadRequest();
-
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
-
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var newPass = "Tmp!" + Guid.NewGuid().ToString("N").Substring(0, 8);
-            var result = await _userManager.ResetPasswordAsync(user, token, newPass);
-
-            if (!result.Succeeded)
-                TempData["Error"] = "Reset parola eșuat.";
-            else
-                TempData["Info"] = $"Parola temporară: {newPass}";
-
-            return RedirectToAction(nameof(Index));
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return Json(true);
+            return Json($"Adresa de email '{email}' este deja folosită.");
         }
     }
 }

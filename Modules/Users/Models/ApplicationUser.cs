@@ -10,8 +10,14 @@ namespace TaskManager.Modules.Users.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        [Required]
+        // Păstrăm FullName pentru compatibilitate, dar adăugăm câmpurile noi
         public string? FullName { get; set; }
+
+        [Required]
+        public string FirstName { get; set; } = "";
+
+        [Required]
+        public string LastName { get; set; } = "";
 
         public int? TotalXp { get; set; } = 0;
 

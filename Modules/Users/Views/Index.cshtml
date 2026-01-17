@@ -1,106 +1,100 @@
-﻿@model TaskManager.Modules.Users.Models.UserListViewModel
-@{
-    ViewData["Title"] = "Users";
-    //Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-<h2>Users</h2>
-
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-@if (TempData["Info"] != null)
-{
-    <div class="alert alert-info">@TempData["Info"]</div>
-}
-
-<!-- Filtrare / sortare -->
-<form class="row g-2 mb-3" method="get" asp-controller="Users" asp-action="Index">
-    <div class="col-auto">
-        <input class="form-control" name="search" value="@Model.Search" placeholder="Caută username, email, nume..." />
-    </div>
-
-    <div class="col-auto">
-        <select class="form-select" asp-for="Sort" name="sort" onchange="this.form.submit()">
-            <option value="username">Username ↑</option>
-            <option value="username_desc">Username ↓</option>
-            <option value="email">Email ↑</option>
-            <option value="email_desc">Email ↓</option>
-        </select>
-    </div>
-
-    <div class="col-auto">
-        <button class="btn btn-primary" type="submit">Caută</button>
-
-        <!-- Reset Search -->
-        <a asp-controller="Users" asp-action="Index" class="btn btn-outline-secondary">Reset</a>
-    </div>
-</form>
-
-<a asp-controller="Users" asp-action="Create" class="btn btn-success mb-3">Creează user</a>
-
-
-<!-- Tabel utilizatori -->
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>FullName</th>
-            <th>Roles</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var u in Model.Users)
-        {
-            <tr>
-                <td>@u.UserName</td>
-                <td>@u.Email</td>
-                <td>@u.FullName</td>
-                <td>@string.Join(", ", u.Roles)</td>
-                <td>
-                    <!-- Edit -->
-                    <a asp-controller="Users" asp-action="Edit" asp-route-id="@u.Id" class="btn btn-sm btn-primary">Edit</a>
-
-                    <!-- Delete -->
-                    <form asp-controller="Users" asp-action="Delete" asp-route-id="@u.Id"
-                          method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                    </form>
-
-
-                    <!-- Reset Password -->
-                    <form asp-controller="Users" asp-action="ResetPassword" asp-route-id="@u.Id"
-                          method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-sm btn-warning">Reset Password</button>
-                    </form>
-
-
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+﻿@model IEnumerable<TaskManager.Modules.Users.Models.UserViewModel>
 
 @{
-    var totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
+    ViewData["Title"] = "Gestiune Utilizatori";
+    Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<nav>
-    <ul class="pagination">
-        @for (int i = 1; i <= totalPages; i++)
+<div class="container fade-in mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="fas fa-users-cog me-2 text-primary"></i>Utilizatori
+            </h2>
+            <p class="text-muted mb-0">Gestionează echipa și rolurile.</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm fw-bold">
+            <i class="fas fa-plus me-2"></i> Adaugă User
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+        </div>
+    }
+
+    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 12px;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-uppercase text-muted small fw-bold">Utilizator</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold">Email</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold">Rol</th>
+                        <th class="pe-4 py-3 text-end text-uppercase text-muted small fw-bold">Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
+                                         style="width: 40px; height: 40px; font-weight: bold;">
+                                        @if (!string.IsNullOrEmpty(item.FirstName))
+                                        {
+                                            @item.FirstName.Substring(0, 1)
+                                            @item.LastName.Substring(0, 1)
+                                        }
+                                        else
+                                        {
+                                            <span>U</span>
+                                        }
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">@item.FirstName @item.LastName</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-muted">@item.Email</td>
+                            <td>
+                                @if (item.Role == "Admin")
+                                {
+                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">Admin</span>
+                                }
+                                else if (item.Role == "Manager")
+                                {
+                                    <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill">Manager</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill">User</span>
+                                }
+                            </td>
+                            <td class="pe-4 text-end">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary me-2" title="Editează">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" class="d-inline" onsubmit="return confirm('Sigur ștergi acest user?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Șterge">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (!Model.Any())
         {
-            <li class="page-item @(i == Model.Page ? "active" : "")">
-                <a class="page-link" asp-controller="Users" asp-action="Index" asp-route-page="@i" asp-route-search="@Model.Search" asp-route-sort="@Model.Sort">@i</a>
-            </li>
+            <div class="text-center py-5">
+                <p class="text-muted">Nu există utilizatori înregistrați.</p>
+            </div>
         }
-    </ul>
-</nav>
+    </div>
+</div>
