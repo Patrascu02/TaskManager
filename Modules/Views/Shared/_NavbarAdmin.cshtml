@@ -5,31 +5,90 @@
 
 @{
     var currentUser = await UserManager.GetUserAsync(User);
-    var displayName = currentUser?.FullName ?? User.Identity?.Name; // Afișează Numele Complet sau Email-ul dacă numele lipsește
+
+    // 1. Logica pentru PRENUME (pentru butonul de sus)
+    string firstName = "Admin";
+    string fullName = "Administrator";
+    string userEmail = "";
+    string userInitials = "A";
+
+    if (currentUser != null)
+    {
+        userEmail = currentUser.Email;
+
+        if (!string.IsNullOrEmpty(currentUser.FullName))
+        {
+            fullName = currentUser.FullName;
+            // Luăm tot ce e înainte de primul spațiu
+            firstName = currentUser.FullName.Split(' ')[0];
+            // Luăm inițială (Prima literă din nume)
+            userInitials = firstName.Substring(0, 1).ToUpper();
+        }
+        else
+        {
+            fullName = User.Identity?.Name ?? "Admin";
+            firstName = fullName; // Fallback
+        }
+    }
 }
 
+<ul class="navbar-nav flex-grow-1">
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Home" asp-action="AdminDashboard">
+            <i class="fas fa-chart-line me-1"></i> Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Users" asp-action="Index">
+            <i class="fas fa-users-cog me-1"></i> Manage Users
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-controller="Tasks" asp-action="Priorities">
+            <i class="fas fa-list-ol me-1"></i> Task Priorities
+        </a>
+    </li>
+</ul>
 
+<ul class="navbar-nav ms-auto">
+    <li class="nav-item dropdown">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-lg">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">Admin Panel</a>
+        <a class="nav-link dropdown-toggle fw-bold text-white d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="me-2">Salut, @firstName!</span>
+            <div class="rounded-circle bg-white text-success d-flex justify-content-center align-items-center" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                @userInitials
+            </div>
+        </a>
 
-        <ul class="navbar-nav me-auto">
-            <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index">Manage Users</a></li>
-            <li class="nav-item"><a class="nav-link" asp-controller="Tasks" asp-action="Priorities">Task Priorities</a></li>
-        </ul>
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-modern" aria-labelledby="navbarDropdown">
 
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-                <a class="nav-link text-light fw-bold" asp-area="Identity" asp-page="/Account/Manage/Index" title="Vezi profilul">
-                    Salut, @displayName!
+            <li class="user-menu-header">
+                <div class="user-avatar-circle">
+                    @userInitials
+                </div>
+                <h6 class="fw-bold text-dark mb-0">@fullName</h6>
+                <small class="text-muted">@userEmail</small>
+                <div class="mt-2">
+                    <span class="badge bg-danger rounded-pill text-uppercase" style="font-size: 0.65rem;">Administrator</span>
+                </div>
+            </li>
+
+            <li class="py-2">
+                <a class="dropdown-item dropdown-item-modern" asp-area="Identity" asp-page="/Account/Manage/Index">
+                    <i class="fas fa-user-cog"></i> Profilul Meu
+                </a>
+                <a class="dropdown-item dropdown-item-modern" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-home"></i> Pagina Principală
                 </a>
             </li>
-            <li class="nav-item">
-                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                    <button type="submit" class="nav-link btn btn-link text-light border-0">Logout</button>
+
+            <li class="border-top bg-light">
+                <form class="form-inline m-0" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="dropdown-item dropdown-item-modern text-danger fw-bold w-100 bg-transparent border-0">
+                        <i class="fas fa-sign-out-alt"></i> Deconectare
+                    </button>
                 </form>
             </li>
         </ul>
-    </div>
-</nav>
+    </li>
+</ul>

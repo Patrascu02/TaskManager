@@ -54,22 +54,26 @@ namespace TaskManager.Modules.Home.Controllers
             // A. Colectăm datele reale din Baza de Date
             var totalUsers = await _db.Users.CountAsync();
             var totalTasks = await _db.UserTasks.CountAsync();
-
-            // Task-uri active = cele care sunt "În lucru" (Status 1)
             var activeTasks = await _db.TaskAssignments.CountAsync(ta => ta.Status == 1);
 
-            // CORECTAT: Folosim (int?) pentru a prinde rezultatul SumAsync si ?? 0 pentru a returna un int valid
             var totalXpNullable = await _db.UserXpHistories.SumAsync(x => x.ChangeAmount);
             int totalXp = totalXpNullable ?? 0;
 
-            // B. Luăm ultimele 8 intrări din istoricul de XP ca "Log-uri Recente"
             var recentActivity = await _db.UserXpHistories
-                                          .Include(x => x.User) // Încărcăm numele userului
-                                          .OrderByDescending(x => x.CreatedAt)
-                                          .Take(8)
-                                          .ToListAsync();
+                                            .Include(x => x.User)
+                                            .OrderByDescending(x => x.CreatedAt)
+                                            .Take(8)
+                                            .ToListAsync();
 
-            // C. Construim Modelul pentru View
+            // B. Date REALE de Sistem (System Info)
+            ViewBag.OSDescription = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
+            ViewBag.FrameworkDescription = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+            ViewBag.ProcessArchitecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString();
+
+            // C. Data și Ora formatate pentru afișare modernă
+            ViewBag.CurrentDate = DateTime.Now.ToString("dd MMMM yyyy");
+            ViewBag.CurrentTime = DateTime.Now.ToString("HH:mm");
+
             var model = new AdminDashboardViewModel
             {
                 TotalUsers = totalUsers,
@@ -77,9 +81,8 @@ namespace TaskManager.Modules.Home.Controllers
                 ActiveTasks = activeTasks,
                 TotalXpAwarded = totalXp,
                 RecentLogs = recentActivity,
-
-                // D. Date simulate pentru monitorizare Server
-                CpuUsagePercent = new Random().Next(20, 65),
+                // Păstrăm simularea doar pentru graficele de performanță momentan (CPU/RAM necesită librării externe complexe)
+                CpuUsagePercent = new Random().Next(20, 40),
                 RamUsageMb = 450,
                 RamTotalMb = 1024,
                 ActiveSessions = new Random().Next(3, 15)

@@ -1,21 +1,12 @@
-﻿@using Microsoft.AspNetCore.Identity
-@using TaskManager.Modules.Users.Models
-@inject UserManager<ApplicationUser> UserManager
-@inject SignInManager<ApplicationUser> SignInManager
-
-@{
-    var currentUser = await UserManager.GetUserAsync(User);
-    var displayName = currentUser?.FullName ?? User.Identity?.Name; // Afișează Numele Complet sau Email-ul dacă numele lipsește
-}
-
-
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">TaskManager</a>
-
-        <div>
-            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-light me-2">Login</a>
-        </div>
-    </div>
-</nav>
+﻿<ul class="navbar-nav ms-auto">
+    <li class="nav-item">
+        <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">
+            <i class="fas fa-user-plus me-1"></i> Register
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link btn btn-outline-light ms-2 px-3 rounded-pill" asp-area="Identity" asp-page="/Account/Login">
+            <i class="fas fa-sign-in-alt me-1"></i> Login
+        </a>
+    </li>
+</ul>
