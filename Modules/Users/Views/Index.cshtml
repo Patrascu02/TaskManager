@@ -15,7 +15,7 @@
             <p class="text-muted mb-0">Gestionează echipa și rolurile.</p>
         </div>
         <a asp-action="Create" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm fw-bold">
-            <i class="fas fa-plus me-2"></i> Adaugă User
+            <i class="fas fa-user-plus me-2"></i> Adaugă User
         </a>
     </div>
 
@@ -27,6 +27,13 @@
     }
 
     <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 12px;">
+        <div class="card-header bg-white border-0 py-3">
+            <div class="input-group" style="max-width: 300px;">
+                <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                <input type="text" id="searchUser" class="form-control bg-light border-start-0" placeholder="Caută utilizator...">
+            </div>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
@@ -37,53 +44,69 @@
                         <th class="pe-4 py-3 text-end text-uppercase text-muted small fw-bold">Acțiuni</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="userTableBody">
                     @foreach (var item in Model)
                     {
+                        var displayName = (!string.IsNullOrEmpty(item.FirstName) || !string.IsNullOrEmpty(item.LastName))
+                        ? $"{item.FirstName} {item.LastName}"
+                        : item.Email;
+
+                        var initials = "";
+                        if (!string.IsNullOrEmpty(item.FirstName) && !string.IsNullOrEmpty(item.LastName))
+                        {
+                            initials = item.FirstName.Substring(0, 1).ToUpper() + item.LastName.Substring(0, 1).ToUpper();
+                        }
+                        else if (!string.IsNullOrEmpty(item.Email))
+                        {
+                            initials = item.Email.Substring(0, 1).ToUpper();
+                        }
+
                         <tr>
                             <td class="ps-4">
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
-                                         style="width: 40px; height: 40px; font-weight: bold;">
-                                        @if (!string.IsNullOrEmpty(item.FirstName))
-                                        {
-                                            @item.FirstName.Substring(0, 1)
-                                            @item.LastName.Substring(0, 1)
-                                        }
-                                        else
-                                        {
-                                            <span>U</span>
-                                        }
+                                         style="width: 40px; height: 40px; font-weight: bold; font-size: 0.9rem;">
+                                        @initials
                                     </div>
                                     <div>
-                                        <div class="fw-bold text-dark">@item.FirstName @item.LastName</div>
+                                        <div class="fw-bold text-dark">@displayName</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-muted">@item.Email</td>
+                            <td class="text-muted small fw-bold">@item.Email</td>
                             <td>
                                 @if (item.Role == "Admin")
                                 {
-                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">Admin</span>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill border border-danger border-opacity-10">
+                                        <i class="fas fa-user-shield me-1"></i> Admin
+                                    </span>
                                 }
                                 else if (item.Role == "Manager")
                                 {
-                                    <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill">Manager</span>
+                                    <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill border border-warning border-opacity-10">
+                                        <i class="fas fa-user-tie me-1"></i> Manager
+                                    </span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill">User</span>
+                                    <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill border border-info border-opacity-10">
+                                        <i class="fas fa-user me-1"></i> User
+                                    </span>
                                 }
                             </td>
                             <td class="pe-4 text-end">
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary me-2" title="Editează">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form asp-action="Delete" asp-route-id="@item.Id" class="d-inline" onsubmit="return confirm('Sigur ștergi acest user?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Șterge">
+                                <div class="btn-group">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light text-primary shadow-sm me-2 rounded" title="Editează">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-light text-danger shadow-sm rounded"
+                                            onclick="confirmDelete('@item.Id', '@item.Email')"
+                                            title="Șterge">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
-                                </form>
+                                </div>
                             </td>
                         </tr>
                     }
@@ -93,8 +116,71 @@
         @if (!Model.Any())
         {
             <div class="text-center py-5">
-                <p class="text-muted">Nu există utilizatori înregistrați.</p>
+                <div class="text-muted mb-3"><i class="fas fa-users-slash fa-3x"></i></div>
+                <h6 class="text-muted">Nu există utilizatori înregistrați.</h6>
             </div>
         }
     </div>
 </div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger"></i>
+                    </div>
+                </div>
+
+                <h4 class="fw-bold text-dark mb-2">Ești sigur?</h4>
+                <p class="text-muted mb-4">
+                    Ești pe cale să ștergi utilizatorul <strong id="deleteUserName" class="text-dark"></strong>.<br>
+                    Această acțiune este ireversibilă.
+                </p>
+
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-light px-4 fw-bold" data-bs-dismiss="modal">
+                        Anulează
+                    </button>
+
+                    <form id="deleteForm" method="post">
+                        <button type="submit" class="btn btn-danger px-4 fw-bold">
+                            Da, Șterge-l
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Funcție Căutare
+        document.getElementById('searchUser').addEventListener('keyup', function() {
+            var value = this.value.toLowerCase();
+            var rows = document.querySelectorAll("#userTableBody tr");
+
+            rows.forEach(function(row) {
+                var text = row.innerText.toLowerCase();
+                row.style.display = text.indexOf(value) > -1 ? "" : "none";
+            });
+        });
+
+        // Funcție Deschidere Modal Ștergere
+        function confirmDelete(userId, userEmail) {
+            // Setăm numele utilizatorului în textul modalului
+            document.getElementById('deleteUserName').textContent = userEmail;
+
+            // Setăm acțiunea formularului către ruta corectă de delete
+            // Ruta este: /Users/Delete/{id}
+            var form = document.getElementById('deleteForm');
+            form.action = '/Users/Delete/' + userId;
+
+            // Deschidem modalul Bootstrap
+            var myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            myModal.show();
+        }
+    </script>
+}

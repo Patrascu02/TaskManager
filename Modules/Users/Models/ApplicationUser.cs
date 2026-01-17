@@ -10,18 +10,16 @@ namespace TaskManager.Modules.Users.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        // Păstrăm FullName pentru compatibilitate, dar adăugăm câmpurile noi
-        public string? FullName { get; set; }
-
-        [Required]
+        // Câmpurile noi necesare pentru Controller-ul modernizat
         public string FirstName { get; set; } = "";
-
-        [Required]
         public string LastName { get; set; } = "";
 
-        public int? TotalXp { get; set; } = 0;
+        // Păstrăm FullName pentru compatibilitate cu codul vechi
+        public string? FullName { get; set; }
 
+        public int? TotalXp { get; set; } = 0;
         public int? LevelId { get; set; }
+
         [ForeignKey("LevelId")]
         public Level? Level { get; set; }
 

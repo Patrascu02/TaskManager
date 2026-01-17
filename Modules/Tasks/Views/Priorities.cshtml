@@ -1,44 +1,90 @@
 ﻿@{
-    ViewData["Title"] = "Task Priorities";
+    ViewData["Title"] = "Legendă Priorități";
+    Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container">
-    <h2 class="mb-4">Niveluri de Prioritate (System Default)</h2>
-    <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i>
-        Aceste niveluri sunt predefinite în sistem pentru a asigura consistența raportării.
+<div class="container fade-in mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="fas fa-info-circle me-2 text-primary"></i>Legendă Priorități
+            </h2>
+            <p class="text-muted mb-0">Definițiile nivelurilor de urgență din sistem.</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-bold">
+            <i class="fas fa-arrow-left me-2"></i> Înapoi la Task-uri
+        </a>
     </div>
 
-    <table class="table table-bordered table-hover mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Nivel (ID)</th>
-                <th>Denumire</th>
-                <th>Culoare Vizuală</th>
-                <th>Descriere</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td><strong>Low</strong></td>
-                <td><span class="badge bg-success">Verde</span></td>
-                <td>Sarcini de rutină, fără termen limită critic.</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td><strong>Medium</strong></td>
-                <td><span class="badge bg-warning text-dark">Galben</span></td>
-                <td>Sarcini standard, care trebuie finalizate în ritm normal.</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td><strong>High</strong></td>
-                <td><span class="badge bg-danger">Roșu</span></td>
-                <td>Urgențe sau sarcini critice care blochează alte procese.</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="alert alert-light border shadow-sm d-flex align-items-center mb-4 rounded-3">
+        <div class="fs-1 text-primary me-3">
+            <i class="fas fa-layer-group"></i>
+        </div>
+        <div>
+            <h5 class="alert-heading fw-bold mb-1">Standardizare</h5>
+            <p class="mb-0 text-muted small">
+                Aceste niveluri sunt predefinite în sistem (Hardcoded) pentru a asigura consistența raportării.
+                Toți utilizatorii trebuie să respecte aceste definiții atunci când creează sarcini noi.
+            </p>
+        </div>
+    </div>
 
-    <a asp-controller="Home" asp-action="AdminDashboard" class="btn btn-secondary mt-3">Înapoi la Dashboard</a>
+    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 12px;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-uppercase text-muted small fw-bold" style="width: 100px;">ID</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold" style="width: 150px;">Nivel</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold" style="width: 150px;">Indicator Vizual</th>
+                        <th class="pe-4 py-3 text-uppercase text-muted small fw-bold">Descriere și Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="ps-4 fw-bold text-muted">1</td>
+                        <td><span class="fw-bold text-dark">Scăzut</span></td>
+                        <td>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 px-3 py-2 rounded-pill">
+                                <i class="fas fa-coffee me-1"></i> Low
+                            </span>
+                        </td>
+                        <td class="pe-4 text-muted">
+                            Sarcini de rutină, administrative sau idei de viitor.
+                            Nu au un termen limită critic și nu blochează activitatea echipei.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="ps-4 fw-bold text-muted">2</td>
+                        <td><span class="fw-bold text-dark">Mediu</span></td>
+                        <td>
+                            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10 px-3 py-2 rounded-pill">
+                                <i class="fas fa-bolt me-1"></i> Medium
+                            </span>
+                        </td>
+                        <td class="pe-4 text-muted">
+                            Sarcini standard de proiect. Trebuie finalizate în ritmul normal de lucru
+                            pentru a respecta roadmap-ul. Aceasta este prioritatea implicită (Default).
+                        </td>
+                    </tr>
+
+                    <tr class="bg-danger bg-opacity-10">
+                        <td class="ps-4 fw-bold text-danger">3</td>
+                        <td><span class="fw-bold text-danger">Ridicat</span></td>
+                        <td>
+                            <span class="badge bg-danger text-white px-3 py-2 rounded-pill shadow-sm">
+                                <i class="fas fa-fire me-1"></i> High
+                            </span>
+                        </td>
+                        <td class="pe-4 text-dark fw-bold">
+                            Urgențe majore, bug-uri critice sau blocaje care opresc producția.
+                            Necesită atenție imediată și realocare de resurse.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

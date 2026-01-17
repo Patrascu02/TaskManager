@@ -142,11 +142,16 @@ namespace TaskManager.Modules.Tasks.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // --- METODA CARE LIPSEA ȘI GENERA EROAREA 404 ---
+        // =========================================================
+        // FIX: Metoda Priorities trimite acum lista de task-uri către tabel
+        // =========================================================
+        // =========================================================
+        // PAGINĂ INFORMATIVĂ (STATICĂ)
+        // =========================================================
         [Authorize(Roles = "Manager,Admin")]
         public IActionResult Priorities()
         {
-            return View();
+            return View(); // Returnează doar pagina statică
         }
 
         // =========================================================
