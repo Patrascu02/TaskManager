@@ -15,60 +15,87 @@
                         <p class="mb-0">Ai <strong>@Model.Count()</strong> sarcini active.</p>
                     </div>
                     <div class="text-end">
-                        <h3 class="mb-0">Level @ViewBag.CurrentLevel</h3>
-                        <small>XP: @ViewBag.CurrentXp</small>
+                        <h3 class="mb-0">Level @(ViewBag.CurrentLevel ?? 1)</h3>
+                        <small>XP: @(ViewBag.CurrentXp ?? 0)</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <h3 class="mb-3">Sarcinile Mele</h3>
+    <h3 class="mb-3"><i class="bi bi-card-checklist"></i> Sarcinile Mele</h3>
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">Nu ai nicio sarcină activă momentan. Relaxează-te! ☕</div>
+        <div class="alert alert-info shadow-sm">
+            <i class="bi bi-info-circle"></i> Nu ai nicio sarcină activă momentan. Relaxează-te! ☕
+        </div>
     }
     else
     {
         <div class="row">
             @foreach (var assignment in Model)
             {
-
-
-                var timeRemaining = assignment.Task.DueDate.HasValue
-                ? assignment.Task.DueDate.Value - DateTime.Now
-                : TimeSpan.Zero;
+                // --- LOGICĂ CALCUL TIMER ȘI STATUS TIMP ---
+                var isOverdue = assignment.Task.DueDate.HasValue && assignment.Task.DueDate.Value < DateTime.Now;
 
                 string timerClass = "bg-success";
-                string timerText = assignment.Task.DueDate.HasValue
-                ? $"{timeRemaining.Days}z, {timeRemaining.Hours}h"
-                : "Fără termen";
+                string timerText = "Fără termen";
 
                 if (assignment.Task.DueDate.HasValue)
                 {
-                    if (timeRemaining.TotalHours < 0) { timerClass = "bg-danger"; timerText = "Expirat"; }
-                    else if (timeRemaining.TotalDays < 1) { timerClass = "bg-warning text-dark"; timerText = "Urgent: " + timerText; }
+                    var timeRemaining = assignment.Task.DueDate.Value - DateTime.Now;
+
+                    if (isOverdue)
+                    {
+                        timerClass = "bg-danger";
+                        timerText = "Expirat (-50% XP)";
+                    }
+                    else if (timeRemaining.TotalDays < 1)
+                    {
+                        timerClass = "bg-warning text-dark";
+                        timerText = $"Urgent: {timeRemaining.Hours}h {timeRemaining.Minutes}m";
+                    }
+                    else
+                    {
+                        timerClass = "bg-success";
+                        timerText = $"{timeRemaining.Days}z {timeRemaining.Hours}h rămase";
+                    }
                 }
 
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 shadow-sm border-start border-5 @(assignment.Task.Priority == 3 ? "border-danger" : assignment.Task.Priority == 2 ? "border-warning" : "border-success")">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <span class="badge bg-light text-dark mb-2">Deadline: @assignment.Task.DueDate?.ToString("dd MMM")</span>
-                                @if (assignment.Status == 0)
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm border-start border-5
+                            @(isOverdue ? "border-danger bg-light" :
+                                               assignment.Task.Priority == 1 ? "border-danger" :
+                                               assignment.Task.Priority == 2 ? "border-warning" : "border-success")">
+
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge @timerClass shadow-sm">
+                            <i class="bi bi-clock"></i> @timerText
+                        </span>
+
+                        @if (assignment.Status == 0)
                                 {
                                     <span class="badge bg-secondary">Nou</span>
                                 }
                                 else
                                 {
-
                                     <span class="badge bg-info text-dark">În Lucru</span>
                                 }
                             </div>
 
                             <h5 class="card-title fw-bold">@assignment.Task.Title</h5>
-                            <p class="card-text text-muted small">@assignment.Task.Description</p>
+                            <p class="card-text text-muted small" style="min-height: 40px;">
+                                @assignment.Task.Description
+                            </p>
+
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar-event"></i> Limită:
+                                    @(assignment.Task.DueDate.HasValue? assignment.Task.DueDate.Value.ToString("dd MMM HH:mm") : "N/A")
+                                </small>
+                            </div>
 
                             <hr />
 

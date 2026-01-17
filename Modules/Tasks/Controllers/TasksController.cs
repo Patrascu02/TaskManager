@@ -9,7 +9,6 @@ using TaskManager.Modules.Users.Models;
 
 namespace TaskManager.Modules.Tasks.Controllers
 {
-    //  [Authorize] simplu permite oricui e logat (inclusiv User) să intre
     [Authorize]
     public class TasksController : Controller
     {
@@ -23,21 +22,22 @@ namespace TaskManager.Modules.Tasks.Controllers
         }
 
         // =========================================================
-        // ZONA MANAGER & ADMIN (Index, Create, Delete, Priorities)
+        // ZONA MANAGER & ADMIN
         // =========================================================
 
         [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Index()
         {
+            // Folosim .Assignments conform modelului tău UserTask
             var tasks = await _db.UserTasks
-                                 .Include(t => t.Assignments) // <--- CRUCIAL: Încarcă asignările
-                                    .ThenInclude(ta => ta.User)   // <--- CRUCIAL: Încarcă numele utilizatorului
+                                 .Include(t => t.Assignments)
+                                    .ThenInclude(ta => ta.User)
                                  .OrderByDescending(t => t.DueDate)
                                  .ToListAsync();
             return View(tasks);
         }
 
-        [Authorize(Roles = "Manager,Admin")] 
+        [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Assign()
         {
             var users = await _userManager.GetUsersInRoleAsync("User");
@@ -51,7 +51,7 @@ namespace TaskManager.Modules.Tasks.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Manager,Admin")] 
+        [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Assign(TaskCreateViewModel model)
         {
             if (!ModelState.IsValid)
@@ -93,9 +93,43 @@ namespace TaskManager.Modules.Tasks.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> Reassign(int id)
+        {
+            var assignment = await _db.TaskAssignments
+                                      .Include(t => t.Task)
+                                      .Include(u => u.User)
+                                      .FirstOrDefaultAsync(a => a.TaskAssignmentId == id);
+
+            if (assignment == null) return NotFound();
+
+            var users = await _userManager.GetUsersInRoleAsync("User");
+            ViewBag.Users = new SelectList(users, "Id", "FullName", assignment.UserId);
+            return View(assignment);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Manager,Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reassign(int id, string newUserId)
+        {
+            var assignment = await _db.TaskAssignments.FindAsync(id);
+            if (assignment == null) return NotFound();
+
+            assignment.UserId = newUserId;
+            assignment.Status = 1; // Îl punem direct în lucru pentru noul user
+            assignment.AssignedAt = DateTime.Now;
+
+            _db.Update(assignment);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Task-ul a fost reasignat cu succes!";
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Manager,Admin")] 
+        [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var task = await _db.UserTasks.FindAsync(id);
@@ -108,58 +142,11 @@ namespace TaskManager.Modules.Tasks.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Priorities()
-        {
-            return View();
-        }
-
-
-        // GET: Afișează formularul de reasignare
-        [Authorize(Roles = "Manager,Admin")]
-        public async Task<IActionResult> Reassign(int id)
-        {
-            // Căutăm asignarea existentă
-            var assignment = await _db.TaskAssignments
-                                      .Include(t => t.Task)
-                                      .Include(u => u.User)
-                                      .FirstOrDefaultAsync(a => a.TaskAssignmentId == id);
-
-            if (assignment == null) return NotFound();
-
-            // Luăm lista de useri eligibili (rol User)
-            var users = await _userManager.GetUsersInRoleAsync("User");
-
-            // Trimitem datele către View
-            ViewBag.Users = new SelectList(users, "Id", "FullName", assignment.UserId);
-            return View(assignment);
-        }
-
-        // POST: Salvează noul user
-        [HttpPost]
-        [Authorize(Roles = "Manager,Admin")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reassign(int id, string newUserId)
-        {
-            var assignment = await _db.TaskAssignments.FindAsync(id);
-            if (assignment == null) return NotFound();
-
-            // Logica de reasignare
-            assignment.UserId = newUserId;
-            assignment.Status = 0; // Resetăm statusul la "Alocat" (sau îl lăsăm 1 dacă vrei să continue direct)
-            assignment.AssignedAt = DateTime.Now; // Resetăm data alocării
-
-            _db.Update(assignment);
-            await _db.SaveChangesAsync();
-
-            TempData["Success"] = "Task-ul a fost reasignat cu succes!";
-            return RedirectToAction(nameof(Index)); // Înapoi la lista de task-uri
-        }
-
         // =========================================================
-        // ZONA USER (Voting & Completion)
+        // ZONA USER (Gamification & Completion)
         // =========================================================
 
-        [Authorize(Roles = "User")] 
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> VoteDifficulty(int id)
         {
             var assignment = await _db.TaskAssignments
@@ -184,23 +171,21 @@ namespace TaskManager.Modules.Tasks.Controllers
             }
             else
             {
-                var vote = new DifficultyVote
+                _db.DifficultyVotes.Add(new DifficultyVote
                 {
                     TaskAssignmentId = assignmentId,
                     VoteValue = (byte)difficultyScore
-                };
-                _db.DifficultyVotes.Add(vote);
+                });
             }
 
             var assignment = await _db.TaskAssignments.FindAsync(assignmentId);
             if (assignment != null && assignment.Status == 0)
             {
-                assignment.Status = 1; // În Lucru
+                assignment.Status = 1; // Trecem în statusul "În Lucru"
             }
 
             await _db.SaveChangesAsync();
             TempData["Success"] = "Vot înregistrat!";
-
             return RedirectToAction("Index", "Home");
         }
 
@@ -218,14 +203,13 @@ namespace TaskManager.Modules.Tasks.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> SubmitCompletion(int assignmentId, string feedbackText, int finalDifficulty)
         {
-            // 1. Încărcăm assignment-ul și Task-ul părinte
             var assignment = await _db.TaskAssignments
                                       .Include(a => a.Task)
                                       .FirstOrDefaultAsync(a => a.TaskAssignmentId == assignmentId);
 
             if (assignment == null) return NotFound();
 
-            // --- LOGICA GAMIFICATION (XP) ---
+            // 1. Calculăm media voturilor inițiale
             var initialVotes = await _db.DifficultyVotes
                                         .Where(v => v.TaskAssignmentId == assignmentId)
                                         .Select(v => (int)v.VoteValue)
@@ -235,9 +219,19 @@ namespace TaskManager.Modules.Tasks.Controllers
             int xpBase = 50;
             decimal feedbackFactor = 1.0m + ((decimal)finalDifficulty - (decimal)initialAverage) * 0.1m;
             if (feedbackFactor < 0.5m) feedbackFactor = 0.5m;
+
             int xpFinal = (int)(xpBase * feedbackFactor);
 
-            var feedback = new CompletionFeedback
+            // 2. Aplicăm PENALIZAREA DE 50% dacă termenul este depășit
+            bool isOverdue = assignment.Task.DueDate.HasValue && DateTime.Now > assignment.Task.DueDate.Value;
+            if (isOverdue)
+            {
+                xpFinal = xpFinal / 2;
+                TempData["Warning"] = "Task finalizat după termen! Ai primit doar 50% din XP.";
+            }
+
+            // 3. Salvăm feedback-ul și XP-ul final
+            _db.CompletionFeedbacks.Add(new CompletionFeedback
             {
                 TaskAssignmentId = assignmentId,
                 PerceivedOutcome = (byte)finalDifficulty,
@@ -246,56 +240,57 @@ namespace TaskManager.Modules.Tasks.Controllers
                 FeedbackFactor = feedbackFactor,
                 XpFinal = xpFinal,
                 CreatedAt = DateTime.Now
-            };
-            _db.CompletionFeedbacks.Add(feedback);
+            });
 
-            // --- ACTUALIZARE STATUS ---
-
-            // 1. Marcam assignment-ul curent ca terminat (În Memorie)
-            assignment.Status = 2;
+            assignment.Status = 2; // Finalizat
             assignment.CompletedAt = DateTime.Now;
 
-            // 2. VERIFICARE CORECTATĂ: Mai lucrează *ALȚII*?
-            // Căutăm assignment-uri pe același task, care NU sunt gata ȘI care NU sunt cel curent
+            // Închidem task-ul părinte dacă nu mai sunt alți useri care lucrează la el
             bool areOthersWorking = await _db.TaskAssignments
-                .AnyAsync(ta => ta.TaskId == assignment.TaskId
-                             && ta.TaskAssignmentId != assignmentId // <--- EXCLUDEM UTILIZATORUL CURENT
-                             && ta.Status != 2);
+                .AnyAsync(ta => ta.TaskId == assignment.TaskId && ta.TaskAssignmentId != assignmentId && ta.Status != 2);
 
-            // 3. Dacă nu mai lucrează nimeni altcineva, închidem task-ul
             if (!areOthersWorking && assignment.Task != null)
             {
                 assignment.Task.IsActive = false;
             }
 
-            // --- ACORDARE XP ---
+            // 4. Actualizăm profilul utilizatorului (XP & Level)
             var user = await _userManager.FindByIdAsync(assignment.UserId);
             if (user != null)
             {
                 user.TotalXp = (user.TotalXp ?? 0) + xpFinal;
 
-                var historyEntry = new UserXpHistory
+                _db.UserXpHistories.Add(new UserXpHistory
                 {
                     UserId = user.Id,
                     ChangeAmount = xpFinal,
-                    Reason = $"Finalizare Task: {assignment.Task?.Title}",
+                    Reason = $"Finalizare Task: {assignment.Task?.Title} {(isOverdue ? "(Overdue)" : "")}",
                     CreatedAt = DateTime.Now
-                };
-                _db.UserXpHistories.Add(historyEntry);
+                });
 
                 int newLevel = (user.TotalXp.Value / 100) + 1;
-                if (newLevel > 100) newLevel = 100;
-
                 if (newLevel > (user.LevelId ?? 1))
                 {
-                    user.LevelId = newLevel;
-                    TempData["Info"] = $"🎉 Level Up! Ai ajuns la nivelul {newLevel}!";
+                    user.LevelId = Math.Min(newLevel, 100);
+                    TempData["Info"] = $"🎉 Felicitări! Ai ajuns la nivelul {user.LevelId}!";
+                }
+
+                // 5. LOGICA PENTRU INSIGNE (AwardedAt conform modelului tău)
+                bool hasNoviceBadge = await _db.UserBadges.AnyAsync(ub => ub.UserId == user.Id && ub.BadgeId == 1);
+                if (!hasNoviceBadge)
+                {
+                    _db.UserBadges.Add(new UserBadge
+                    {
+                        UserId = user.Id,
+                        BadgeId = 1,
+                        AwardedAt = DateTime.Now // Folosim AwardedAt din modelul tău
+                    });
+                    TempData["Info"] += " 🏆 Ai obținut insigna: Novice!";
                 }
             }
 
-            await _db.SaveChangesAsync(); // Abia aici se salvează totul
-
-            TempData["Success"] = $"Task finalizat! (+{xpFinal} XP)";
+            await _db.SaveChangesAsync();
+            TempData["Success"] = $"Sarcina a fost închisă! (+{xpFinal} XP)";
             return RedirectToAction("Index", "Home");
         }
     }
