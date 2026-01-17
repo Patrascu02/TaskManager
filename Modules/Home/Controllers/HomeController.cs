@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore; // Necesar pentru CountAsync
-using TaskManager.Data; // Necesar pentru ApplicationDbContext
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using TaskManager.Data;
 using TaskManager.Modules.Users.Models;
 using TaskManager.Modules.Security.Models;
 using TaskManager.Modules.Tasks.Models;
+using TaskManager.Modules.Home.Models; // NECESAR pentru AdminDashboardViewModel
 
 namespace TaskManager.Modules.Home.Controllers
 {
@@ -13,11 +15,11 @@ namespace TaskManager.Modules.Home.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ApplicationDbContext _db; // Adaugat pentru acces la baza de date
+        private readonly ApplicationDbContext _db;
 
         public HomeController(ILogger<HomeController> logger,
                               UserManager<ApplicationUser> userManager,
-                              ApplicationDbContext db) // Injectam DB
+                              ApplicationDbContext db)
         {
             _logger = logger;
             _userManager = userManager;
@@ -32,61 +34,98 @@ namespace TaskManager.Modules.Home.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return View();
 
+            // Redirecționare în funcție de rol
             if (await _userManager.IsInRoleAsync(user, "Admin"))
                 return RedirectToAction("AdminDashboard");
 
             if (await _userManager.IsInRoleAsync(user, "Manager"))
-                return RedirectToAction("Leaderboard", "Gamification");
+                return RedirectToAction("Index", "Tasks");
 
+            // Default: User Dashboard
             return RedirectToAction("UserDashboard");
         }
 
-        // ==== DASHBOARD-URI ====
-
+        // ==============================================================
+        // 1. ADMIN DASHBOARD (Design Modern "Green Aurora")
+        // ==============================================================
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> AdminDashboard()
         {
-
-            // 1. Colectăm statistici reale
-            var totalUsers = await _userManager.Users.CountAsync();
+            // A. Colectăm datele reale din Baza de Date
+            var totalUsers = await _db.Users.CountAsync();
             var totalTasks = await _db.UserTasks.CountAsync();
-            var activeTasks = await _db.UserTasks.CountAsync(t => t.IsActive);
 
-            // 2. Trimitem datele către View
-            ViewBag.TotalUsers = totalUsers;
-            ViewBag.TotalTasks = totalTasks;
-            ViewBag.ActiveTasks = activeTasks;
-            ViewBag.ServerTime = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
-            ViewBag.OSDescription = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
-            ViewBag.Framework = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+            // Task-uri active = cele care sunt "În lucru" (Status 1)
+            var activeTasks = await _db.TaskAssignments.CountAsync(ta => ta.Status == 1);
 
-            return View();
+            // CORECTAT: Folosim (int?) pentru a prinde rezultatul SumAsync si ?? 0 pentru a returna un int valid
+            var totalXpNullable = await _db.UserXpHistories.SumAsync(x => x.ChangeAmount);
+            int totalXp = totalXpNullable ?? 0;
+
+            // B. Luăm ultimele 8 intrări din istoricul de XP ca "Log-uri Recente"
+            var recentActivity = await _db.UserXpHistories
+                                          .Include(x => x.User) // Încărcăm numele userului
+                                          .OrderByDescending(x => x.CreatedAt)
+                                          .Take(8)
+                                          .ToListAsync();
+
+            // C. Construim Modelul pentru View
+            var model = new AdminDashboardViewModel
+            {
+                TotalUsers = totalUsers,
+                TotalTasks = totalTasks,
+                ActiveTasks = activeTasks,
+                TotalXpAwarded = totalXp,
+                RecentLogs = recentActivity,
+
+                // D. Date simulate pentru monitorizare Server
+                CpuUsagePercent = new Random().Next(20, 65),
+                RamUsageMb = 450,
+                RamTotalMb = 1024,
+                ActiveSessions = new Random().Next(3, 15)
+            };
+
+            return View(model);
         }
 
-
-
-        public IActionResult ManagerDashboard()
-        {
-            return View();
-        }
-
+        // ==============================================================
+        // 2. USER DASHBOARD (Task-uri, XP și Insigne)
+        // ==============================================================
+        [Authorize]
         public async Task<IActionResult> UserDashboard()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Index");
 
-            // 1. Luăm task-urile asignate acestui user care NU sunt finalizate încă
-            // Status 0 = Assigned, 1 = In Progress, 2 = Completed (Presupunem 2 e finalizat)
+            // A. Încărcăm task-urile asignate active (care nu sunt finalizate/Status 2)
             var myTasks = await _db.TaskAssignments
-                                   .Include(ta => ta.Task) // Încărcăm detaliile task-ului
+                                   .Include(ta => ta.Task)
                                    .Where(ta => ta.UserId == user.Id && ta.Status != 2)
                                    .OrderBy(ta => ta.Task.DueDate)
                                    .ToListAsync();
 
-            // 2. Putem trimite și date despre XP
-            ViewBag.CurrentXp = user.TotalXp;
+            // B. Încărcăm INSIGNELE (Badges) pentru a le afișa pe profil
+            var myBadges = await _db.UserBadges
+                                    .Include(ub => ub.Badge)
+                                    .Where(ub => ub.UserId == user.Id)
+                                    .OrderByDescending(ub => ub.AwardedAt)
+                                    .ToListAsync();
+
+            // C. Trimitem datele către View prin ViewBag
+            ViewBag.CurrentXp = user.TotalXp ?? 0;
             ViewBag.CurrentLevel = user.LevelId ?? 1;
+            ViewBag.MyBadges = myBadges;
 
             return View(myTasks);
+        }
+
+        // ==============================================================
+        // 3. ALTE PAGINI
+        // ==============================================================
+
+        public IActionResult ManagerDashboard()
+        {
+            return View();
         }
 
         public IActionResult Privacy()
