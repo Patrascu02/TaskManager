@@ -1,82 +1,260 @@
-﻿@{
-    Layout = "_Layout";
+﻿@using Licenta.Models.ViewModels
+@model AdminDashboardViewModel
+@{
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5 fade-in-up">
         <div>
-            <h2 class="fw-bold"><i class="bi bi-speedometer2 text-danger"></i> Admin Dashboard</h2>
-            <p class="text-muted">Monitorizare în timp real și administrare sistem.</p>
+            <h2 class="mb-1 text-gradient" style="font-size: 2.5rem;">
+                <i class="fas fa-leaf me-2"></i>Admin Dashboard
+            </h2>
+            <p class="text-muted fw-medium fs-5">Bine ai venit în centrul de comandă BC Club.</p>
         </div>
-        <span class="badge bg-light text-dark border p-2">
-            <i class="bi bi-clock"></i> Server Time: @ViewBag.ServerTime
-        </span>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card text-white bg-success mb-3 shadow h-100">
-                <div class="card-header bg-transparent border-0">Server Status</div>
-                <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <h1 class="display-4"><i class="bi bi-hdd-rack-fill"></i></h1>
-                    <h5 class="card-title">ONLINE</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-dark bg-info bg-opacity-10 border-info mb-3 shadow h-100">
-                <div class="card-header border-info text-info fw-bold">Database</div>
-                <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <h1 class="display-4 text-info"><i class="bi bi-database-check"></i></h1>
-                    <h5 class="card-title">Connected</h5>
-                    <small class="text-muted">SQL Server Active</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-dark bg-warning bg-opacity-10 border-warning mb-3 shadow h-100">
-                <div class="card-header border-warning text-warning fw-bold">Security</div>
-                <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <h1 class="display-4 text-warning"><i class="bi bi-shield-lock-fill"></i></h1>
-                    <h5 class="card-title">Secured</h5>
-                    <small class="text-muted">RBAC Role System</small>
-                </div>
-            </div>
+        <div class="d-flex gap-3">
+            <a asp-action="ManageRoles" class="btn btn-light bg-white text-dark shadow-sm hover-lift">
+                <i class="fas fa-user-shield me-2 text-warning"></i>Roluri
+            </a>
+            <a asp-action="CreateUser" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Utilizator Nou
+            </a>
         </div>
     </div>
 
-    <h4 class="mb-3 text-secondary">Statistici Platformă</h4>
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card border-primary shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h6 class="text-primary text-uppercase">Total Utilizatori</h6>
-                    <h2 class="display-5 fw-bold text-dark">@ViewBag.TotalUsers</h2>
-                    <a asp-controller="Users" asp-action="Index" class="btn btn-sm btn-outline-primary mt-2">Gestionează Useri</a>
+    <div class="row g-4 mb-5">
+        <div class="col-xl-4 col-md-6 fade-in-up" style="animation-delay: 0.1s">
+            <div class="card stat-card bg-admin-primary h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-white-50 fw-bold mb-2">Total Utilizatori</h6>
+                            <h2 class="display-4 fw-bold mb-0 text-white">@Model.TotalUsers</h2>
+                        </div>
+                        <span class="badge bg-white bg-opacity-25 rounded-pill p-2 px-3 text-white backdrop-blur">
+                            <i class="fas fa-check-circle me-1"></i> Activ
+                        </span>
+                    </div>
+                    <i class="fas fa-users"></i>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-success shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h6 class="text-success text-uppercase">Total Task-uri</h6>
-                    <h2 class="display-5 fw-bold text-dark">@ViewBag.TotalTasks</h2>
-                    <p class="mb-0 text-muted">Active: <strong>@ViewBag.ActiveTasks</strong></p>
+
+        <div class="col-xl-4 col-md-6 fade-in-up" style="animation-delay: 0.2s">
+            <div class="card stat-card bg-admin-light h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-white-50 fw-bold mb-2">Jucători Înregistrați</h6>
+                            <h2 class="display-4 fw-bold mb-0 text-white">@Model.TotalPlayers</h2>
+                        </div>
+                        <span class="badge bg-white bg-opacity-25 rounded-pill p-2 px-3 text-white backdrop-blur">
+                            +@Model.TotalCoaches Staff
+                        </span>
+                    </div>
+                    <i class="fas fa-basketball-ball"></i>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-secondary shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="text-secondary text-uppercase mb-3">Environment Info</h6>
-                    <ul class="list-unstyled small text-muted">
-                        <li class="mb-2"><strong>OS:</strong> @ViewBag.OSDescription</li>
-                        <li class="mb-2"><strong>Framework:</strong> @ViewBag.Framework</li>
-                        <li><strong>App Version:</strong> v1.0.0 (Licență)</li>
-                    </ul>
+
+        <div class="col-xl-4 col-md-6 fade-in-up" style="animation-delay: 0.3s">
+            <div class="card stat-card bg-admin-accent h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase text-white-50 fw-bold mb-2">Evenimente Sistem</h6>
+                            <h2 class="display-4 fw-bold mb-0 text-white">@Model.RecentLogs?.Count()</h2>
+                        </div>
+                        <span class="badge bg-white bg-opacity-25 rounded-pill p-2 px-3 text-white backdrop-blur">
+                            Securitate
+                        </span>
+                    </div>
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 fade-in-up" style="animation-delay: 0.4s">
+        <div class="col-lg-8">
+            <div class="card h-100 border-0">
+                <div class="card-header bg-transparent border-bottom border-light py-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-dark">
+                        <i class="fas fa-history text-primary me-2"></i>Istoric Recent
+                    </h5>
+                    <a asp-action="AuditLogs" class="btn btn-sm btn-outline-success rounded-pill px-3">Vezi tot</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light bg-opacity-50">
+                                <tr>
+                                    <th class="ps-4">Utilizator</th>
+                                    <th>Acțiune</th>
+                                    <th>Timp</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.RecentLogs != null && Model.RecentLogs.Any())
+                                {
+                                    foreach (var log in Model.RecentLogs)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3 text-success">
+                                                        <i class="fas fa-user-tie"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="d-block fw-bold text-dark">ID: @log.StaffId</span>
+                                                        <small class="text-muted">Membru Staff</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="fw-medium text-dark">@log.Action</span>
+                                            </td>
+                                            <td class="text-muted small">
+                                                <i class="far fa-clock me-1"></i> @log.Timestamp.ToString("dd MMM HH:mm")
+                                            </td>
+                                            <td class="text-center">
+                                                <i class="fas fa-check-circle text-success fs-5 shadow-sm rounded-circle bg-white"></i>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 text-muted">
+                                            Nu există activitate recentă.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card h-100 bg-white border-0 shadow-sm">
+                <div class="card-body p-4 d-flex flex-column">
+                    <h5 class="fw-bold text-dark mb-4 d-flex align-items-center">
+                        <i class="fas fa-server text-primary me-2"></i>Status Server
+                        <span class="badge bg-success bg-opacity-10 text-success ms-auto small pulse-animation">Live</span>
+                    </h5>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-end mb-1">
+                            <span class="text-muted small fw-bold text-uppercase">Procesor (CPU)</span>
+                            <span class="fw-bold text-dark">@Model.CpuUsagePercent%</span>
+                        </div>
+                        <div class="progress" style="height: 8px; background-color: #ecfdf5;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: @Model.CpuUsagePercent%; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-end mb-1">
+                            <span class="text-muted small fw-bold text-uppercase">Memorie RAM</span>
+                            <span class="fw-bold text-dark">@Model.RamUsageMb MB / @Model.RamTotalMb MB</span>
+                        </div>
+                        <div class="progress" style="height: 8px; background-color: #ecfdf5;">
+                            @{
+                                var ramClass = Model.RamPercentage > 80 ? "bg-danger" : "bg-success";
+                            }
+                            <div class="progress-bar @ramClass" role="progressbar" style="width: @Model.RamPercentage%; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-end mb-1">
+                            <span class="text-muted small fw-bold text-uppercase">Stocare</span>
+                            <span class="fw-bold text-warning">@Model.StorageUsageMb MB</span>
+                        </div>
+                        <div class="progress" style="height: 8px; background-color: #ecfdf5;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: @Model.StoragePercentage%; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-6">
+                            <div class="p-3 rounded-3 bg-light border border-light text-center h-100">
+                                <i class="fas fa-users text-primary mb-2 fs-5"></i>
+                                <h6 class="fw-bold mb-0 text-dark">@Model.ActiveSessions</h6>
+                                <small class="text-muted">Sesiuni</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded-3 bg-light border border-light text-center h-100">
+                                <i class="fas fa-clock text-warning mb-2 fs-5"></i>
+                                <h6 class="fw-bold mb-0 text-dark">Online</h6>
+                                <small class="text-muted">De 24h</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-4">
+                        <div class="d-flex align-items-center p-3 rounded-3 bg-primary bg-opacity-10 border border-primary border-opacity-10">
+                            <i class="fas fa-shield-alt text-primary fs-4 me-3"></i>
+                            <div>
+                                <small class="d-block fw-bold text-primary">Sistem Securizat</small>
+                                <small class="text-muted lh-1" style="font-size: 0.75rem;">Verificat acum 2 min</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Utilități CSS specifice acestei pagini */
+    .backdrop-blur {
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.8s ease-out backwards;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        transition: transform 0.3s ease;
+    }
+
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+</style>

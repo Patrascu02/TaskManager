@@ -23,7 +23,7 @@ namespace TaskManager.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); // Identity tables
+            base.OnModelCreating(modelBuilder); // Configurare Identity
 
             // --- Levels ---
             modelBuilder.Entity<Level>(entity =>
@@ -38,7 +38,8 @@ namespace TaskManager.Data
             // --- ApplicationUser ---
             modelBuilder.Entity<ApplicationUser>(entity =>
             {
-                entity.ToTable("AspNetUsers"); // Identity table
+                entity.ToTable("AspNetUsers");
+
                 entity.HasOne(u => u.Level)
                       .WithMany(l => l.Users)
                       .HasForeignKey(u => u.LevelId)
@@ -75,6 +76,7 @@ namespace TaskManager.Data
                 entity.Property(t => t.Priority).IsRequired();
                 entity.Property(t => t.IsActive).IsRequired();
 
+                // CORECTAT: Folosim .Assignments conform modelului tău
                 entity.HasMany(t => t.Assignments)
                       .WithOne(a => a.Task)
                       .HasForeignKey(a => a.TaskId)
@@ -144,7 +146,7 @@ namespace TaskManager.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // --- Badge ---
+            // --- Badge (AICI AM CORECTAT) ---
             modelBuilder.Entity<Badge>(entity =>
             {
                 entity.ToTable("Badges");
@@ -152,6 +154,7 @@ namespace TaskManager.Data
                 entity.Property(b => b.Name).IsRequired().HasMaxLength(100);
                 entity.Property(b => b.Description).HasMaxLength(500);
 
+                // Am scos Icon și XpBonus din configurare pentru că nu există în modelul tău
                 entity.HasMany(b => b.UserBadges)
                       .WithOne(ub => ub.Badge)
                       .HasForeignKey(ub => ub.BadgeId)
@@ -187,7 +190,11 @@ namespace TaskManager.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Generăm automat 10 niveluri
+            // ==========================================
+            // DATA SEEDING (POPULARE AUTOMATĂ)
+            // ==========================================
+
+            // 1. Levels (1-100)
             var levels = new List<Level>();
             for (int i = 1; i <= 100; i++)
             {
@@ -200,6 +207,15 @@ namespace TaskManager.Data
                 });
             }
             modelBuilder.Entity<Level>().HasData(levels);
+
+            // 2. Badges (Insigne) - CORECTAT (Fără Icon și XpBonus)
+            modelBuilder.Entity<Badge>().HasData(
+                new Badge { BadgeId = 1, Name = "Novice", Description = "Ai finalizat primul tău task!" },
+                new Badge { BadgeId = 2, Name = "Harnic", Description = "Ai finalizat 5 task-uri." },
+                new Badge { BadgeId = 3, Name = "Expert", Description = "Ai atins nivelul 5." },
+                new Badge { BadgeId = 4, Name = "Veteran", Description = "Ai finalizat 20 de task-uri." },
+                new Badge { BadgeId = 5, Name = "Punctual", Description = "Ai terminat 3 task-uri înainte de termen." }
+            );
         }
     }
 }

@@ -142,6 +142,13 @@ namespace TaskManager.Modules.Tasks.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // --- METODA CARE LIPSEA ȘI GENERA EROAREA 404 ---
+        [Authorize(Roles = "Manager,Admin")]
+        public IActionResult Priorities()
+        {
+            return View();
+        }
+
         // =========================================================
         // ZONA USER (Gamification & Completion)
         // =========================================================
@@ -283,7 +290,7 @@ namespace TaskManager.Modules.Tasks.Controllers
                     {
                         UserId = user.Id,
                         BadgeId = 1,
-                        AwardedAt = DateTime.Now // Folosim AwardedAt din modelul tău
+                        AwardedAt = DateTime.Now // Folosim AwardedAt corect
                     });
                     TempData["Info"] += " 🏆 Ai obținut insigna: Novice!";
                 }
