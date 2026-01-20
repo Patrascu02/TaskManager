@@ -11,7 +11,7 @@
     </div>
     <div>
         <h3 class="fw-bold mb-0 text-dark">Profil Public</h3>
-        <small class="text-muted">Informațiile tale vizibile în platformă</small>
+        <small class="text-muted">Informațiile tale de identificare (Protejate)</small>
     </div>
 </div>
 
@@ -23,8 +23,13 @@
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="form-floating mb-3">
-                <input asp-for="Username" class="form-control bg-light border-0 fw-bold text-primary" disabled />
-                <label asp-for="Username" class="form-label text-muted"><i class="bi bi-person-fill me-1"></i> Utilizator</label>
+                <input asp-for="Username" class="form-control bg-light border-0 fw-bold text-dark shadow-none" readonly />
+                <label asp-for="Username" class="form-label text-muted"><i class="bi bi-person-badge-fill me-1"></i> Username</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" value="@User.Identity.Name" class="form-control bg-light border-0 fw-bold text-dark shadow-none" readonly />
+                <label class="form-label text-muted"><i class="bi bi-envelope-fill me-1"></i> Email</label>
             </div>
 
             <div class="form-floating mb-4">

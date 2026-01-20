@@ -2,52 +2,67 @@
 @model LoginModel
 
 @{
-    ViewData["Title"] = "Log In";
+    ViewData["Title"] = "Autentificare";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-lg border-0 rounded-3">
-                <div class="card-header bg-primary text-white text-center py-4">
-                    <h3 class="mb-0 fw-bold"><i class="bi bi-box-arrow-in-right"></i> TaskManager</h3>
-                    <p class="mb-0 text-white-50 small">Autentificare în contul tău</p>
-                </div>
+<div class="row justify-content-center align-items-center min-vh-75 fade-in-up">
+    <div class="col-lg-10 col-xl-9">
+        <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">
+            <div class="row g-0">
 
-                <div class="card-body p-4">
+                <div class="col-md-6 bg-white bg-opacity-65 backdrop-blur p-5 position-relative">
+                    <div class="mb-5">
+                        <h2 class="fw-bold text-gradient mb-2">Bine ai revenit!</h2>
+                        <p class="text-muted small">Platformă privată. Introdu datele de acces.</p>
+                    </div>
+
                     <form id="account" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 text-center small"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                            <label asp-for="Input.Email" class="text-muted">Adresă Email</label>
-                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                            <input asp-for="Input.Email" class="form-control bg-white border-0 shadow-sm" placeholder="name@example.com" style="border-radius: 12px;" />
+                            <label asp-for="Input.Email" class="text-muted ps-4">Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger small ms-2"></span>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                            <label asp-for="Input.Password" class="text-muted">Parolă</label>
-                            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                            <input asp-for="Input.Password" class="form-control bg-white border-0 shadow-sm" placeholder="Parolă" style="border-radius: 12px;" />
+                            <label asp-for="Input.Password" class="text-muted ps-4">Parolă</label>
+                            <span asp-validation-for="Input.Password" class="text-danger small ms-2"></span>
                         </div>
 
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" asp-for="Input.RememberMe" />
-                            <label class="form-check-label text-muted" asp-for="Input.RememberMe">
-                                Ține-mă minte
-                            </label>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" asp-for="Input.RememberMe" />
+                                <label class="form-check-label small text-muted" asp-for="Input.RememberMe">Ține-mă minte</label>
+                            </div>
+                            <a id="forgot-password" asp-page="./ForgotPassword" class="small text-primary text-decoration-none fw-bold">Ai uitat parola?</a>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button id="login-submit" type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
-                                Autentificare
-                            </button>
-                        </div>
+                        <button id="login-submit" type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg hover-lift">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Intră în cont
+                        </button>
                     </form>
                 </div>
-            </div>
 
-            <div class="text-center mt-3 text-muted small">
-                <i class="bi bi-shield-lock-fill"></i> Conexiune securizată TaskManager
+                <div class="col-md-6 d-none d-md-flex flex-column justify-content-center align-items-center text-white text-center p-5 position-relative bg-primary">
+                    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(29, 78, 216, 0.8)); z-index: 1;"></div>
+
+                    <div class="position-relative" style="z-index: 2;">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-4 d-inline-block mb-4 shadow-sm backdrop-blur">
+                            <i class="bi bi-shield-lock-fill display-4"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">Acces Restricționat</h3>
+                        <p class="opacity-75 mb-4 px-3">
+                            Această aplicație este destinată exclusiv membrilor organizației.
+                        </p>
+
+                        <div class="badge bg-white bg-opacity-10 border border-white border-opacity-25 p-3 rounded-pill fw-light">
+                            <i class="bi bi-info-circle me-2"></i> Conturile sunt create de Administrator.
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -56,3 +71,11 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+<style>
+    .bg-opacity-65 {
+        background-color: rgba(255, 255, 255, 0.65) !important;
+    }
+
+    .backdrop-blur {
+        backdrop-filter: blur(10px);
+    }</style>

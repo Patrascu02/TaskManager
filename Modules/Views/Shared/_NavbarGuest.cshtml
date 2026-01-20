@@ -1,12 +1,25 @@
 ﻿<ul class="navbar-nav ms-auto">
     <li class="nav-item">
-        <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">
-            <i class="fas fa-user-plus me-1"></i> Register
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link btn btn-outline-light ms-2 px-3 rounded-pill" asp-area="Identity" asp-page="/Account/Login">
-            <i class="fas fa-sign-in-alt me-1"></i> Login
+        <a class="nav-link btn btn-glass-primary ms-2 px-4 rounded-pill fw-bold" asp-area="Identity" asp-page="/Account/Login">
+            <i class="fas fa-sign-in-alt me-2"></i> Autentificare
         </a>
     </li>
 </ul>
+
+<style>
+    /* Stil specific pentru butonul din navbar */
+    .btn-glass-primary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+
+        .btn-glass-primary:hover {
+            background: white;
+            color: var(--primary-color) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+</style>
