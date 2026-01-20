@@ -87,10 +87,7 @@
                                                     @assign.User?.FullName?.Substring(0, 1)
                                                 </div>
                                                 <span class="small fw-bold text-dark me-3">@assign.User?.FullName</span>
-
-                                                <a asp-action="Reassign" asp-route-id="@assign.TaskAssignmentId"
-                                                   class="btn-checkbox-action"
-                                                   title="Reasignează">
+                                                <a asp-action="Reassign" asp-route-id="@assign.TaskAssignmentId" class="btn-checkbox-action" title="Reasignează">
                                                     🔄
                                                 </a>
                                             </div>
@@ -131,19 +128,14 @@
 
                             <td class="pe-4 py-3 text-end border-bottom border-light">
                                 <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="Details" asp-route-id="@item.TaskId" class="btn-emoji-action btn-info-soft" title="Detalii">👁️</a>
 
-                                    <a asp-action="Details" asp-route-id="@item.TaskId"
-                                       class="btn-emoji-action btn-info-soft"
-                                       title="Detalii">
-                                        👁️
-                                    </a>
-
-                                    <form asp-action="Delete" asp-route-id="@item.TaskId" method="post" class="d-inline" onsubmit="return confirm('Sigur ștergi acest task?');">
-                                        <button type="submit" class="btn-emoji-action btn-danger-soft" title="Șterge">
-                                            🗑️
-                                        </button>
-                                    </form>
-
+                                    <button type="button"
+                                            class="btn-emoji-action btn-danger-soft"
+                                            title="Șterge"
+                                            onclick="openDeleteModal(@item.TaskId)">
+                                        🗑️
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -155,14 +147,57 @@
         @if (!Model.Any())
         {
             <div class="text-center py-5">
-                <div class="bg-light rounded-circle p-4 d-inline-block mb-3" style="font-size: 3rem;">
-                    📭
-                </div>
+                <div class="bg-light rounded-circle p-4 d-inline-block mb-3" style="font-size: 3rem;">📭</div>
                 <h5 class="fw-bold text-muted">Nu există sarcini active.</h5>
             </div>
         }
     </div>
 </div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px);">
+            <div class="modal-body p-5 text-center">
+
+                <div class="mb-4">
+                    <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <span style="font-size: 40px;">⚠️</span>
+                    </div>
+                </div>
+
+                <h3 class="fw-bold text-dark mb-2">Ești sigur?</h3>
+                <p class="text-muted mb-4">
+                    Această acțiune va șterge task-ul permanent.<br>Nu vei putea anula această operațiune.
+                </p>
+
+                <form id="deleteForm" method="post" asp-action="Delete">
+                    <input type="hidden" name="id" id="deleteTaskId" />
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">
+                            Anulează
+                        </button>
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-lg hover-scale">
+                            🗑️ Da, Șterge
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openDeleteModal(id) {
+        // Setăm ID-ul în input-ul ascuns din modal
+        document.getElementById('deleteTaskId').value = id;
+
+        // Deschidem modalul Bootstrap
+        var myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        myModal.show();
+    }
+</script>
 
 <style>
     /* Efect Hover Tabel */
@@ -177,7 +212,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
 
-    /* Avatare */
+    /* Avatare & Iconițe */
     .avatar-circle {
         width: 28px;
         height: 28px;
@@ -196,7 +231,7 @@
         display: inline-block;
     }
 
-    /* === STIL CHECKBOX PĂTRAT (GOL -> PLIN) === */
+    /* Buton Checkbox */
     .btn-checkbox-action {
         display: inline-flex;
         align-items: center;
@@ -219,10 +254,9 @@
             color: white !important;
             transform: scale(1.1);
             box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);
-            text-decoration: none;
         }
 
-    /* === STIL BUTOANE ACȚIUNI (EMOJI) === */
+    /* Butoane Acțiuni */
     .btn-emoji-action {
         display: inline-flex;
         align-items: center;
@@ -240,10 +274,8 @@
         .btn-emoji-action:hover {
             transform: translateY(-3px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            text-decoration: none;
         }
 
-    /* Culori Specifice Butoane */
     .btn-warning-soft {
         background-color: #fff3cd;
         color: #856404;
@@ -270,6 +302,10 @@
         .btn-danger-soft:hover {
             background-color: #dc3545;
         }
+
+    .hover-scale:hover {
+        transform: scale(1.05);
+    }
 
     tbody tr:last-child td {
         border-bottom: 0 !important;
