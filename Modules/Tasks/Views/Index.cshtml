@@ -1,124 +1,277 @@
 ﻿@model IEnumerable<TaskManager.Modules.Tasks.Models.UserTask>
 
 @{
-    ViewData["Title"] = "Manage Tasks";
+    ViewData["Title"] = "Management Task-uri";
+    Layout = "_Layout";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2><i class="bi bi-list-task"></i> Manage Tasks</h2>
-        <a asp-action="Assign" class="btn btn-success"><i class="bi bi-plus-lg"></i> Alocă Task Nou</a>
+<div class="container-fluid py-5 fade-in-up">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="display-5 fw-bold text-gradient">
+                📋 Task Manager
+            </h2>
+            <p class="text-muted fs-5">Gestionează sarcinile și echipa.</p>
+        </div>
+        <div>
+            <a asp-action="Assign" class="btn btn-primary btn-lg rounded-pill shadow-lg hover-lift fw-bold px-4">
+                ➕ Task Nou
+            </a>
+        </div>
     </div>
 
-    <table class="table table-hover shadow-sm bg-white rounded">
-        <thead class="table-light">
-            <tr>
-                <th>Titlu</th>
-                <th>Prioritate</th>
-                <th>Alocat Către</th>
-                <th>Deadline & Status Timp</th>
-                <th>Status Task</th>
-                <th>Acțiuni</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                // --- LOGICĂ CALCUL TIMER ---
-                string timerClass = "bg-secondary";
-                string timeText = "Fără termen";
-
-                if (item.DueDate.HasValue)
-                {
-                    var timeRemaining = item.DueDate.Value - DateTime.Now;
-
-                    if (timeRemaining.TotalHours < 0)
+    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 24px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
+                <thead class="bg-light bg-opacity-50">
+                    <tr>
+                        <th class="py-4 ps-4 text-uppercase text-muted small fw-bold border-0">📌 Sarcina</th>
+                        <th class="py-4 text-uppercase text-muted small fw-bold border-0">⚡ Prioritate</th>
+                        <th class="py-4 text-uppercase text-muted small fw-bold border-0">👥 Echipă</th>
+                        <th class="py-4 text-uppercase text-muted small fw-bold border-0">📅 Deadline</th>
+                        <th class="py-4 text-uppercase text-muted small fw-bold border-0">🚦 Status</th>
+                        <th class="py-4 pe-4 text-end text-uppercase text-muted small fw-bold border-0">⚙️ Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
                     {
-                        timerClass = "bg-danger";
-                        timeText = "Termen depășit!";
-                    }
-                    else if (timeRemaining.TotalDays < 1)
-                    {
-                        timerClass = "bg-warning text-dark";
-                        timeText = $"Urgent: {timeRemaining.Hours}h {timeRemaining.Minutes}m";
-                    }
-                    else
-                    {
-                        timerClass = "bg-success";
-                        timeText = $"{timeRemaining.Days}z {timeRemaining.Hours}h rămase";
-                    }
-                }
+                        // --- LOGICĂ ---
+                        string badgeClass = item.Priority == 1 ? "bg-danger text-danger border-danger" : (item.Priority == 2 ? "bg-warning text-dark border-warning" : "bg-success text-success border-success");
+                        string priorityEmoji = item.Priority == 1 ? "🔥" : (item.Priority == 2 ? "⚡" : "☕");
+                        string priorityText = item.Priority == 1 ? "High" : (item.Priority == 2 ? "Medium" : "Low");
 
-                <tr>
-                    <td>
-                        <strong>@item.Title</strong><br />
-                        <small class="text-muted">
-                            @(item.Description?.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)
-                        </small>
-                    </td>
-                    <td>
-                        @if (item.Priority == 1)
-                        {
-                            <span class="badge bg-danger">High</span>
-                        }
-                        else if (item.Priority == 2)
-                        {
-                            <span class="badge bg-warning text-dark">Medium</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success">Low</span>
-                        }
-                    </td>
+                        DateTime? deadline = item.DueDate;
+                        string timerClass = "text-muted";
+                        string timeText = "Fără termen";
+                        string clockEmoji = "🕒";
 
-                    <td>
-                        @if (item.Assignments != null && item.Assignments.Any())
+                        if (deadline.HasValue)
                         {
-                            @foreach (var assignment in item.Assignments)
-                            {
-                                <div class="mb-1 d-flex align-items-center">
-                                    <span class="me-2"><i class="bi bi-person-circle"></i> @assignment.User?.FullName</span>
+                            var timeRemaining = deadline.Value - DateTime.Now;
+                            if (timeRemaining.TotalSeconds < 0) { timerClass = "text-danger fw-bold"; timeText = "Expirat!"; clockEmoji = "⚠️"; }
+                            else if (timeRemaining.TotalDays < 1) { timerClass = "text-warning fw-bold"; timeText = $"{timeRemaining.Hours}h {timeRemaining.Minutes}m"; clockEmoji = "⏳"; }
+                            else { timerClass = "text-success fw-bold"; timeText = $"{timeRemaining.Days} zile"; }
+                        }
 
-                                    <a asp-action="Reassign" asp-route-id="@assignment.TaskAssignmentId"
-                                       class="btn btn-sm btn-outline-warning"
-                                       title="Reasignează acest task">
-                                        <i class="bi bi-person-gear"></i>
-                                    </a>
+                        <tr class="table-row-hover position-relative">
+
+                            <td class="ps-4 py-3 border-bottom border-light">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-white shadow-sm rounded-4 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; font-size: 1.5rem;">
+                                        📄
+                                    </div>
+                                    <div style="max-width: 250px;">
+                                        <div class="fw-bold text-dark mb-1">@item.Title</div>
+                                        <div class="text-muted small text-truncate">
+                                            @(item.Description?.Length > 40 ? item.Description.Substring(0, 40) + "..." : item.Description)
+                                        </div>
+                                    </div>
                                 </div>
-                            }
-                        }
-                        else
-                        {
-                            <span class="text-muted fst-italic">Nealocat</span>
-                        }
-                    </td>
+                            </td>
 
-                    <td>
-                        <div class="d-flex flex-column">
-                            <span class="small fw-bold">@(item.DueDate.HasValue? item.DueDate.Value.ToString("dd MMM yyyy") : "N/A")</span>
-                            <span class="badge @timerClass" style="font-size: 0.85em;">
-                                <i class="bi bi-clock"></i> @timeText
-                            </span>
-                        </div>
-                    </td>
+                            <td class="py-3 border-bottom border-light">
+                                <span class="badge @badgeClass bg-opacity-10 border border-opacity-25 rounded-pill px-3 py-2 shadow-sm">
+                                    @priorityEmoji @priorityText
+                                </span>
+                            </td>
 
-                    <td>
-                        <span class="badge @(item.IsActive ? "bg-primary" : "bg-dark")">
-                            @(item.IsActive ? "Activ" : "Inactiv")
-                        </span>
-                    </td>
+                            <td class="py-3 border-bottom border-light">
+                                @if (item.Assignments != null && item.Assignments.Any())
+                                {
+                                    <div class="d-flex flex-column gap-2">
+                                        @foreach (var assign in item.Assignments)
+                                        {
+                                            <div class="d-flex align-items-center bg-white bg-opacity-75 rounded-3 pe-2 p-1 shadow-sm border border-light w-auto d-inline-flex">
+                                                <div class="avatar-circle bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2 shadow-sm">
+                                                    @assign.User?.FullName?.Substring(0, 1)
+                                                </div>
+                                                <span class="small fw-bold text-dark me-3">@assign.User?.FullName</span>
 
-                    <td>
-                        <div class="btn-group">
-                            <form asp-action="Delete" asp-route-id="@item.TaskId" method="post" onsubmit="return confirm('Sigur ștergi acest task?');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash"></i> Del
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                                                <a asp-action="Reassign" asp-route-id="@assign.TaskAssignmentId"
+                                                   class="btn-checkbox-action"
+                                                   title="Reasignează">
+                                                    🔄
+                                                </a>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted border rounded-pill px-3">Nealocat</span>
+                                }
+                            </td>
+
+                            <td class="py-3 border-bottom border-light">
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold text-dark small mb-1">
+                                        @(deadline.HasValue? deadline.Value.ToString("dd MMM yyyy") : "-")
+                                    </span>
+                                    <span class="small @timerClass d-flex align-items-center">
+                                        <span class="me-1">@clockEmoji</span> @timeText
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td class="py-3 border-bottom border-light">
+                                @if (item.IsActive)
+                                {
+                                    <span class="d-flex align-items-center text-primary fw-bold small">
+                                        <span class="status-dot bg-primary me-2"></span> Activ
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="d-flex align-items-center text-muted fw-bold small">
+                                        <span class="status-dot bg-secondary me-2"></span> Inactiv
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="pe-4 py-3 text-end border-bottom border-light">
+                                <div class="d-flex justify-content-end gap-2">
+
+                                    <a asp-action="Details" asp-route-id="@item.TaskId"
+                                       class="btn-emoji-action btn-info-soft"
+                                       title="Detalii">
+                                        👁️
+                                    </a>
+
+                                    <form asp-action="Delete" asp-route-id="@item.TaskId" method="post" class="d-inline" onsubmit="return confirm('Sigur ștergi acest task?');">
+                                        <button type="submit" class="btn-emoji-action btn-danger-soft" title="Șterge">
+                                            🗑️
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <div class="bg-light rounded-circle p-4 d-inline-block mb-3" style="font-size: 3rem;">
+                    📭
+                </div>
+                <h5 class="fw-bold text-muted">Nu există sarcini active.</h5>
+            </div>
+        }
+    </div>
 </div>
+
+<style>
+    /* Efect Hover Tabel */
+    .table-row-hover {
+        transition: all 0.2s ease-in-out;
+    }
+
+        .table-row-hover:hover {
+            background-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.002);
+            z-index: 1;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+    /* Avatare */
+    .avatar-circle {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* === STIL CHECKBOX PĂTRAT (GOL -> PLIN) === */
+    .btn-checkbox-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: 2px solid #cbd5e1;
+        background-color: transparent;
+        border-radius: 6px;
+        color: #64748b;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-size: 1.1rem;
+        line-height: 1;
+    }
+
+        .btn-checkbox-action:hover {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+            color: white !important;
+            transform: scale(1.1);
+            box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);
+            text-decoration: none;
+        }
+
+    /* === STIL BUTOANE ACȚIUNI (EMOJI) === */
+    .btn-emoji-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        border: 0;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        font-size: 1.2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+        .btn-emoji-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-decoration: none;
+        }
+
+    /* Culori Specifice Butoane */
+    .btn-warning-soft {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+        .btn-warning-soft:hover {
+            background-color: #ffc107;
+        }
+
+    .btn-info-soft {
+        background-color: #cff4fc;
+        color: #055160;
+    }
+
+        .btn-info-soft:hover {
+            background-color: #0dcaf0;
+        }
+
+    .btn-danger-soft {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+        .btn-danger-soft:hover {
+            background-color: #dc3545;
+        }
+
+    tbody tr:last-child td {
+        border-bottom: 0 !important;
+    }
+</style>

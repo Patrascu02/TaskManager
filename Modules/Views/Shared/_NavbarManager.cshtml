@@ -1,34 +1,39 @@
-﻿@using Microsoft.AspNetCore.Identity
-@using TaskManager.Modules.Users.Models
-@inject UserManager<ApplicationUser> UserManager
-@inject SignInManager<ApplicationUser> SignInManager
+﻿<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <li class="nav-item">
+        <a class="nav-link fw-bold" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+        </a>
+    </li>
 
-@{
-    var currentUser = await UserManager.GetUserAsync(User);
-    var displayName = currentUser?.FullName ?? User.Identity?.Name; // Afișează Numele Complet sau Email-ul dacă numele lipsește
-}
+    <li class="nav-item dropdown">
+        <div class="btn-group">
+            <a class="nav-link fw-bold pe-1" asp-controller="Tasks" asp-action="Index">
+                <i class="bi bi-list-check me-1"></i> Management Task-uri
+            </a>
+            <a class="nav-link dropdown-toggle dropdown-toggle-split ps-1" href="#" id="tasksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="visually-hidden">Toggle Dropdown</span>
+            </a>
+            <ul class="dropdown-menu border-0 shadow-lg" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
+                <li>
+                    <a class="dropdown-item" asp-controller="Tasks" asp-action="Priorities">
+                        <i class="bi bi-info-circle me-2 text-info"></i> Vezi Priorități
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </li>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">Manager Panel</a>
+    <li class="nav-item">
+        <a class="nav-link fw-bold" asp-controller="Users" asp-action="Team">
+            <i class="bi bi-people-fill me-1"></i> Echipa Mea
+        </a>
+    </li>
 
-        <ul class="navbar-nav me-auto">
-            <li class="nav-item"><a class="nav-link" asp-controller="Tasks" asp-action="Index">Manage Tasks</a></li>
-            <li class="nav-item"><a class="nav-link" asp-controller="Tasks" asp-action="Assign">Assign Tasks</a></li>
-            <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Team">Team Overview</a></li>
-        </ul>
+    <li class="nav-item">
+        <a class="nav-link fw-bold" asp-controller="Gamification" asp-action="Leaderboard">
+            <i class="bi bi-trophy-fill me-1 text-warning"></i> Clasament
+        </a>
+    </li>
+</ul>
 
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-                <a class="nav-link text-light fw-bold" asp-area="Identity" asp-page="/Account/Manage/Index" title="Vezi profilul">
-                    Salut, @displayName!
-                </a>
-            </li>
-            <li class="nav-item">
-                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                    <button type="submit" class="nav-link btn btn-link text-light border-0">Logout</button>
-                </form>
-            </li>
-        </ul>
-    </div>
-</nav>
+<partial name="_LoginPartial" />

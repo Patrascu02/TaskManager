@@ -96,16 +96,34 @@ namespace TaskManager.Modules.Tasks.Controllers
         [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Reassign(int id)
         {
-            var assignment = await _db.TaskAssignments
+            // 1. Găsim asignarea pe care vrem să o modificăm
+            var currentAssignment = await _db.TaskAssignments
                                       .Include(t => t.Task)
                                       .Include(u => u.User)
                                       .FirstOrDefaultAsync(a => a.TaskAssignmentId == id);
 
-            if (assignment == null) return NotFound();
+            if (currentAssignment == null) return NotFound();
 
-            var users = await _userManager.GetUsersInRoleAsync("User");
-            ViewBag.Users = new SelectList(users, "Id", "FullName", assignment.UserId);
-            return View(assignment);
+            // 2. AFLĂM CINE ESTE DEJA PE TASK (pentru a-i exclude)
+            // Căutăm toate asignările de pe acest TaskId
+            var existingUserIds = await _db.TaskAssignments
+                                           .Where(ta => ta.TaskId == currentAssignment.TaskId)
+                                           .Select(ta => ta.UserId)
+                                           .ToListAsync();
+
+            // 3. Luăm toți userii din rolul 'User'
+            var allUsers = await _userManager.GetUsersInRoleAsync("User");
+
+            // 4. FILTRARE STRICTĂ:
+            // Păstrăm userul dacă: NU este deja pe task SAU este chiar userul curent (ca să apară selectat în listă)
+            var availableUsers = allUsers
+                .Where(u => !existingUserIds.Contains(u.Id) || u.Id == currentAssignment.UserId)
+                .ToList();
+
+            // Pregătim lista pentru Dropdown
+            ViewBag.Users = new SelectList(availableUsers, "Id", "FullName", currentAssignment.UserId);
+
+            return View(currentAssignment);
         }
 
         [HttpPost]

@@ -1,16 +1,63 @@
 ﻿@model TaskManager.Modules.Tasks.Models.TaskAssignment
 
-<h2>Reasignare Task: @Model.Task.Title</h2>
-<p>Utilizator curent: <strong>@Model.User.FullName</strong></p>
+@{
+    ViewData["Title"] = "Realocare Task";
+    Layout = "_Layout";
+}
 
-<form asp-action="Reassign" method="post">
-    <input type="hidden" name="id" value="@Model.TaskAssignmentId" />
+<div class="row justify-content-center align-items-center min-vh-75 fade-in-up">
+    <div class="col-md-6 col-lg-5">
 
-    <div class="mb-3">
-        <label class="form-label">Alege noul responsabil:</label>
-        <select name="newUserId" class="form-select" asp-items="ViewBag.Users"></select>
+        <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 24px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);">
+            <div class="card-body p-5">
+
+                <div class="text-center mb-4">
+                    <div class="bg-primary text-white rounded-circle p-3 d-inline-block mb-3 shadow-sm">
+                        <i class="bi bi-person-gear display-4"></i>
+                    </div>
+                    <h2 class="fw-bold text-gradient">Schimbă Responsabilul</h2>
+                    <p class="text-muted">Task: <strong>@Model.Task?.Title</strong></p>
+                </div>
+
+                <div class="alert bg-white border-0 shadow-sm rounded-3 d-flex align-items-center mb-4">
+                    <div class="me-3">
+                        <span class="text-muted small text-uppercase fw-bold">Acum la:</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px; font-weight: bold;">
+                            @Model.User?.FullName?.Substring(0, 1)
+                        </div>
+                        <span class="fw-bold text-dark">@Model.User?.FullName</span>
+                    </div>
+                </div>
+
+                <form asp-action="Reassign" method="post">
+                    <input type="hidden" name="id" value="@Model.TaskAssignmentId" />
+
+                    <div class="form-floating mb-4">
+                        <select name="newUserId" class="form-select border-0 shadow-sm bg-light fw-bold" asp-items="ViewBag.Users" style="height: 60px;">
+                        </select>
+                        <label class="text-muted ps-3">Alocă către alt coleg</label>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-lg hover-lift fw-bold">
+                            <i class="bi bi-check-circle-fill me-2"></i> Salvează Modificarea
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill fw-bold border-0">
+                            Renunță
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
     </div>
+</div>
 
-    <button type="submit" class="btn btn-warning">Reasignează Task</button>
-    <a asp-action="Index" class="btn btn-secondary">Anulează</a>
-</form>
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+</style>
