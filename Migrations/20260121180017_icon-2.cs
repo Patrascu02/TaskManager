@@ -10,35 +10,46 @@ namespace TaskManager.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // --- ȘTERGE SAU COMENTEAZĂ ACESTE LINII ---
-            // migrationBuilder.AddColumn<string>(
-            //    name: "Icon",
-            //    table: "Badges",
-            //    type: "nvarchar(max)",
-            //    nullable: false,
-            //    defaultValue: "bi-award-fill");
-            // ------------------------------------------
+            // --- AM COMENTAT CREAREA COLOANEI PENTRU CĂ EXISTĂ DEJA ---
+            // migrationBuilder.AddColumn<string>(name: "Icon", table: "Badges", ...);
 
-            // --- PĂSTREAZĂ DOAR PARTEA DE SQL UPDATE ---
+            // === POPULARE AUTOMATĂ A ICONIȚELOR ===
 
-            // 1. REGULI GENERALE
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-bug-fill' WHERE Name LIKE '%Bug%' OR Name LIKE '%Eroare%' OR Name LIKE '%Fix%'");
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-trophy-fill' WHERE Name LIKE '%Expert%' OR Name LIKE '%Senior%' OR Name LIKE '%Master%'");
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-stopwatch-fill' WHERE Name LIKE '%Timp%' OR Name LIKE '%Rapid%' OR Name LIKE '%Deadline%'");
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-hand-thumbs-up-fill' WHERE Name LIKE '%Welcome%' OR Name LIKE '%Novice%' OR Name LIKE '%Start%'");
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-people-fill' WHERE Name LIKE '%Team%' OR Name LIKE '%Echipa%'");
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-check-circle-fill' WHERE Name LIKE '%Task%' OR Name LIKE '%Harnic%'");
-
-            // 2. CANTITATE
+            // 1. CANTITATE (Numere)
+            // Primul Task -> Cifra 1
             migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-1-circle-fill' WHERE Name LIKE '%Primul%' OR Name LIKE '%First%' OR Name LIKE '%1 Task%'");
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-check2-all' WHERE Name LIKE '%10 %' OR Name LIKE '%Zece%'");
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-collection-fill' WHERE Name LIKE '%100 %' OR Name LIKE '%Suta%'");
+
+            // 10 Task-uri -> Cifra 1 pătrat / Listă
+            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-collection-fill' WHERE Name LIKE '%10 %' OR Name LIKE '%Zece%'");
+
+            // 100 Task-uri -> Stea în cerc
+            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-stars' WHERE Name LIKE '%100 %' OR Name LIKE '%Suta%'");
+
+            // 1000 Task-uri -> Diamant
             migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-gem' WHERE Name LIKE '%1000 %' OR Name LIKE '%Mie%'");
 
-            // 3. TIMP
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-alarm-fill' WHERE Name LIKE '%Punctual%' OR Name LIKE '%Timp%'");
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-lightning-charge-fill' WHERE Name LIKE '%Rapid%' OR Name LIKE '%Viteza%'");
-            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-calendar-check-fill' WHERE Name LIKE '%Deadline%' OR Name LIKE '%Termen%'");
+            // 2. TIMP / VITEZĂ
+            // Rapid / Viteza -> Fulger
+            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-lightning-charge-fill' WHERE Name LIKE '%Rapid%' OR Name LIKE '%Viteza%' OR Name LIKE '%Fast%'");
+
+            // Punctual / Deadline -> Ceas / Calendar
+            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-alarm-fill' WHERE Name LIKE '%Punctual%' OR Name LIKE '%Timp%' OR Name LIKE '%Deadline%'");
+
+            // 3. SPECIAL / BUGURI
+            // Bug-uri -> Gândac
+            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-bug-fill' WHERE Name LIKE '%Bug%' OR Name LIKE '%Fix%'");
+
+            // Expert / Senior -> Trofeu
+            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-trophy-fill' WHERE Name LIKE '%Expert%' OR Name LIKE '%Senior%' OR Name LIKE '%Master%'");
+
+            // Începător -> Like / Mână
+            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-hand-thumbs-up-fill' WHERE Name LIKE '%Welcome%' OR Name LIKE '%Novice%' OR Name LIKE '%Start%'");
+
+            // Echipă -> Oameni
+            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-people-fill' WHERE Name LIKE '%Team%' OR Name LIKE '%Echipa%'");
+
+            // Default pentru restul (ca să nu rămână nimic gol)
+            migrationBuilder.Sql("UPDATE Badges SET Icon = 'bi-award-fill' WHERE Icon IS NULL OR Icon = ''");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

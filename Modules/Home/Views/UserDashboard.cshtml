@@ -10,43 +10,27 @@
     Layout = "_Layout";
     ViewData["Title"] = "Dashboard";
 
-    // --- 1. PRELUARE DATE UTILIZATOR (Full Name) ---
+    // Date Utilizator
     var currentUser = await UserManager.GetUserAsync(User);
-
-    // Construim numele complet sau folosim proprietatea FullName
     string displayName = currentUser?.FullName;
-    if (string.IsNullOrEmpty(displayName))
-    {
-        // Fallback la First + Last dacă FullName e gol
-        displayName = $"{currentUser?.FirstName} {currentUser?.LastName}".Trim();
-    }
-    if (string.IsNullOrEmpty(displayName))
-    {
-        // Ultimul resort: Username fără @domain
-        displayName = currentUser?.UserName?.Split('@')[0] ?? "Angajat";
-    }
+    if (string.IsNullOrEmpty(displayName)) displayName = currentUser?.UserName?.Split('@')[0] ?? "Angajat";
 
-    // Inițiale pentru Avatar
     string userInitials = "U";
     if (!string.IsNullOrEmpty(displayName))
     {
         var parts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length >= 2)
-            userInitials = $"{parts[0][0]}{parts[1][0]}".ToUpper();
-        else if (parts.Length == 1)
-            userInitials = parts[0].Substring(0, 1).ToUpper();
+        userInitials = parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : parts[0].Substring(0, 1).ToUpper();
     }
 
-    // --- 2. STATISTICI ---
+    // Statistici
     int currentLevel = (ViewBag.CurrentLevel as int?) ?? 1;
     int currentXp = (ViewBag.CurrentXp as int?) ?? 0;
     int xpProgress = currentXp % 100;
 
-    // Insigne (Safe Cast)
+    // Insigne
     var myBadges = ViewBag.MyBadges as IEnumerable<UserBadge>;
     if (myBadges == null) { myBadges = new List<UserBadge>(); }
 
-    // Sarcini
     var tasksNew = Model.Where(t => t.Status == 0).ToList();
     var tasksInProgress = Model.Where(t => t.Status == 1).ToList();
 }
@@ -54,14 +38,11 @@
 <div class="dashboard-wrapper fade-in">
 
     <aside class="dashboard-sidebar">
-
         <div class="profile-section">
             <div class="avatar-container">
                 <div class="avatar-circle">@userInitials</div>
-                <div class="online-indicator"></div>
             </div>
-
-            <h5 class="profile-name text-truncate" title="@displayName">@displayName</h5>
+            <h5 class="profile-name text-truncate w-100" title="@displayName">@displayName</h5>
             <p class="profile-role">Angajat</p>
         </div>
 
@@ -74,7 +55,7 @@
                 <div class="xp-fill" style="width: @xpProgress%;"></div>
             </div>
             <div class="text-end mt-1">
-                <small class="text-white-50" style="font-size: 0.65rem;">Următorul nivel: @(100 - xpProgress) XP</small>
+                <small class="text-white-50" style="font-size: 0.65rem;">Next: @(100 - xpProgress) XP</small>
             </div>
         </div>
 
@@ -100,32 +81,29 @@
                     @foreach (var ub in myBadges)
                     {
                         var badgeName = ub.Badge?.Name ?? "Insignă";
+                        var iconClass = ub.Badge?.Icon ?? "bi-star-fill";
 
-                        <div class="badge-box bg-white text-center rounded p-1"
-                             data-bs-toggle="tooltip"
-                             title="@badgeName">
-                            <div class="fs-4">🏅</div>
+                        <div class="badge-box" data-bs-toggle="tooltip" title="@badgeName">
+                            <i class="bi @iconClass text-warning fs-5"></i>
                         </div>
                     }
                 </div>
             }
             else
             {
-                <div class="empty-badges text-center p-3 rounded bg-white bg-opacity-10">
-                    <span class="fs-2 opacity-50">🔒</span>
-                    <p class="text-white-50 small mb-0 mt-1" style="line-height:1.2;">Nicio insignă deblocată.</p>
+                <div class="text-center p-3 rounded" style="background: rgba(255,255,255,0.1);">
+                    <i class="bi bi-lock-fill fs-3 text-white-50 mb-2 d-block"></i>
+                    <p class="text-white-50 small mb-0">Nicio insignă.</p>
                 </div>
             }
         </div>
-
     </aside>
 
     <main class="dashboard-main">
-
         <header class="main-header mb-5">
             <div>
                 <h2 class="fw-bold text-dark mb-1">Salut, @displayName! 👋</h2>
-                <p class="text-muted mb-0">Bine ai revenit! Spor la treabă astăzi.</p>
+                <p class="text-muted mb-0">Spor la treabă astăzi.</p>
             </div>
             <div class="header-date d-none d-md-block">
                 <i class="bi bi-calendar-day me-2 text-primary"></i>
@@ -136,21 +114,25 @@
         <div class="row g-4">
 
             <div class="col-lg-6">
-                <div class="column-wrapper h-100">
-                    <div class="col-header border-bottom border-2 border-secondary mb-4 pb-2 d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 text-uppercase fw-bold text-muted">
-                            <i class="bi bi-inbox me-2"></i>De Făcut
-                        </h6>
-                        <span class="badge bg-secondary rounded-pill">@tasksNew.Count</span>
+                <div class="h-100">
+
+                    <div class="column-header-glass header-todo">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box shadow-sm">
+                                <i class="bi bi-inbox-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="column-title">De Făcut</h6>
+                                <small class="text-muted" style="font-size: 0.75rem;">Sarcini noi</small>
+                            </div>
+                        </div>
+                        <span class="column-count">@tasksNew.Count</span>
                     </div>
 
-                    <div class="col-content">
+                    <div>
                         @if (!tasksNew.Any())
                         {
-                            <div class="empty-state">
-                                <i class="bi bi-check2-circle fs-1 mb-2 text-muted opacity-50"></i>
-                                <p>Nu ai sarcini noi.</p>
-                            </div>
+                            <div class="empty-state"><i class="bi bi-emoji-smile fs-1 mb-2 text-muted opacity-50"></i><p>Nu ai sarcini noi.</p></div>
                         }
                         @foreach (var task in tasksNew)
                         {
@@ -161,21 +143,25 @@
             </div>
 
             <div class="col-lg-6">
-                <div class="column-wrapper h-100">
-                    <div class="col-header border-bottom border-2 border-primary mb-4 pb-2 d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 text-uppercase fw-bold text-primary">
-                            <i class="bi bi-lightning-charge me-2"></i>În Lucru
-                        </h6>
-                        <span class="badge bg-primary rounded-pill">@tasksInProgress.Count</span>
+                <div class="h-100">
+
+                    <div class="column-header-glass header-progress">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box shadow-sm">
+                                <i class="bi bi-lightning-charge-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="column-title">În Lucru</h6>
+                                <small class="text-muted" style="font-size: 0.75rem;">Progres activ</small>
+                            </div>
+                        </div>
+                        <span class="column-count">@tasksInProgress.Count</span>
                     </div>
 
-                    <div class="col-content">
+                    <div>
                         @if (!tasksInProgress.Any())
                         {
-                            <div class="empty-state">
-                                <i class="bi bi-pause-circle fs-1 mb-2 text-muted opacity-50"></i>
-                                <p>Nimic în lucru.</p>
-                            </div>
+                            <div class="empty-state"><i class="bi bi-cup-hot fs-1 mb-2 text-muted opacity-50"></i><p>Nimic în lucru.</p></div>
                         }
                         @foreach (var task in tasksInProgress)
                         {
@@ -184,52 +170,56 @@
                     </div>
                 </div>
             </div>
-
         </div>
-
     </main>
 </div>
 
 @{
     Microsoft.AspNetCore.Html.IHtmlContent RenderTaskCard(TaskAssignment assignment)
     {
-        string priorityColor = assignment.Task.Priority == 1 ? "danger" : (assignment.Task.Priority == 2 ? "warning" : "success");
-        string priorityLabel = assignment.Task.Priority == 1 ? "Ridicat" : (assignment.Task.Priority == 2 ? "Mediu" : "Scăzut");
-        string badgeClass = assignment.Task.Priority == 1 ? "bg-danger" : (assignment.Task.Priority == 2 ? "bg-warning text-dark" : "bg-success");
+        int pVal = assignment.Task.Priority;
+        string priorityClass = pVal == 1 ? "priority-high" : (pVal == 2 ? "priority-medium" : "priority-low");
+        string priorityLabel = pVal == 1 ? "Ridicat" : (pVal == 2 ? "Mediu" : "Scăzut");
 
         bool isOverdue = assignment.Task.DueDate.HasValue && assignment.Task.DueDate.Value < DateTime.Now;
-        string dateText = assignment.Task.DueDate.HasValue ? assignment.Task.DueDate.Value.ToString("dd MMM") : "-";
+        string dateText = assignment.Task.DueDate.HasValue ? assignment.Task.DueDate.Value.ToString("dd MMM") : "Fără termen";
+        string dateColor = isOverdue ? "text-danger fw-bold" : "text-muted";
+        string dateIcon = isOverdue ? "bi-exclamation-circle-fill" : "bi-calendar2-event";
 
-        <div class="task-card p-3 mb-3 bg-white rounded-3 shadow-sm border-start border-4 border-@priorityColor position-relative hover-lift">
+        <div class="task-card @priorityClass">
+            <div class="task-indicator"></div>
 
-            <div class="d-flex justify-content-between mb-2">
-                <span class="badge @badgeClass rounded-pill" style="font-size: 0.65rem;">@priorityLabel</span>
+            <div class="d-flex justify-content-between align-items-start mb-2 ps-3">
+                <span class="priority-badge">@priorityLabel</span>
                 @if (isOverdue)
                 {
-                    <span class="badge bg-danger rounded-pill">Expirat</span>
+                    <span class="badge bg-danger rounded-pill shadow-sm" style="font-size: 0.65rem;">
+                        <i class="bi bi-clock-history me-1"></i> Expirat
+                    </span>
                 }
             </div>
 
-            <h6 class="fw-bold text-dark mb-2">@assignment.Task.Title</h6>
-            <p class="text-muted small mb-3 text-truncate-2">
-                @(assignment.Task.Description?.Length > 60 ? assignment.Task.Description.Substring(0, 60) + "..." : assignment.Task.Description)
+            <h5 class="task-title">@assignment.Task.Title</h5>
+
+            <p class="task-desc text-truncate-2">
+                @(assignment.Task.Description?.Length > 90 ? assignment.Task.Description.Substring(0, 90) + "..." : assignment.Task.Description)
             </p>
 
-            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-light">
-                <span class="small text-muted fw-bold">
-                    <i class="bi bi-clock me-1"></i> @dateText
+            <div class="task-footer">
+                <span class="@dateColor small fw-bold">
+                    <i class="bi @dateIcon me-1"></i> @dateText
                 </span>
 
                 @if (assignment.Status == 0)
                 {
-                    <a href="/Tasks/VoteDifficulty/@assignment.TaskAssignmentId" class="btn btn-sm btn-light text-primary fw-bold rounded-pill px-3 py-1" style="font-size: 0.8rem;">
+                    <a href="/Tasks/VoteDifficulty/@assignment.TaskAssignmentId" class="btn-action-task btn-vote text-decoration-none">
                         Votează
                     </a>
                 }
                 else
                 {
-                    <a href="/Tasks/CompleteTask/@assignment.TaskAssignmentId" class="btn btn-sm btn-success text-white fw-bold rounded-pill px-3 py-1" style="font-size: 0.8rem;">
-                        <i class="bi bi-check2"></i> Gata
+                    <a href="/Tasks/CompleteTask/@assignment.TaskAssignmentId" class="btn-action-task btn-complete text-decoration-none">
+                        <i class="bi bi-check-lg me-1"></i>Gata
                     </a>
                 }
             </div>
@@ -237,246 +227,3 @@
         return null;
     }
 }
-
-<style>
-    /* RESET & LAYOUT */
-    .dashboard-wrapper {
-        display: flex;
-        background-color: #f8f9fa;
-        margin: -1.5rem; /* Umple containerul din Layout */
-        min-height: 100vh;
-        overflow-x: hidden;
-    }
-
-    /* === SIDEBAR === */
-    .dashboard-sidebar {
-        width: 280px;
-        background: #1e293b; /* Dark Blue */
-        color: white;
-        padding: 2rem 1.5rem;
-        display: flex;
-        flex-direction: column;
-        flex-shrink: 0;
-        border-right: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .profile-section {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .avatar-circle {
-        width: 70px;
-        height: 70px;
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: white;
-        margin: 0 auto 10px;
-        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
-        border: 2px solid rgba(255,255,255,0.2);
-    }
-
-    .profile-name {
-        font-weight: 700;
-        margin-bottom: 2px;
-        color: #fff;
-        font-size: 1.1rem;
-    }
-
-    .profile-role {
-        color: #94a3b8;
-        font-size: 0.8rem;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    /* XP Bar */
-    .stats-card {
-        background: rgba(255,255,255,0.05);
-        padding: 15px;
-        border-radius: 12px;
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .xp-track {
-        height: 6px;
-        background: rgba(0,0,0,0.3);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .xp-fill {
-        height: 100%;
-        background: #f59e0b;
-        border-radius: 10px;
-    }
-
-    /* Quick Stats */
-    .quick-stats-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .q-stat {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #e2e8f0;
-        border-radius: 10px;
-        padding: 10px;
-        text-align: center;
-    }
-
-        .q-stat small {
-            color: #94a3b8;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-
-    /* BADGES (Insigne) - ACUM SE VĂD CLAR */
-    .badges-section {
-        border-top: 1px solid rgba(255,255,255,0.1);
-        padding-top: 1.5rem;
-    }
-
-    .sidebar-label {
-        color: #94a3b8;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        font-weight: 700;
-        letter-spacing: 1px;
-        margin-bottom: 1rem;
-    }
-
-    .badges-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); /* Auto-fit */
-        gap: 8px;
-    }
-
-    .badge-box {
-        width: 45px;
-        height: 45px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        transition: transform 0.2s;
-        cursor: help;
-    }
-
-        .badge-box:hover {
-            transform: scale(1.1);
-            background: #f8fafc !important;
-        }
-
-    /* === MAIN CONTENT === */
-    .dashboard-main {
-        flex-grow: 1;
-        padding: 2.5rem;
-        overflow-y: auto;
-    }
-
-    .main-header {
-        border-bottom: 1px solid #e2e8f0;
-        padding-bottom: 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .header-date {
-        background: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: 600;
-        color: #475569;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        border: 2px dashed #cbd5e1;
-        border-radius: 12px;
-        color: #94a3b8;
-        margin-top: 1rem;
-    }
-
-    .text-truncate-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .hover-lift {
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-        .hover-lift:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        }
-
-    /* Responsive */
-    @@media (max-width: 991px) {
-        .dashboard-wrapper {
-            flex-direction: column;
-            margin: 0;
-        }
-
-        .dashboard-sidebar {
-            width: 100%;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .profile-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 0;
-            text-align: left;
-            width: 100%;
-        }
-
-        .avatar-container {
-            margin: 0;
-            width: 50px;
-            height: 50px;
-        }
-
-        .avatar-circle {
-            width: 50px;
-            height: 50px;
-            font-size: 1.2rem;
-        }
-
-        .stats-card, .quick-stats-grid {
-            display: none;
-        }
-        /* Ascundem detalii pe mobil pt simplitate */
-        .badges-section {
-            display: none;
-        }
-
-        .dashboard-main {
-            padding: 1.5rem;
-        }
-
-        .main-header h2 {
-            font-size: 1.5rem;
-        }
-    }
-</style>
