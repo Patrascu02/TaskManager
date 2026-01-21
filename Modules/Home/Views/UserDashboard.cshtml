@@ -1,197 +1,482 @@
-﻿@model IEnumerable<TaskManager.Modules.Tasks.Models.TaskAssignment>
+﻿@using TaskManager.Modules.Tasks.Models
+@using TaskManager.Modules.Users.Models
+@using TaskManager.Modules.Gamification.Models
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+
+@model IEnumerable<TaskAssignment>
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Profilul Meu";
+    ViewData["Title"] = "Dashboard";
+
+    // --- 1. PRELUARE DATE UTILIZATOR (Full Name) ---
+    var currentUser = await UserManager.GetUserAsync(User);
+
+    // Construim numele complet sau folosim proprietatea FullName
+    string displayName = currentUser?.FullName;
+    if (string.IsNullOrEmpty(displayName))
+    {
+        // Fallback la First + Last dacă FullName e gol
+        displayName = $"{currentUser?.FirstName} {currentUser?.LastName}".Trim();
+    }
+    if (string.IsNullOrEmpty(displayName))
+    {
+        // Ultimul resort: Username fără @domain
+        displayName = currentUser?.UserName?.Split('@')[0] ?? "Angajat";
+    }
+
+    // Inițiale pentru Avatar
+    string userInitials = "U";
+    if (!string.IsNullOrEmpty(displayName))
+    {
+        var parts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+            userInitials = $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        else if (parts.Length == 1)
+            userInitials = parts[0].Substring(0, 1).ToUpper();
+    }
+
+    // --- 2. STATISTICI ---
+    int currentLevel = (ViewBag.CurrentLevel as int?) ?? 1;
+    int currentXp = (ViewBag.CurrentXp as int?) ?? 0;
+    int xpProgress = currentXp % 100;
+
+    // Insigne (Safe Cast)
+    var myBadges = ViewBag.MyBadges as IEnumerable<UserBadge>;
+    if (myBadges == null) { myBadges = new List<UserBadge>(); }
+
+    // Sarcini
+    var tasksNew = Model.Where(t => t.Status == 0).ToList();
+    var tasksInProgress = Model.Where(t => t.Status == 1).ToList();
 }
 
-<div class="container py-5">
+<div class="dashboard-wrapper fade-in">
 
-    <div class="row mb-5 fade-in-up">
-        <div class="col-12">
-            <div class="card border-0 shadow-lg overflow-hidden position-relative bg-admin-primary text-white">
-                <i class="bi bi-controller position-absolute opacity-25" style="font-size: 10rem; right: -20px; top: -30px; transform: rotate(15deg);"></i>
+    <aside class="dashboard-sidebar">
 
-                <div class="card-body p-5 position-relative z-1">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
-                        <div class="text-center text-md-start mb-4 mb-md-0">
-                            <h6 class="text-uppercase text-white-50 fw-bold ls-1 mb-2">Bine ai revenit,</h6>
-                            <h1 class="display-4 fw-bold mb-0 text-shadow">@User.Identity.Name!</h1>
-                            <p class="mb-0 mt-2 opacity-75"><i class="bi bi-check2-circle me-1"></i> Ai <strong>@Model.Count()</strong> sarcini active.</p>
-                        </div>
+        <div class="profile-section">
+            <div class="avatar-container">
+                <div class="avatar-circle">@userInitials</div>
+                <div class="online-indicator"></div>
+            </div>
 
-                        <div class="d-flex align-items-center gap-4 bg-white bg-opacity-10 p-4 rounded-4 backdrop-blur shadow-sm border border-white border-opacity-25">
-                            <div class="text-center px-2">
-                                <div class="display-5 fw-bold text-warning mb-0">@(ViewBag.CurrentLevel ?? 1)</div>
-                                <small class="text-uppercase fw-bold small opacity-75">Level</small>
-                            </div>
-                            <div style="width: 1px; height: 50px; background: rgba(255,255,255,0.3);"></div>
-                            <div class="text-center px-2">
-                                <div class="display-5 fw-bold text-white mb-0">@(ViewBag.CurrentXp ?? 0)</div>
-                                <small class="text-uppercase fw-bold small opacity-75">Total XP</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <h5 class="profile-name text-truncate" title="@displayName">@displayName</h5>
+            <p class="profile-role">Angajat</p>
+        </div>
+
+        <div class="stats-card mt-4">
+            <div class="d-flex justify-content-between align-items-end mb-2">
+                <span class="text-uppercase fw-bold text-white-50 small">Level @currentLevel</span>
+                <span class="fw-bold text-warning">@currentXp XP</span>
+            </div>
+            <div class="xp-track">
+                <div class="xp-fill" style="width: @xpProgress%;"></div>
+            </div>
+            <div class="text-end mt-1">
+                <small class="text-white-50" style="font-size: 0.65rem;">Următorul nivel: @(100 - xpProgress) XP</small>
             </div>
         </div>
-    </div>
 
-    <div class="row mb-5 fade-in-up" style="animation-delay: 0.1s;">
-        <div class="col-12">
-            <h4 class="mb-4 fw-bold text-primary"><i class="bi bi-award-fill me-2"></i>Colectia Mea</h4>
-
-            <div class="card border-0 shadow-sm p-4">
-                @if (ViewBag.MyBadges != null && ((IEnumerable<dynamic>)ViewBag.MyBadges).Any())
-                {
-                    <div class="d-flex flex-wrap gap-4 justify-content-center justify-content-md-start">
-                        @foreach (var userBadge in ViewBag.MyBadges)
-                        {
-                            <div class="text-center hover-lift p-3 rounded-4 bg-light border border-light"
-                                 style="min-width: 120px; transition: 0.3s;"
-                                 title="@userBadge.Badge.Description">
-                                <div class="bg-white rounded-circle shadow-sm p-3 d-inline-block mb-2">
-                                    <i class="bi bi-star-fill fs-1 text-warning"></i>
-                                </div>
-                                <h6 class="fw-bold text-dark mb-1">@userBadge.Badge.Name</h6>
-                                <small class="text-muted" style="font-size: 0.7rem;">@userBadge.AwardedAt.ToString("dd MMM")</small>
-                            </div>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="text-center py-4 text-muted">
-                        <i class="bi bi-trophy fs-1 opacity-25 mb-2 d-block"></i>
-                        <p class="mb-0">Încă nu ai insigne. Finalizează sarcini pentru a le debloca!</p>
-                    </div>
-                }
+        <div class="quick-stats-grid mt-4">
+            <div class="q-stat">
+                <span class="h4 fw-bold mb-0 d-block">@Model.Count()</span>
+                <small>Sarcini</small>
+            </div>
+            <div class="q-stat">
+                <span class="h4 fw-bold mb-0 d-block">@myBadges.Count()</span>
+                <small>Insigne</small>
             </div>
         </div>
-    </div>
 
-    <h4 class="mb-4 fw-bold text-primary fade-in-up" style="animation-delay: 0.2s;">
-        <i class="bi bi-list-task me-2"></i>Task-uri Active
-    </h4>
+        <div class="badges-section mt-5">
+            <h6 class="sidebar-label">
+                <i class="bi bi-award-fill me-2"></i>Colecția Mea
+            </h6>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-success shadow-sm fade-in-up d-flex align-items-center p-4 rounded-4 border-0" style="background: rgba(209, 250, 229, 0.8);">
-            <i class="bi bi-cup-hot-fill fs-2 me-3 text-success"></i>
-            <div>
-                <h5 class="fw-bold text-success mb-1">Ești liber!</h5>
-                <p class="mb-0 text-success opacity-75">Nu ai nicio sarcină activă momentan. Relaxează-te! ☕</p>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="row g-4">
-            @foreach (var assignment in Model)
+            @if (myBadges.Any())
             {
-                // LOGICĂ C# (Păstrată intactă)
-                var isOverdue = assignment.Task.DueDate.HasValue && assignment.Task.DueDate.Value < DateTime.Now;
-                string timerClass = "bg-success";
-                string timerText = "Fără termen";
-                string borderClass = "border-success"; // Default Low Priority (3)
-
-                if (assignment.Task.Priority == 1) { borderClass = "border-danger"; } // High
-                else if (assignment.Task.Priority == 2) { borderClass = "border-warning"; } // Medium
-
-                if (assignment.Task.DueDate.HasValue)
-                {
-                    var timeRemaining = assignment.Task.DueDate.Value - DateTime.Now;
-                    if (isOverdue)
+                <div class="badges-grid">
+                    @foreach (var ub in myBadges)
                     {
-                        timerClass = "bg-danger";
-                        timerText = "Expirat (-50% XP)";
-                        borderClass = "border-danger";
-                    }
-                    else if (timeRemaining.TotalDays < 1)
-                    {
-                        timerClass = "bg-warning text-dark";
-                        timerText = $"Urgent: {timeRemaining.Hours}h {timeRemaining.Minutes}m";
-                    }
-                    else
-                    {
-                        timerClass = "bg-success";
-                        timerText = $"{timeRemaining.Days}z {timeRemaining.Hours}h rămase";
-                    }
-                }
+                        var badgeName = ub.Badge?.Name ?? "Insignă";
 
-                <div class="col-md-6 col-lg-4 fade-in-up" style="animation-delay: 0.3s;">
-                    <div class="card h-100 shadow-sm hover-lift border-0 border-start border-5 @borderClass position-relative overflow-hidden">
-
-                        @if (isOverdue)
-                        {
-                            <div class="position-absolute top-0 start-0 w-100 h-100 bg-danger opacity-10 pe-none"></div>
-                        }
-
-                        <div class="card-body d-flex flex-column p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span class="badge @timerClass rounded-pill shadow-sm px-3 py-2">
-                                    <i class="bi bi-clock me-1"></i> @timerText
-                                </span>
-                                @if (assignment.Status == 0)
-                                {
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill">Nou</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill">În Lucru</span>
-                                }
-                            </div>
-
-                            <h5 class="card-title fw-bold text-dark mb-2">@assignment.Task.Title</h5>
-                            <p class="card-text text-muted small flex-grow-1 mb-4" style="line-height: 1.6;">
-                                @(assignment.Task.Description?.Length > 100 ? assignment.Task.Description.Substring(0, 100) + "..." : assignment.Task.Description)
-                            </p>
-
-                            <div class="d-flex align-items-center justify-content-between border-top pt-3 mt-auto border-light">
-                                <small class="text-muted fw-bold">
-                                    <i class="bi bi-calendar-event me-1 text-primary"></i>
-                                    @(assignment.Task.DueDate.HasValue? assignment.Task.DueDate.Value.ToString("dd MMM HH:mm") : "N/A")
-                                </small>
-                            </div>
-
-                            <div class="d-grid mt-3">
-                                @if (assignment.Status == 0)
-                                {
-                                    <a asp-controller="Tasks" asp-action="VoteDifficulty" asp-route-id="@assignment.TaskAssignmentId" class="btn btn-outline-primary rounded-pill fw-bold">
-                                        <i class="bi bi-bar-chart-fill me-2"></i>Votează Dificultatea
-                                    </a>
-                                }
-                                else
-                                {
-                                    <a asp-controller="Tasks" asp-action="CompleteTask" asp-route-id="@assignment.TaskAssignmentId" class="btn btn-success text-white rounded-pill fw-bold shadow-sm">
-                                        <i class="bi bi-check-circle-fill me-2"></i>Finalizează
-                                    </a>
-                                }
-                            </div>
+                        <div class="badge-box bg-white text-center rounded p-1"
+                             data-bs-toggle="tooltip"
+                             title="@badgeName">
+                            <div class="fs-4">🏅</div>
                         </div>
-                    </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-badges text-center p-3 rounded bg-white bg-opacity-10">
+                    <span class="fs-2 opacity-50">🔒</span>
+                    <p class="text-white-50 small mb-0 mt-1" style="line-height:1.2;">Nicio insignă deblocată.</p>
                 </div>
             }
         </div>
-    }
+
+    </aside>
+
+    <main class="dashboard-main">
+
+        <header class="main-header mb-5">
+            <div>
+                <h2 class="fw-bold text-dark mb-1">Salut, @displayName! 👋</h2>
+                <p class="text-muted mb-0">Bine ai revenit! Spor la treabă astăzi.</p>
+            </div>
+            <div class="header-date d-none d-md-block">
+                <i class="bi bi-calendar-day me-2 text-primary"></i>
+                @DateTime.Now.ToString("dd MMMM yyyy")
+            </div>
+        </header>
+
+        <div class="row g-4">
+
+            <div class="col-lg-6">
+                <div class="column-wrapper h-100">
+                    <div class="col-header border-bottom border-2 border-secondary mb-4 pb-2 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 text-uppercase fw-bold text-muted">
+                            <i class="bi bi-inbox me-2"></i>De Făcut
+                        </h6>
+                        <span class="badge bg-secondary rounded-pill">@tasksNew.Count</span>
+                    </div>
+
+                    <div class="col-content">
+                        @if (!tasksNew.Any())
+                        {
+                            <div class="empty-state">
+                                <i class="bi bi-check2-circle fs-1 mb-2 text-muted opacity-50"></i>
+                                <p>Nu ai sarcini noi.</p>
+                            </div>
+                        }
+                        @foreach (var task in tasksNew)
+                        {
+                            @RenderTaskCard(task)
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="column-wrapper h-100">
+                    <div class="col-header border-bottom border-2 border-primary mb-4 pb-2 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 text-uppercase fw-bold text-primary">
+                            <i class="bi bi-lightning-charge me-2"></i>În Lucru
+                        </h6>
+                        <span class="badge bg-primary rounded-pill">@tasksInProgress.Count</span>
+                    </div>
+
+                    <div class="col-content">
+                        @if (!tasksInProgress.Any())
+                        {
+                            <div class="empty-state">
+                                <i class="bi bi-pause-circle fs-1 mb-2 text-muted opacity-50"></i>
+                                <p>Nimic în lucru.</p>
+                            </div>
+                        }
+                        @foreach (var task in tasksInProgress)
+                        {
+                            @RenderTaskCard(task)
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
 </div>
 
+@{
+    Microsoft.AspNetCore.Html.IHtmlContent RenderTaskCard(TaskAssignment assignment)
+    {
+        string priorityColor = assignment.Task.Priority == 1 ? "danger" : (assignment.Task.Priority == 2 ? "warning" : "success");
+        string priorityLabel = assignment.Task.Priority == 1 ? "Ridicat" : (assignment.Task.Priority == 2 ? "Mediu" : "Scăzut");
+        string badgeClass = assignment.Task.Priority == 1 ? "bg-danger" : (assignment.Task.Priority == 2 ? "bg-warning text-dark" : "bg-success");
+
+        bool isOverdue = assignment.Task.DueDate.HasValue && assignment.Task.DueDate.Value < DateTime.Now;
+        string dateText = assignment.Task.DueDate.HasValue ? assignment.Task.DueDate.Value.ToString("dd MMM") : "-";
+
+        <div class="task-card p-3 mb-3 bg-white rounded-3 shadow-sm border-start border-4 border-@priorityColor position-relative hover-lift">
+
+            <div class="d-flex justify-content-between mb-2">
+                <span class="badge @badgeClass rounded-pill" style="font-size: 0.65rem;">@priorityLabel</span>
+                @if (isOverdue)
+                {
+                    <span class="badge bg-danger rounded-pill">Expirat</span>
+                }
+            </div>
+
+            <h6 class="fw-bold text-dark mb-2">@assignment.Task.Title</h6>
+            <p class="text-muted small mb-3 text-truncate-2">
+                @(assignment.Task.Description?.Length > 60 ? assignment.Task.Description.Substring(0, 60) + "..." : assignment.Task.Description)
+            </p>
+
+            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-light">
+                <span class="small text-muted fw-bold">
+                    <i class="bi bi-clock me-1"></i> @dateText
+                </span>
+
+                @if (assignment.Status == 0)
+                {
+                    <a href="/Tasks/VoteDifficulty/@assignment.TaskAssignmentId" class="btn btn-sm btn-light text-primary fw-bold rounded-pill px-3 py-1" style="font-size: 0.8rem;">
+                        Votează
+                    </a>
+                }
+                else
+                {
+                    <a href="/Tasks/CompleteTask/@assignment.TaskAssignmentId" class="btn btn-sm btn-success text-white fw-bold rounded-pill px-3 py-1" style="font-size: 0.8rem;">
+                        <i class="bi bi-check2"></i> Gata
+                    </a>
+                }
+            </div>
+        </div>
+        return null;
+    }
+}
+
 <style>
-    .backdrop-blur {
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+    /* RESET & LAYOUT */
+    .dashboard-wrapper {
+        display: flex;
+        background-color: #f8f9fa;
+        margin: -1.5rem; /* Umple containerul din Layout */
+        min-height: 100vh;
+        overflow-x: hidden;
     }
 
-    .ls-1 {
+    /* === SIDEBAR === */
+    .dashboard-sidebar {
+        width: 280px;
+        background: #1e293b; /* Dark Blue */
+        color: white;
+        padding: 2rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        border-right: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .profile-section {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .avatar-circle {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: white;
+        margin: 0 auto 10px;
+        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+        border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .profile-name {
+        font-weight: 700;
+        margin-bottom: 2px;
+        color: #fff;
+        font-size: 1.1rem;
+    }
+
+    .profile-role {
+        color: #94a3b8;
+        font-size: 0.8rem;
+        margin: 0;
+        text-transform: uppercase;
         letter-spacing: 1px;
     }
 
+    /* XP Bar */
+    .stats-card {
+        background: rgba(255,255,255,0.05);
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .xp-track {
+        height: 6px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .xp-fill {
+        height: 100%;
+        background: #f59e0b;
+        border-radius: 10px;
+    }
+
+    /* Quick Stats */
+    .quick-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .q-stat {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #e2e8f0;
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+    }
+
+        .q-stat small {
+            color: #94a3b8;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+    /* BADGES (Insigne) - ACUM SE VĂD CLAR */
+    .badges-section {
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 1.5rem;
+    }
+
+    .sidebar-label {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+    }
+
+    .badges-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); /* Auto-fit */
+        gap: 8px;
+    }
+
+    .badge-box {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: transform 0.2s;
+        cursor: help;
+    }
+
+        .badge-box:hover {
+            transform: scale(1.1);
+            background: #f8fafc !important;
+        }
+
+    /* === MAIN CONTENT === */
+    .dashboard-main {
+        flex-grow: 1;
+        padding: 2.5rem;
+        overflow-y: auto;
+    }
+
+    .main-header {
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-date {
+        background: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        color: #475569;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        color: #94a3b8;
+        margin-top: 1rem;
+    }
+
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
     .hover-lift {
-        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        transition: transform 0.2s, box-shadow 0.2s;
     }
 
         .hover-lift:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
         }
+
+    /* Responsive */
+    @@media (max-width: 991px) {
+        .dashboard-wrapper {
+            flex-direction: column;
+            margin: 0;
+        }
+
+        .dashboard-sidebar {
+            width: 100%;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            text-align: left;
+            width: 100%;
+        }
+
+        .avatar-container {
+            margin: 0;
+            width: 50px;
+            height: 50px;
+        }
+
+        .avatar-circle {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+        }
+
+        .stats-card, .quick-stats-grid {
+            display: none;
+        }
+        /* Ascundem detalii pe mobil pt simplitate */
+        .badges-section {
+            display: none;
+        }
+
+        .dashboard-main {
+            padding: 1.5rem;
+        }
+
+        .main-header h2 {
+            font-size: 1.5rem;
+        }
+    }
 </style>
