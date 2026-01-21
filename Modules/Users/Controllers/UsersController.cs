@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using TaskManager.Modules.Users.Models;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TaskManager.Data;
+using TaskManager.Modules.Users.Models;
 
 namespace TaskManager.Modules.Users.Controllers
 {
@@ -14,11 +15,15 @@ namespace TaskManager.Modules.Users.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _db;
 
-        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        // --- CONSTRUCTOR CORECTAT ---
+        // Am adăugat 'ApplicationDbContext db' la parametri
+        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext db)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _db = db; // Acum 'db' există și poate fi atribuit lui '_db'
         }
 
         // 1. INDEX (LISTA)
@@ -37,7 +42,7 @@ namespace TaskManager.Modules.Users.Controllers
                     LastName = user.LastName ?? "",
                     Email = user.Email,
                     Role = roles.FirstOrDefault() ?? "User",
-                    Password = "Hidden" // Nu afișăm parola
+                    Password = "Hidden"
                 });
             }
             return View(modelList);
@@ -54,7 +59,7 @@ namespace TaskManager.Modules.Users.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UserViewModel model)
         {
-            ModelState.Remove("Id"); // Id-ul nu e necesar la creare
+            ModelState.Remove("Id");
 
             if (ModelState.IsValid)
             {
@@ -171,6 +176,23 @@ namespace TaskManager.Modules.Users.Controllers
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null) return Json(true);
             return Json($"Adresa de email '{email}' este deja folosită.");
+        }
+
+        // 8. TEAM (ECHIPA MEA)
+        public async Task<IActionResult> Team()
+        {
+            var usersInRole = await _userManager.GetUsersInRoleAsync("User");
+            var userIds = usersInRole.Select(u => u.Id).ToList();
+
+            var employees = await _db.Users
+                                     .Include(u => u.CurrentBadge) // Insigna echipată
+                                     .Include(u => u.Badges)       // <--- LISTA TUTUROR INSIGNELOR
+                                        .ThenInclude(ub => ub.Badge) // Detaliile insignei (Nume, etc.)
+                                     .Include(u => u.Level)
+                                     .Where(u => userIds.Contains(u.Id))
+                                     .ToListAsync();
+
+            return View(employees);
         }
     }
 }

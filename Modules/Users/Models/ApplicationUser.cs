@@ -10,18 +10,22 @@ namespace TaskManager.Modules.Users.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        // Câmpurile noi necesare pentru Controller-ul modernizat
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
-
-        // Păstrăm FullName pentru compatibilitate cu codul vechi
         public string? FullName { get; set; }
 
         public int? TotalXp { get; set; } = 0;
-        public int? LevelId { get; set; }
 
+        // --- LEVEL ---
+        public int? LevelId { get; set; }
         [ForeignKey("LevelId")]
         public Level? Level { get; set; }
+
+        // --- BADGE (Aici era problema) ---
+        public int? CurrentBadgeId { get; set; }
+
+        [ForeignKey("CurrentBadgeId")]
+        public virtual Badge? CurrentBadge { get; set; } // <--- ACEASTA LINIE LIPSEA
 
         public bool? IsActive { get; set; } = true;
 
