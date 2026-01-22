@@ -1,93 +1,535 @@
 ﻿@model TaskManager.Modules.Users.Models.ApplicationUser
 
 @{
-    ViewData["Title"] = "My Progress";
+    ViewData["Title"] = "Progresul Meu";
+    Layout = "_Layout";
 
-    // Calcule nivel
+    // Calcule
     int currentXp = Model.TotalXp ?? 0;
     int currentLevel = Model.LevelId ?? 1;
-    int nextLevelXp = currentLevel * 100;
-    int progressPercent = (currentXp % 100);
-    if (currentXp >= nextLevelXp) progressPercent = 100;
+    int xpPerLevel = 100;
+    int xpProgress = currentXp % xpPerLevel;
+    int progressPercent = xpProgress;
+
+    string userInitials = "U";
+    if (!string.IsNullOrEmpty(Model.FullName))
+    {
+        var parts = Model.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        userInitials = parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : parts[0].Substring(0, 1).ToUpper();
+    }
 }
 
-<div class="container mt-4">
-    <div class="card shadow border-0 mb-4 bg-primary text-white">
-        <div class="card-body p-4 d-flex justify-content-between align-items-center">
-            <div>
-                <h2 class="fw-bold">@Model.FullName</h2>
-                <p class="mb-0 text-white-50">Level @currentLevel Employee</p>
+<div class="dashboard-wrapper fade-in" style="flex-direction: column; padding: 2rem;">
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10">
+            <div class="hero-cyber-card position-relative overflow-hidden">
+                <div class="cyber-grid-overlay"></div>
+                <div class="cyber-light-sweep"></div>
+
+                <div class="d-flex flex-column flex-md-row align-items-center justify-content-between position-relative z-10 px-5 py-4">
+                    <div class="d-flex align-items-center mb-4 mb-md-0 w-100 w-md-auto justify-content-center justify-content-md-start">
+                        <div class="profile-avatar-cyber me-4">
+                            <span class="initials-glow">@userInitials</span>
+                            <div class="scanning-ring"></div>
+                        </div>
+                        <div class="text-center text-md-start">
+                            <h2 class="fw-bold text-white mb-1 text-shadow-cyber">@Model.FullName</h2>
+                            <div class="d-flex align-items-center justify-content-center justify-content-md-start">
+                                <span class="badge cyber-badge-level me-2">LEVEL @currentLevel</span>
+                                <small class="text-cyan-light letter-spacing-2 text-uppercase">Target ID: Employee</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center text-md-end">
+                        <div class="xp-data-block">
+                            <span class="d-block text-uppercase small text-cyan-light mb-1">Total XP Data</span>
+                            <div class="xp-digital-value">@currentXp <span class="fs-6 text-muted">units</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-5 pb-4 position-relative z-10">
+                    <div class="d-flex justify-content-between small text-cyan-light fw-bold mb-2">
+                        <span>Current Level Status</span>
+                        <span class="text-warning" style="text-shadow: 0 0 5px rgba(255,193,7,0.5);">PROGRESS: @progressPercent%</span>
+                    </div>
+
+                    <div class="progress cyber-progress-track">
+                        <div class="progress-bar plasma-bar" role="progressbar" style="width: @progressPercent%">
+                            <div class="plasma-shine"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 text-center">
+                        <div class="mission-alert">
+                            <i class="bi bi-crosshair me-2"></i>
+                             TARGET: EARN @(100 - xpProgress) XP FOR NEXT LEVEL
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="text-center">
-                <div class="display-4 fw-bold">@currentXp <span class="fs-4">XP</span></div>
-                <div class="badge bg-warning text-dark mt-2">Next Level: @nextLevelXp XP</div>
-            </div>
-        </div>
-        <div class="progress rounded-0" style="height: 10px;">
-            <div class="progress-bar bg-warning" role="progressbar" style="width: @progressPercent%;" aria-valuenow="@progressPercent" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white fw-bold">
-                    <i class="bi bi-clock-history text-primary"></i> Istoric Activitate
+    <div class="row justify-content-center g-5">
+
+        <div class="col-lg-7">
+            <div class="cyber-panel-container h-100">
+                <div class="panel-header-cyber mb-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold text-white mb-0 d-flex align-items-center">
+                        <i class="bi bi-award-fill text-warning icon-glow me-3"></i>
+                        <span>Trophy Database</span>
+                    </h5>
+                    <span class="cyber-counter-badge">@Model.Badges?.Count() UNLOCKED</span>
                 </div>
-                <div class="card-body p-0">
+
+                @if (Model.Badges != null && Model.Badges.Any())
+                {
+                    <div class="badges-grid-cyber">
+                        @foreach (var ub in Model.Badges)
+                        {
+                            var badgeName = ub.Badge?.Name ?? "Insignă";
+                            var badgeDesc = ub.Badge?.Description ?? "Realizare.";
+                            var iconClass = ub.Badge?.Icon ?? "bi-star-fill";
+
+                            <div class="badge-module-cyber" data-bs-toggle="tooltip" title="@badgeDesc">
+                                <div class="module-border-glow"></div>
+                                <div class="badge-icon-hologram">
+                                    <i class="bi @iconClass"></i>
+                                </div>
+                                <div class="badge-data">
+                                    <h6 class="text-white fw-bold mb-1 text-truncate">@badgeName</h6>
+                                    <span class="data-date">ACQUIRED: @ub.AwardedAt.ToString("yyyy.MM.dd")</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state-cyber">
+                        <i class="bi bi-shield-lock display-4 text-cyan-dark"></i>
+                        <p class="mt-3 text-cyan-light mb-0 ls-1">DATABASE EMPTY</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="cyber-panel-container h-100">
+                <div class="panel-header-cyber mb-4">
+                    <h5 class="fw-bold text-white mb-0 d-flex align-items-center">
+                        <i class="bi bi-activity text-primary icon-glow me-3"></i>
+                        <span>System Logs</span>
+                    </h5>
+                </div>
+
+                <div class="data-log-stream">
                     @if (Model.XpHistories != null && Model.XpHistories.Any())
                     {
-                        <ul class="list-group list-group-flush">
-                            @foreach (var entry in Model.XpHistories.OrderByDescending(x => x.CreatedAt).Take(10))
-                            {
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i class="bi bi-star-fill text-warning me-2"></i>
-                                        @entry.Reason
-                                        <div class="small text-muted">@(entry.CreatedAt?.ToString("dd MMM yyyy HH:mm") ?? "N/A")</div>
+                        @foreach (var entry in Model.XpHistories.OrderByDescending(x => x.CreatedAt).Take(8))
+                        {
+                            <div class="log-entry-cyber">
+                                <div class="log-indicator">
+                                    <i class="bi bi-terminal-fill"></i>
+                                </div>
+                                <div class="log-content">
+                                    <span class="log-message text-white">@entry.Reason</span>
+
+                                    <div class="log-timestamp-box">
+                                        <span class="text-white fw-bold">@entry.CreatedAt?.ToString("HH:mm")</span>
+                                        <span class="text-cyan-light opacity-75 ms-2">@entry.CreatedAt?.ToString("dd.MM.yyyy")</span>
                                     </div>
-                                    <span class="badge bg-success rounded-pill">+@entry.ChangeAmount XP</span>
-                                </li>
-                            }
-                        </ul>
+                                </div>
+                                <div class="log-value-neon">
+                                    +@entry.ChangeAmount
+                                </div>
+                            </div>
+                        }
                     }
                     else
                     {
-                        <div class="p-4 text-center text-muted">
-                            Nu ai activitate recentă. Rezolvă task-uri pentru a câștiga XP!
+                        <div class="text-center py-5">
+                            <small class="text-cyan-light ls-1">NO RECENT LOGS FOUND</small>
                         </div>
                     }
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white fw-bold">
-                    <i class="bi bi-award text-danger"></i> Insigne & Realizări
-                </div>
-                <div class="card-body text-center">
-                    @if (Model.Badges != null && Model.Badges.Any())
-                    {
-                        <div class="d-flex flex-wrap justify-content-center gap-2">
-                            @foreach (var badgeLink in Model.Badges)
-                            {
-                                <div class="badge-item p-2 border rounded bg-light" title="@badgeLink.Badge?.Description">
-                                    <div class="fs-1">🏅</div>
-                                    <div class="small fw-bold">@badgeLink.Badge?.Name</div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="py-4">
-                            <span class="display-1 text-muted opacity-25">🔒</span>
-                            <p class="text-muted small mt-2">Încă nu ai deblocat nicio insignă.</p>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
     </div>
 </div>
+
+<style>
+    /* --- CULORI & VARIABILE --- */
+    :root {
+        --cyber-dark-bg: rgba(30, 41, 59, 0.85);
+        --cyber-teal: #0e7490;
+        --cyber-cyan: #06b6d4;
+        --cyber-green: #10b981;
+        --cyber-gold: #f59e0b;
+    }
+
+    .text-cyan-light {
+        color: #a5f3fc;
+    }
+
+    .text-cyan-dark {
+        color: #155e75;
+    }
+
+    .letter-spacing-2 {
+        letter-spacing: 2px;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .font-monospace {
+        font-family: 'Courier New', monospace;
+    }
+
+    /* === 1. HERO CARD FUTURISTIC === */
+    .hero-cyber-card {
+        background: linear-gradient(135deg, rgba(15, 118, 110, 0.9) 0%, rgba(14, 116, 144, 0.95) 100%);
+        border-radius: 16px;
+        border: 1px solid var(--cyber-cyan);
+        box-shadow: 0 0 30px rgba(14, 116, 144, 0.5), inset 0 0 20px rgba(6, 182, 212, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .cyber-grid-overlay {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        opacity: 0.3;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .cyber-light-sweep {
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+        transform: rotate(30deg);
+        animation: sweep 8s infinite linear;
+        pointer-events: none;
+        z-index: 2;
+    }
+    @@keyframes sweep {
+        from
+
+    {
+        transform: translateX(-100%) rotate(30deg);
+    }
+
+    to {
+        transform: translateX(100%) rotate(30deg);
+    }
+
+    }
+
+    .profile-avatar-cyber {
+        width: 100px;
+        height: 100px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .initials-glow {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #fff;
+        z-index: 2;
+        text-shadow: 0 0 15px var(--cyber-cyan);
+    }
+
+    .scanning-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        border-top-color: var(--cyber-cyan);
+        border-bottom-color: var(--cyber-green);
+        animation: spinRing 4s linear infinite;
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+    }
+    @@keyframes spinRing {
+        to
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    .text-shadow-cyber {
+        text-shadow: 0 0 10px rgba(255,255,255,0.4);
+    }
+
+    .cyber-badge-level {
+        background: var(--cyber-dark-bg);
+        color: var(--cyber-cyan);
+        border: 1px solid var(--cyber-cyan);
+        padding: 5px 12px;
+        letter-spacing: 1px;
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    }
+
+    .xp-data-block {
+        background: rgba(0,0,0,0.4);
+        padding: 15px 30px;
+        border-radius: 12px;
+        border-left: 4px solid var(--cyber-green);
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    .xp-digital-value {
+        font-family: 'Courier New', monospace;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--cyber-green);
+        text-shadow: 0 0 10px var(--cyber-green);
+        line-height: 1;
+    }
+
+    /* --- BARA DE PROGRES "PLASMA" (MODIFICATĂ) --- */
+    .cyber-progress-track {
+        height: 16px;
+        background: rgba(0,0,0,0.6);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 2px;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+    }
+
+    .plasma-bar {
+        /* Gradient dinamic: Verde Neon -> Albastru Electric */
+        background: linear-gradient(90deg, #39ff14, #00d2ff);
+        background-size: 200% 100%;
+        animation: plasmaFlow 3s infinite linear;
+        border-radius: 6px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 15px #39ff14;
+    }
+        /* Striații oblice pentru efect tech */
+        .plasma-bar::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+            background-size: 1rem 1rem;
+            z-index: 1;
+        }
+    @@keyframes plasmaFlow {
+        0%
+
+    {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
+
+    }
+
+    /* --- MISSION ALERT (TEXT VIZIBIL) --- */
+    .mission-alert {
+        display: inline-block;
+        background: rgba(250, 204, 21, 0.15); /* Yellow transparent */
+        border: 1px solid #facc15;
+        color: #facc15; /* Bright Neon Yellow */
+        padding: 8px 20px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-shadow: 0 0 5px rgba(250, 204, 21, 0.5);
+        box-shadow: 0 0 15px rgba(250, 204, 21, 0.2);
+        animation: pulseAlert 2s infinite alternate;
+    }
+    @@keyframes pulseAlert {
+        from
+
+    {
+        opacity: 0.8;
+    }
+
+    to {
+        opacity: 1;
+        text-shadow: 0 0 10px rgba(250, 204, 21, 0.8);
+    }
+
+    }
+
+
+    /* === 2. DARK CYBER PANELS === */
+    .cyber-panel-container {
+        background: var(--cyber-dark-bg);
+        backdrop-filter: blur(15px);
+        border-radius: 16px;
+        padding: 2rem;
+        border: 1px solid rgba(6, 182, 212, 0.3);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .panel-header-cyber {
+        border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+        padding-bottom: 15px;
+    }
+
+    .icon-glow {
+        filter: drop-shadow(0 0 8px currentColor);
+    }
+
+    .cyber-counter-badge {
+        background: rgba(0,0,0,0.4);
+        color: var(--cyber-cyan);
+        font-family: monospace;
+        padding: 4px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--cyber-cyan);
+        font-size: 0.8rem;
+    }
+
+    /* === 3. INSIGNE === */
+    .badges-grid-cyber {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+    }
+
+    .badge-module-cyber {
+        position: relative;
+        background: rgba(15, 23, 42, 0.6);
+        border-radius: 12px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.05);
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+
+        .badge-module-cyber:hover {
+            transform: translateY(-5px);
+            border-color: var(--cyber-gold);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+        }
+
+    .module-border-glow {
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        box-shadow: inset 0 0 0 2px transparent;
+        transition: all 0.3s;
+    }
+
+    .badge-module-cyber:hover .module-border-glow {
+        box-shadow: inset 0 0 0 2px var(--cyber-gold);
+    }
+
+    .badge-icon-hologram {
+        font-size: 2.8rem;
+        color: var(--cyber-gold);
+        margin-bottom: 12px;
+        filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.6));
+        animation: holoFlicker 4s infinite alternate;
+    }
+    @@keyframes holoFlicker {
+        0%, 100%
+
+    {
+        opacity: 1;
+    }
+
+    95% {
+        opacity: 0.8;
+    }
+
+    }
+
+    .data-date {
+        font-family: monospace;
+        font-size: 0.7rem;
+        color: #64748b;
+        display: block;
+        margin-top: 5px;
+    }
+
+    /* === 4. SYSTEM LOGS (MODIFICAT PENTRU VIZIBILITATE) === */
+    .data-log-stream {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .log-entry-cyber {
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.3);
+        border-left: 3px solid var(--cyber-cyan);
+        padding: 10px 15px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        transition: all 0.2s;
+    }
+
+        .log-entry-cyber:hover {
+            background: rgba(6, 182, 212, 0.1);
+            margin-left: 5px;
+        }
+
+    .log-indicator {
+        color: var(--cyber-cyan);
+        margin-right: 15px;
+        font-size: 1.1rem;
+    }
+
+    .log-content {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .log-message {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Timpul Vizibil */
+    .log-timestamp-box {
+        font-size: 0.75rem;
+        margin-top: 2px;
+    }
+
+    .log-value-neon {
+        color: var(--cyber-green);
+        font-weight: 800;
+        font-size: 0.9rem;
+        text-shadow: 0 0 8px var(--cyber-green);
+    }
+
+    .empty-state-cyber {
+        text-align: center;
+        padding: 3rem;
+        background: rgba(0,0,0,0.2);
+        border-radius: 16px;
+        border: 1px dashed var(--cyber-dark-bg);
+    }
+</style>

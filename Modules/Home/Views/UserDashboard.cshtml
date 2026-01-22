@@ -8,26 +8,26 @@
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "COMMAND_CENTER";
 
-    // Date Utilizator
+    // User Data
     var currentUser = await UserManager.GetUserAsync(User);
     string displayName = currentUser?.FullName;
-    if (string.IsNullOrEmpty(displayName)) displayName = currentUser?.UserName?.Split('@')[0] ?? "Angajat";
+    if (string.IsNullOrEmpty(displayName)) displayName = currentUser?.UserName?.Split('@')[0] ?? "OPERATIVE";
 
-    string userInitials = "U";
+    string userInitials = "OP";
     if (!string.IsNullOrEmpty(displayName))
     {
         var parts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         userInitials = parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : parts[0].Substring(0, 1).ToUpper();
     }
 
-    // Statistici
+    // Stats
     int currentLevel = (ViewBag.CurrentLevel as int?) ?? 1;
     int currentXp = (ViewBag.CurrentXp as int?) ?? 0;
     int xpProgress = currentXp % 100;
 
-    // Insigne
+    // Badges
     var myBadges = ViewBag.MyBadges as IEnumerable<UserBadge>;
     if (myBadges == null) { myBadges = new List<UserBadge>(); }
 
@@ -37,189 +37,153 @@
 
 <div class="dashboard-wrapper fade-in">
 
-    <aside class="dashboard-sidebar">
-        <div class="profile-section">
-            <div class="avatar-container">
-                <div class="avatar-circle">@userInitials</div>
+    <aside class="cyber-sidebar">
+        <div class="scan-line"></div>
+
+        <div class="profile-hud">
+            <div class="avatar-hex">
+                <span class="avatar-text">@userInitials</span>
             </div>
-            <h5 class="profile-name text-truncate w-100" title="@displayName">@displayName</h5>
-            <p class="profile-role">Angajat</p>
+            <div>
+                <h5 class="hud-username">@displayName</h5>
+                <div class="hud-role">
+                    <i class="bi bi-shield-check me-1"></i> ACCESS GRANTED
+                </div>
+            </div>
         </div>
 
-        <div class="stats-card mt-4">
-            <div class="d-flex justify-content-between align-items-end mb-2">
-                <span class="text-uppercase fw-bold text-white-50 small">Level @currentLevel</span>
-                <span class="fw-bold text-warning">@currentXp XP</span>
+        <div class="p-3 mb-4" style="background: rgba(0,0,0,0.4); border: 1px dashed rgba(255,255,255,0.1);">
+            <div class="d-flex justify-content-between text-info small font-monospace mb-1">
+                <span>LVL.@currentLevel</span>
+                <span>XP:@currentXp</span>
             </div>
-            <div class="xp-track">
-                <div class="xp-fill" style="width: @xpProgress%;"></div>
+            <div class="progress" style="height: 6px; background: rgba(255,255,255,0.1);">
+                <div class="progress-bar bg-info" style="width: @xpProgress%; box-shadow: 0 0 10px #0dcaf0;"></div>
             </div>
             <div class="text-end mt-1">
-                <small class="text-white-50" style="font-size: 0.65rem;">Next: @(100 - xpProgress) XP</small>
+                <small class="text-white-50" style="font-size: 0.6rem;">NEXT_LVL_REQ: @(100 - xpProgress)</small>
             </div>
         </div>
 
-        <div class="quick-stats-grid mt-4">
-            <div class="q-stat">
-                <span class="h4 fw-bold mb-0 d-block">@Model.Count()</span>
-                <small>Sarcini</small>
+        <div class="hud-stats-grid">
+            <div class="hud-stat-box">
+                <span class="stat-num">@Model.Count()</span>
+                <span class="stat-lbl">ASSIGNMENTS</span>
+                <div class="scan-line"></div>
             </div>
-            <div class="q-stat">
-                <span class="h4 fw-bold mb-0 d-block">@myBadges.Count()</span>
-                <small>Insigne</small>
+            <div class="hud-stat-box">
+                <span class="stat-num text-warning">@myBadges.Count()</span>
+                <span class="stat-lbl">TROPHIES</span>
+                <div class="scan-line"></div>
             </div>
         </div>
 
-        <div class="badges-section mt-5">
-            <h6 class="sidebar-label">
-                <i class="bi bi-award-fill me-2"></i>Colecția Mea
-            </h6>
-
-            @if (myBadges.Any())
-            {
-                <div class="badges-grid">
-                    @foreach (var ub in myBadges)
-                    {
-                        var badgeName = ub.Badge?.Name ?? "Insignă";
-                        var iconClass = ub.Badge?.Icon ?? "bi-star-fill";
-
-                        <div class="badge-box" data-bs-toggle="tooltip" title="@badgeName">
-                            <i class="bi @iconClass text-warning fs-5"></i>
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="text-center p-3 rounded" style="background: rgba(255,255,255,0.1);">
-                    <i class="bi bi-lock-fill fs-3 text-white-50 mb-2 d-block"></i>
-                    <p class="text-white-50 small mb-0">Nicio insignă.</p>
-                </div>
-            }
+        <div class="mt-4">
+            <h6 class="text-info small font-monospace border-bottom border-secondary pb-2 mb-3">LATEST_ACQUISITIONS</h6>
+            <div class="d-flex gap-2">
+                @foreach (var ub in myBadges.Take(4))
+                {
+                    var icon = ub.Badge?.Icon ?? "bi-star-fill";
+                    <div class="p-2 border border-secondary bg-dark text-warning" title="@ub.Badge?.Name">
+                        <i class="bi @icon"></i>
+                    </div>
+                }
+            </div>
         </div>
     </aside>
 
     <main class="dashboard-main">
-        <header class="main-header mb-5">
+        <header class="hud-header-panel">
             <div>
-                <h2 class="fw-bold text-dark mb-1">Salut, @displayName! 👋</h2>
-                <p class="text-muted mb-0">Spor la treabă astăzi.</p>
+                <h2 class="hud-welcome">DASHBOARD USER</h2>
+                <small >SYSTEM ONLINE // USER: @displayName.ToUpper()</small>
             </div>
-            <div class="header-date d-none d-md-block">
-                <i class="bi bi-calendar-day me-2 text-primary"></i>
-                @DateTime.Now.ToString("dd MMMM yyyy")
+            <div class="hud-date">
+                <i class="bi bi-clock-history me-2"></i>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")
             </div>
         </header>
 
         <div class="row g-4">
-
             <div class="col-lg-6">
-                <div class="h-100">
-
-                    <div class="column-header-glass header-todo">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-box shadow-sm">
-                                <i class="bi bi-inbox-fill"></i>
-                            </div>
-                            <div>
-                                <h6 class="column-title">De Făcut</h6>
-                                <small class="text-muted" style="font-size: 0.75rem;">Sarcini noi</small>
-                            </div>
-                        </div>
-                        <span class="column-count">@tasksNew.Count</span>
-                    </div>
-
-                    <div>
-                        @if (!tasksNew.Any())
-                        {
-                            <div class="empty-state"><i class="bi bi-emoji-smile fs-1 mb-2 text-muted opacity-50"></i><p>Nu ai sarcini noi.</p></div>
-                        }
-                        @foreach (var task in tasksNew)
-                        {
-                            @RenderTaskCard(task)
-                        }
-                    </div>
+                <div class="hud-col-header">
+                    <h6 class="hud-col-title"><i class="bi bi-broadcast me-2"></i> INCOMING TASKS</h6>
+                    <span class="hud-badge-count">@tasksNew.Count</span>
                 </div>
+
+                @if (!tasksNew.Any())
+                {
+                    <div class="p-4 border border-dashed border-secondary text-center text-muted font-monospace">
+                        NO INCOMING DATA STREAMS
+                    </div>
+                }
+                @foreach (var task in tasksNew)
+                {
+                    @RenderTechTask(task)
+                }
             </div>
 
             <div class="col-lg-6">
-                <div class="h-100">
-
-                    <div class="column-header-glass header-progress">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-box shadow-sm">
-                                <i class="bi bi-lightning-charge-fill"></i>
-                            </div>
-                            <div>
-                                <h6 class="column-title">În Lucru</h6>
-                                <small class="text-muted" style="font-size: 0.75rem;">Progres activ</small>
-                            </div>
-                        </div>
-                        <span class="column-count">@tasksInProgress.Count</span>
-                    </div>
-
-                    <div>
-                        @if (!tasksInProgress.Any())
-                        {
-                            <div class="empty-state"><i class="bi bi-cup-hot fs-1 mb-2 text-muted opacity-50"></i><p>Nimic în lucru.</p></div>
-                        }
-                        @foreach (var task in tasksInProgress)
-                        {
-                            @RenderTaskCard(task)
-                        }
-                    </div>
+                <div class="hud-col-header" style="border-left-color: #10b981;">
+                    <h6 class="hud-col-title text-success"><i class="bi bi-cpu-fill me-2"></i> ACTIVE PROCESSES</h6>
+                    <span class="hud-badge-count bg-success text-white">@tasksInProgress.Count</span>
                 </div>
+
+                @if (!tasksInProgress.Any())
+                {
+                    <div class="p-4 border border-dashed border-secondary text-center text-muted font-monospace">
+                        NO ACTIVE PROCESSES
+                    </div>
+                }
+                @foreach (var task in tasksInProgress)
+                {
+                    @RenderTechTask(task)
+                }
             </div>
         </div>
     </main>
 </div>
 
 @{
-    Microsoft.AspNetCore.Html.IHtmlContent RenderTaskCard(TaskAssignment assignment)
+    Microsoft.AspNetCore.Html.IHtmlContent RenderTechTask(TaskAssignment assignment)
     {
-        int pVal = assignment.Task.Priority;
-        string priorityClass = pVal == 1 ? "priority-high" : (pVal == 2 ? "priority-medium" : "priority-low");
-        string priorityLabel = pVal == 1 ? "Ridicat" : (pVal == 2 ? "Mediu" : "Scăzut");
+        // Prio logic
+        int p = assignment.Task.Priority;
+        string prioClass = p == 1 ? "prio-1" : (p == 2 ? "prio-2" : "prio-3");
+        string prioName = p == 1 ? "CRITICAL" : (p == 2 ? "MODERATE" : "STANDARD");
 
-        bool isOverdue = assignment.Task.DueDate.HasValue && assignment.Task.DueDate.Value < DateTime.Now;
-        string dateText = assignment.Task.DueDate.HasValue ? assignment.Task.DueDate.Value.ToString("dd MMM") : "Fără termen";
-        string dateColor = isOverdue ? "text-danger fw-bold" : "text-muted";
-        string dateIcon = isOverdue ? "bi-exclamation-circle-fill" : "bi-calendar2-event";
+        // Date
+        bool overdue = assignment.Task.DueDate.HasValue && assignment.Task.DueDate.Value < DateTime.Now;
+        string dateStr = assignment.Task.DueDate.HasValue ? assignment.Task.DueDate.Value.ToString("dd.MM.yy") : "N/A";
+        string dateColor = overdue ? "text-danger" : "text-info";
 
-        <div class="task-card @priorityClass">
-            <div class="task-indicator"></div>
-
-            <div class="d-flex justify-content-between align-items-start mb-2 ps-3">
-                <span class="priority-badge">@priorityLabel</span>
-                @if (isOverdue)
+        <div class="tech-card">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="tag-prio @prioClass">@prioName PRIORITY</span>
+                @if (overdue)
                 {
-                    <span class="badge bg-danger rounded-pill shadow-sm" style="font-size: 0.65rem;">
-                        <i class="bi bi-clock-history me-1"></i> Expirat
-                    </span>
+                    <span class="text-danger small font-monospace fw-bold">!! OVERDUE !!</span>
                 }
             </div>
 
-            <h5 class="task-title">@assignment.Task.Title</h5>
-
-            <p class="task-desc text-truncate-2">
-                @(assignment.Task.Description?.Length > 90 ? assignment.Task.Description.Substring(0, 90) + "..." : assignment.Task.Description)
+            <h6 class="tech-title">@assignment.Task.Title</h6>
+            <div class="tech-line"></div>
+            <p class="tech-desc text-truncate-2">
+                @(assignment.Task.Description?.Length > 70 ? assignment.Task.Description.Substring(0, 70) + "..." : assignment.Task.Description)
             </p>
 
-            <div class="task-footer">
-                <span class="@dateColor small fw-bold">
-                    <i class="bi @dateIcon me-1"></i> @dateText
-                </span>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <small class="font-monospace @dateColor"><i class="bi bi-calendar-event"></i> @dateStr</small>
 
                 @if (assignment.Status == 0)
                 {
-                    <a href="/Tasks/VoteDifficulty/@assignment.TaskAssignmentId" class="btn-action-task btn-vote text-decoration-none">
-                        Votează
+                    <a href="/Tasks/VoteDifficulty/@assignment.TaskAssignmentId" class="btn-tech text-decoration-none">
+                        START <i class="bi bi-chevron-right"></i>
                     </a>
                 }
                 else
                 {
-                    <a href="/Tasks/CompleteTask/@assignment.TaskAssignmentId" class="btn-action-task btn-complete text-decoration-none">
-                        <i class="bi bi-check-lg me-1"></i>Gata
+                    <a href="/Tasks/CompleteTask/@assignment.TaskAssignmentId" class="btn-tech btn-tech-success text-decoration-none">
+                        COMPLETE <i class="bi bi-check2"></i>
                     </a>
                 }
             </div>

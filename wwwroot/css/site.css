@@ -3,586 +3,719 @@
 :root {
     --primary-gradient: linear-gradient(135deg, #0f766e 0%, #0e7490 100%);
     --accent-color: #10b981;
-    --bg-card: #ffffff;
-    --text-dark: #1e293b;
-    --text-muted: #64748b;
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-    --radius-md: 12px;
+    --bg-card: #ffffff; /* Fallback */
+    --text-dark: #e2e8f0; /* Text deschis pt Dark Mode */
+    /* CYBER HUD PALETTE (PĂSTRATE PENTRU ELEMENTELE DARK) */
+    --hud-bg: #0f172a; /* Deep Space Blue */
+    --hud-panel: rgba(30, 41, 59, 0.6);
+    --hud-border: rgba(6, 182, 212, 0.4);
+    --hud-cyan: #06b6d4;
+    --hud-teal: #14b8a6;
+    --hud-green: #10b981;
+    --hud-alert: #f43f5e;
+    --hud-gold: #f59e0b;
 }
 
-html {
+html, body {
     height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
 }
 
-/* === 1. FUNDAL ANIMAT GLOBAL (LIVE) === */
+/* === 1. FUNDAL TECH GLOBAL (MODIFICAT) === */
 body {
-    min-height: 100vh;
     font-family: 'Poppins', sans-serif;
-    color: var(--text-dark);
+    /* AICI E SCHIMBAREA: Fundal Deschis (Albastru deschis / Azur) */
+    background-color: #f0f9ff;
+    background: linear-gradient(to bottom, #f0f9ff, #e0f2fe);
+    /* Textul de bază devine închis ca să se vadă pe fundal */
+    color: #334155;
+    /* Pattern-ul de grilă adaptat pt fundal deschis (linii mai vizibile) */
+    background-image: linear-gradient(rgba(14, 116, 144, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(14, 116, 144, 0.15) 1px, transparent 1px);
+    background-size: 40px 40px;
     display: flex;
     flex-direction: column;
-    margin: 0;
-    /* Gradient animat */
-    background: linear-gradient(-45deg, #e0eafc, #cfdef3, #e2ebf0, #fdfbfb);
-    background-size: 400% 400%;
-    animation: gradientBG 12s ease infinite;
 }
 
-@keyframes gradientBG {
-    0% {
-        background-position: 0% 50%;
+    /* PĂSTRĂM SCANLINE-UL GLOBAL (Efect TV) */
+    body::after {
+        content: " ";
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+        z-index: 2;
+        background-size: 100% 2px, 3px 100%;
+        pointer-events: none;
     }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
 
 main {
     flex: 1;
+    position: relative;
+    z-index: 3;
 }
 
-/* === 2. NAVBAR FIX === */
+/* ==================================================================================
+   RESTUL RĂMÂNE EXACT LA FEL (DARK TECH) PENTRU A PLUTI PESTE FUNDALUL DESCHIS
+================================================================================== */
+
+/* === 2. NAVBAR TECH (Rămâne Dark) === */
 .custom-navbar {
-    background: var(--primary-gradient);
-    padding: 1rem 0;
-    box-shadow: var(--shadow-md);
+    background: rgba(15, 23, 42, 0.9);
+    border-bottom: 1px solid var(--hud-cyan);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
     position: relative;
     z-index: 1000;
 }
 
 .navbar-brand {
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    font-weight: 800;
+    color: var(--hud-cyan) !important;
+    text-shadow: 0 0 5px var(--hud-cyan);
 }
 
-/* === 3. CARDURI GENERALE === */
-.card {
-    background-color: var(--bg-card);
-    border: none;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    transition: transform 0.2s;
-    margin-bottom: 1.5rem;
-}
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-lg);
-    }
-
-/* Utilitare */
-.btn-primary {
-    background: var(--primary-gradient);
-    border: none;
-}
-
-/* =========================================
-   4. DASHBOARD 3D & SIDEBAR
-   ========================================= */
-
-/* Wrapper principal */
+/* === 3. DASHBOARD WRAPPER === */
 .dashboard-wrapper {
     display: flex;
-    margin-top: 1rem; /* Fix Navbar */
-    margin-left: -1rem;
-    margin-right: -1rem;
-    margin-bottom: -1.5rem;
-    min-height: 85vh;
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(8px);
-    border-radius: 20px 20px 0 0;
-    overflow: hidden;
+    margin-top: 0;
+    min-height: 90vh;
 }
 
-/* --- SIDEBAR 3D --- */
-.dashboard-sidebar {
-    width: 320px;
-    background: linear-gradient(160deg, #1e3a8a 0%, #0f172a 100%);
-    color: white;
+/* === 4. SIDEBAR - COMMAND PANEL (MODIFICAT - Fără colț tăiat) === */
+.cyber-sidebar {
+    width: 340px;
+    background: rgba(15, 23, 42, 0.85); /* Dark Sidebar */
+    backdrop-filter: blur(10px);
+    border-right: 2px solid var(--hud-border);
     padding: 2rem 1.5rem;
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
-    box-shadow: 15px 0 30px rgba(0,0,0,0.3), inset 1px 1px 0 rgba(255,255,255,0.1);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
     position: relative;
-    z-index: 10;
-}
-
-/* Profil Avatar */
-.profile-section {
-    text-align: center;
-    margin-bottom: 2.5rem;
-}
-
-.avatar-container {
-    margin-bottom: 15px;
-    position: relative;
-    display: inline-block;
-}
-
-.avatar-circle {
-    width: 80px;
-    height: 80px;
-    background: radial-gradient(circle at 30% 30%, #60a5fa, #2563eb);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    font-weight: bold;
+    /* AM SCOS linia cu clip-path: polygon(...) */
+    /* Adăugăm colțuri rotunjite doar pe partea dreaptă */
+    border-radius: 0 16px 16px 0;
     color: white;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset -5px -5px 10px rgba(0,0,0,0.2), inset 5px 5px 10px rgba(255,255,255,0.3);
-    border: 2px solid rgba(255,255,255,0.1);
 }
-
-.profile-name {
-    font-weight: 700;
-    color: #fff;
-    font-size: 1.2rem;
-    margin-bottom: 2px;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-}
-
-.profile-role {
-    color: #cbd5e1;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    opacity: 0.8;
-}
-
-/* Stats Card */
-.stats-card {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5), inset -1px -1px 1px rgba(255,255,255,0.05);
-    border-top: 1px solid rgba(0,0,0,0.3);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.xp-track {
-    height: 8px;
-    background: rgba(0,0,0,0.5);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
-}
-
-.xp-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #f59e0b, #fbbf24);
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
-}
-
-.quick-stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.q-stat {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 12px;
-    padding: 15px 10px;
-    text-align: center;
-    box-shadow: inset 1px 1px 4px rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.03);
-    color: #e2e8f0;
-}
-
-/* Badges */
-.sidebar-label {
-    color: #94a3b8;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin-bottom: 1.2rem;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.8);
-}
-
-.badges-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.badge-box {
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f8fafc;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    transition: transform 0.2s ease;
-    cursor: pointer;
-}
-
-    .badge-box:hover {
-        transform: translateY(-3px) scale(1.1);
-        box-shadow: 0 8px 12px rgba(0,0,0,0.4);
+    .cyber-sidebar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 2px;
+        height: 100px;
+        background: var(--hud-cyan);
+        box-shadow: 0 0 10px var(--hud-cyan);
     }
 
-/* --- MAIN CONTENT --- */
+.profile-hud {
+    text-align: center;
+    margin-bottom: 2rem;
+    border: 1px solid var(--hud-border);
+    padding: 20px;
+    background: rgba(6, 182, 212, 0.05);
+    position: relative;
+}
+
+    .profile-hud::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: -1px;
+        width: 20px;
+        height: 20px;
+        border-bottom: 2px solid var(--hud-cyan);
+        border-left: 2px solid var(--hud-cyan);
+    }
+
+    .profile-hud::before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        right: -1px;
+        width: 20px;
+        height: 20px;
+        border-top: 2px solid var(--hud-cyan);
+        border-right: 2px solid var(--hud-cyan);
+    }
+
+.avatar-hex {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 15px;
+    background: var(--hud-bg);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--hud-cyan);
+    position: relative;
+}
+
+    .avatar-hex::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: var(--hud-cyan);
+        opacity: 0.1;
+    }
+
+.avatar-text {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--hud-cyan);
+    text-shadow: 0 0 10px var(--hud-cyan);
+    z-index: 2;
+}
+
+.hud-username {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.hud-role {
+    color: var(--hud-green);
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* Stats Sidebar */
+.hud-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.hud-stat-box {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+    .hud-stat-box:hover {
+        border-color: var(--hud-green);
+    }
+
+        .hud-stat-box:hover .scan-line {
+            top: 100%;
+            transition: top 0.5s;
+        }
+
+.stat-num {
+    font-size: 1.5rem;
+    color: white;
+    font-weight: 700;
+    font-family: 'Courier New';
+    display: block;
+}
+
+.stat-lbl {
+    font-size: 0.6rem;
+    color: var(--hud-cyan);
+    text-transform: uppercase;
+}
+
+/* --- MAIN DASHBOARD AREA --- */
 .dashboard-main {
     flex-grow: 1;
-    padding: 3rem;
+    padding: 2rem;
     overflow-y: auto;
 }
 
-.main-header {
-    border-bottom: 2px solid rgba(0,0,0,0.05);
-    padding-bottom: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header-date {
-    background: white;
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-weight: 600;
-    color: #475569;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-/* === 5. COLUMN HEADERS SPECTACULAR (NOU) === */
-.column-header-glass {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 20px;
-    padding: 1.2rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8);
-    border: 1px solid rgba(255,255,255,0.5);
-    transition: transform 0.3s ease;
-}
-
-    .column-header-glass:hover {
-        transform: translateY(-3px);
-        background: rgba(255, 255, 255, 0.85);
-        box-shadow: 0 12px 25px rgba(0,0,0,0.06);
-    }
-
-/* Header De Făcut (Gri/Slate) */
-.header-todo {
-    border-left: 6px solid #64748b;
-}
-
-    .header-todo .icon-box {
-        background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
-        color: #475569;
-    }
-
-/* Header În Lucru (Albastru) */
-.header-progress {
-    border-left: 6px solid #3b82f6;
-}
-
-    .header-progress .icon-box {
-        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-        color: #2563eb;
-    }
-
-/* Iconița Pătrată din Header */
-.column-header-glass .icon-box {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.4rem;
-    margin-right: 15px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
-}
-
-.column-title {
-    font-weight: 800;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #334155;
-    margin: 0;
-}
-
-.column-count {
-    font-weight: 700;
-    font-size: 0.95rem;
-    padding: 6px 14px;
-    border-radius: 30px;
-    background: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    color: #1e293b;
-}
-
-
-/* === 6. CARDURI TASK - PREMIUM GLASS === */
-.priority-high {
-    --card-accent: #ef4444;
-    --card-glow: rgba(239, 68, 68, 0.4);
-}
-
-.priority-medium {
-    --card-accent: #f59e0b;
-    --card-glow: rgba(245, 158, 11, 0.4);
-}
-
-.priority-low {
-    --card-accent: #10b981;
-    --card-glow: rgba(16, 185, 129, 0.4);
-}
-
-.task-card {
-    position: relative;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 24px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), inset 0 0 20px rgba(255,255,255,0.5);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    overflow: hidden;
-}
-
-    .task-card:hover {
-        transform: translateY(-8px) scale(1.02);
-        background: rgba(255, 255, 255, 0.9);
-        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 0 15px var(--card-glow);
-        z-index: 10;
-        border-color: #fff;
-    }
-
-/* Indicator Linie Stânga */
-.task-indicator {
-    position: absolute;
-    left: 15px;
-    top: 25px;
-    bottom: 25px;
-    width: 6px;
-    background: var(--card-accent);
-    border-radius: 10px;
-    box-shadow: 0 0 8px var(--card-glow);
-}
-
-.task-title {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: #1e293b;
-    margin-bottom: 0.5rem;
-    padding-left: 15px;
-    letter-spacing: -0.5px;
-}
-
-.task-desc {
-    padding-left: 15px;
-    font-size: 0.9rem;
-    color: #64748b;
-    line-height: 1.6;
-    margin-bottom: 1.2rem;
-}
-
-/* Badge-uri Interne */
-.priority-badge {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 1px;
-    padding: 5px 12px;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.5);
-    color: var(--card-accent);
-    border: 1px solid var(--card-accent);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.task-footer {
-    padding-left: 15px;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Butoane Acțiune */
-.btn-action-task {
+/* === HEADER PANEL - TIP CARD (NOU) === */
+.hud-header-panel {
+    /* Fundal Foarte Întunecat și Solid */
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    /* Bordură */
+    border: 1px solid var(--hud-border);
+    border-left: 5px solid var(--hud-cyan);
     border-radius: 12px;
-    padding: 8px 20px;
+    /* Spațiere */
+    padding: 1.5rem 2rem;
+    margin-bottom: 30px;
+    /* Umbră */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    /* Layout */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+align-items: flex-end;
+/* IMPORTANT: Titlul devine închis pentru contrast cu fundalul deschis */
+.hud-welcome {
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    /* CULOARE: ALB PUR + GLOW PUTERNIC */
+    color: #ffffff !important;
+    text-shadow: 0 0 20px rgba(6, 182, 212, 0.8);
+}   text-shadow: 0 0 15px rgba(6, 182, 212, 0.6); /* Glow Cyan */
+
+
+.hud-header-panel small {
+    /* CULOARE: CYAN DESCHIS (Să se vadă clar pe negru) */
+    color: #a5f3fc !important;
+    font-family: 'Courier New', monospace;
     font-size: 0.85rem;
     font-weight: 600;
-    transition: all 0.2s;
-    border: none;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    letter-spacing: 1px;
+    display: block;
+    margin-top: 5px;
 }
 
-.btn-vote {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
+
+
+.hud-date {
+    font-family: 'Courier New', monospace;
+    /* Text CYAN pe fundal NEGRU */
+    color: var(--hud-cyan);
+    background: rgba(0, 0, 0, 0.3); /* Fundal închis la dată */
+    border: 1px solid var(--hud-cyan);
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
 }
 
-    .btn-vote:hover {
-        box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
-        transform: translateY(-2px);
-        color: white;
+/* --- COLUMNS (Rămân Dark) --- */
+.hud-col-header {
+    background: rgba(30, 41, 59, 0.9);
+    border-left: 4px solid var(--hud-cyan);
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.hud-col-title {
+    color: var(--hud-cyan);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.hud-badge-count {
+    background: var(--hud-cyan);
+    color: black;
+    padding: 2px 8px;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+/* --- COMPLEX TASK CARD (Rămân Dark) --- */
+.tech-card {
+    background: rgba(30, 41, 59, 0.85); /* Dark Card */
+    border: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 20px;
+    position: relative;
+    padding: 1.5rem;
+    /* Colțuri rotunjite (fără tăieturi) */
+    border-radius: 12px;
+    /* Umbră inițială subtilă */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    /* Tranziție fină pentru efectul 3D */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* Ascundem overflow pentru bara colorată din stânga */
+    overflow: hidden;
+}
+
+    /* Bara colorată din stânga (Priority line) */
+    .tech-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--hud-border);
+        transition: background 0.3s;
     }
 
-.btn-complete {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-}
-
-    .btn-complete:hover {
-        box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
-        transform: translateY(-2px);
-        color: white;
+    .tech-card:hover {
+        /* 1. Ridicare în sus (Lift) */
+        transform: translateY(-10px) scale(1.02);
+        /* 2. Fundalul devine puțin mai solid/luminos */
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 1));
+        /* 3. Umbră puternică dedesubt (pentru a simula înălțimea) + Glow colorat */
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4), /* Umbra de adâncime */
+        0 0 20px rgba(6, 182, 212, 0.2); /* Glow Cyan */
+        /* 4. Bordura se aprinde */
+        border-color: var(--hud-cyan);
+        z-index: 10; /* Aduce cardul în fața celorlalte */
     }
 
-.empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    border: 2px dashed #cbd5e1;
-    border-radius: 15px;
+        .tech-card:hover::before {
+            background: var(--hud-cyan);
+            box-shadow: 0 0 15px var(--hud-cyan); /* Bara stângă strălucește */
+        }
+
+.tech-line {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 10px 0;
+    width: 100%;
+}
+
+.tech-title {
+    color: white;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 1rem;
+}
+
+.tech-desc {
     color: #94a3b8;
-    margin-top: 1rem;
-    background: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    font-family: 'Courier New';
 }
 
-.text-truncate-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+/* Priority Tags */
+.tag-prio {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border: 1px solid;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.prio-1 {
+    color: var(--hud-alert);
+    border-color: var(--hud-alert);
+    text-shadow: 0 0 5px var(--hud-alert);
+}
+
+.prio-2 {
+    color: var(--hud-gold);
+    border-color: var(--hud-gold);
+    text-shadow: 0 0 5px var(--hud-gold);
+}
+
+.prio-3 {
+    color: var(--hud-green);
+    border-color: var(--hud-green);
+    text-shadow: 0 0 5px var(--hud-green);
+}
+
+/* Buttons Tech */
+.btn-tech {
+    background: transparent;
+    border: 1px solid var(--hud-cyan);
+    color: var(--hud-cyan);
+    padding: 5px 15px;
+    font-family: 'Courier New';
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    position: relative;
     overflow: hidden;
 }
 
-/* === MODERN DROPDOWN === */
-@keyframes slideInDown {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
+    .btn-tech:hover {
+        background: var(--hud-cyan);
+        color: #000;
+        box-shadow: 0 0 15px var(--hud-cyan);
     }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
+.btn-tech-success {
+    border-color: var(--hud-green);
+    color: var(--hud-green);
+}
+
+    .btn-tech-success:hover {
+        background: var(--hud-green);
+        color: #000;
+        box-shadow: 0 0 15px var(--hud-green);
+    }
+
+/* Animations */
+.scan-line {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: rgba(6, 182, 212, 0.5);
+    box-shadow: 0 0 10px var(--hud-cyan);
+    animation: scan 3s linear infinite;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+@keyframes scan {
+    0% {
+        top: -20%;
+    }
+
+    100% {
+        top: 120%;
     }
 }
 
-.dropdown-menu-modern {
-    animation: slideInDown 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    padding: 0;
-    overflow: hidden;
-    min-width: 260px;
-    margin-top: 15px !important;
-}
-
-.user-menu-header {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    padding: 20px;
-    text-align: center;
-    border-bottom: 1px solid #cbd5e1;
-}
-
-.user-avatar-circle {
-    width: 60px;
-    height: 60px;
-    background-color: var(--accent-color);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin: 0 auto 10px auto;
-    box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
-}
-
-.dropdown-item-modern {
-    padding: 12px 20px;
-    color: var(--text-dark);
-    font-weight: 500;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-}
-
-    .dropdown-item-modern:hover {
-        background-color: #f1f5f9;
-        color: var(--accent-color);
-        padding-left: 25px;
-    }
-
-    .dropdown-item-modern i {
-        width: 24px;
-        text-align: center;
-        margin-right: 10px;
-        color: #94a3b8;
-    }
-
-    .dropdown-item-modern:hover i {
-        color: var(--accent-color);
-    }
-
-/* Responsive */
+/* --- RESPONSIVE --- */
 @media (max-width: 991px) {
     .dashboard-wrapper {
         flex-direction: column;
-        margin: 0;
-        margin-top: 10px;
-        background: none;
     }
 
-    .dashboard-sidebar {
+    .cyber-sidebar {
         width: 100%;
-        padding: 1.5rem;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 20px 20px 0 0;
+        clip-path: none;
+        border-right: none;
+        border-bottom: 2px solid var(--hud-cyan);
     }
 
-    .profile-section {
+    .profile-hud {
         display: flex;
         align-items: center;
-        gap: 15px;
-        margin: 0;
         text-align: left;
+        gap: 20px;
     }
 
-    .avatar-circle {
+    .avatar-hex {
+        margin: 0;
         width: 60px;
         height: 60px;
-        font-size: 1.5rem;
-        margin: 0;
     }
 
-    .stats-card, .quick-stats-grid, .badges-section {
+    .hud-stats-grid {
         display: none;
     }
 
-    .dashboard-main {
-        padding: 1.5rem;
+
+    /* =========================================
+   7. LEADERBOARD STYLES (TECH HUD)
+   ========================================= */
+
+    /* --- PODIUM (TOP 3) --- */
+    .podium-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 20px;
+        margin-bottom: 3rem;
+        padding-top: 20px;
+    }
+
+    .podium-card {
+        background: rgba(30, 41, 59, 0.9); /* Dark background */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px 12px 0 0;
+        text-align: center;
+        padding: 2rem 1.5rem;
+        position: relative;
+        clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 100%, 0 100%, 0 10%);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        transition: transform 0.3s;
+        flex: 1;
+    }
+
+        .podium-card:hover {
+            transform: translateY(-10px);
+            z-index: 5;
+        }
+
+    /* Rank Colors */
+    .rank-1 { /* GOLD */
+        border-top: 4px solid #facc15;
+        box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);
+        height: 380px; /* Cel mai înalt */
+        order: 2; /* Centru */
+    }
+
+        .rank-1 .rank-badge {
+            background: linear-gradient(135deg, #facc15, #ca8a04);
+            color: black;
+        }
+
+    .rank-2 { /* SILVER / CYAN */
+        border-top: 4px solid #38bdf8;
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        height: 340px;
+        order: 1; /* Stânga */
+    }
+
+        .rank-2 .rank-badge {
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            color: black;
+        }
+
+    .rank-3 { /* BRONZE */
+        border-top: 4px solid #fb923c;
+        box-shadow: 0 0 20px rgba(251, 146, 60, 0.2);
+        height: 320px;
+        order: 3; /* Dreapta */
+    }
+
+        .rank-3 .rank-badge {
+            background: linear-gradient(135deg, #fb923c, #ea580c);
+            color: black;
+        }
+
+    /* Avatar Podium */
+    .podium-avatar-box {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 15px;
+        position: relative;
+    }
+
+    .podium-avatar {
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.1);
+        clip-path: circle(50% at 50% 50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: white;
+    }
+
+    .rank-badge {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    /* Text Podium */
+    .podium-name {
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+
+    .podium-xp {
+        font-family: 'Courier New', monospace;
+        color: var(--hud-cyan);
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    .podium-level {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* --- LISTA RESTUL JUCĂTORILOR (ROW CARDS) --- */
+    .leaderboard-row {
+        display: flex;
+        align-items: center;
+        background: rgba(30, 41, 59, 0.85); /* Dark background */
+        border: 1px solid rgba(255,255,255,0.05);
+        border-left: 3px solid rgba(255,255,255,0.2);
+        padding: 1rem 1.5rem;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+        .leaderboard-row:hover {
+            transform: translateX(5px);
+            background: rgba(30, 41, 59, 1);
+            border-left-color: var(--hud-cyan);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+    .lb-rank {
+        width: 40px;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #64748b;
+        font-family: 'Courier New', monospace;
+    }
+
+    .lb-user {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .lb-avatar-small {
+        width: 40px;
+        height: 40px;
+        background: rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-weight: 700;
+        color: white;
+    }
+
+    .lb-name {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .lb-role {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    .lb-stats {
+        text-align: right;
+        min-width: 100px;
+    }
+
+    .lb-xp {
+        color: var(--hud-cyan);
+        font-weight: 700;
+        font-family: 'Courier New';
+        display: block;
+    }
+
+    .lb-lvl {
+        color: #64748b;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    /* Responsive Podium */
+    @media (max-width: 768px) {
+        .podium-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .podium-card {
+            width: 100%;
+            height: auto !important;
+            order: initial !important;
+            margin-bottom: 15px;
+        }
     }
 }

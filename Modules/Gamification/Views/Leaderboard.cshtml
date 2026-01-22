@@ -1,59 +1,97 @@
 ﻿@model IEnumerable<TaskManager.Modules.Users.Models.ApplicationUser>
 
 @{
-    ViewData["Title"] = "Leaderboard";
+    Layout = "_Layout";
+    ViewData["Title"] = "CLASAMENT";
+
+    // 1. Sortăm toți utilizatorii după XP (descrescător)
+    var sortedUsers = Model.OrderByDescending(u => u.TotalXp).ToList();
+
+    // Helper simplu pentru inițiale
+    string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "U";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : parts[0].Substring(0, 1).ToUpper();
+    }
 }
 
-<div class="container mt-4 text-center">
-    <h2 class="mb-4 text-primary fw-bold"><i class="bi bi-trophy-fill text-warning"></i> Top Performers</h2>
+<div class="dashboard-wrapper fade-in">
 
-    <div class="card shadow border-0">
-        <div class="card-body p-0">
-            <table class="table table-striped mb-0">
-                <thead class="bg-primary text-white">
-                    <tr>
-                        <th>#</th>
-                        <th>Utilizator</th>
-                        <th>Nivel</th>
-                        <th>Total XP</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        int rank = 1;
-                    }
-                    @foreach (var user in Model)
-                    {
+
+    <main class="dashboard-main">
+
+        <header class="hud-header-panel">
+            <div>
+                <h2 class="hud-welcome">CLASAMENT GENERAL</h2>
+                <small >IERARHIE BAZATĂ PE PUNCTE DE EXPERIENȚĂ (XP)</small>
+            </div>
+            <div class="hud-date">
+                <i class="bi bi-calendar-check me-2"></i>@DateTime.Now.ToString("dd.MM.yyyy")
+            </div>
+        </header>
+
+        <div class="tech-card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-borderless table-hover mb-0" style="color: #e2e8f0;">
+                    <thead style="background: rgba(0,0,0,0.3); border-bottom: 2px solid var(--hud-cyan);">
                         <tr>
-                            <td class="fw-bold">
-                                @if (rank == 1)
-                                {
-                                    <span class="fs-4">-1-</span>
-                                }
-                                else if (rank == 2)
-                                {
-
-                                    <span class="fs-4">-2-</span>
-                                }
-                                else if (rank == 3)
-                                {
-
-                                    <span class="fs-4">-3-</span>
-                                }
-                                else
-                                {
-
-                                    <span>@rank</span>
-                                }
-                            </td>
-                            <td>@user.FullName</td>
-                            <td><span class="badge bg-info text-dark">Lvl @(user.LevelId ?? 1)</span></td>
-                            <td class="fw-bold text-success">@user.TotalXp XP</td>
+                            <th class="py-3 ps-4 text-info font-monospace" style="width: 80px;">RANK</th>
+                            <th class="py-3 text-info font-monospace">UTILIZATOR</th>
+                            <th class="py-3 text-center text-info font-monospace">NIVEL</th>
+                            <th class="py-3 pe-4 text-end text-info font-monospace">XP TOTAL</th>
                         </tr>
-                        rank++;
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < sortedUsers.Count; i++)
+                        {
+                            var user = sortedUsers[i];
+
+                            // Culori pentru primele 3 locuri (fără medalii complexe, doar text colorat)
+                            var rankColor = i == 0 ? "text-warning" : (i == 1 ? "text-info" : (i == 2 ? "text-danger" : "text-muted"));
+
+                            // Fundal alternant subtil
+                            var rowBg = i % 2 == 0 ? "rgba(255,255,255,0.02)" : "transparent";
+
+                            <tr style="background-color: @rowBg; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td class="py-3 ps-4 align-middle fw-bold @rankColor" style="font-size: 1.2rem;">
+                                    #@(i + 1)
+                                </td>
+
+                                <td class="py-3 align-middle">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);">
+                                            @GetInitials(user.FullName)
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-white">@user.FullName</div>
+                                            <div class="small text-white-50" style="font-size: 0.75rem;">Angajat</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="py-3 text-center align-middle">
+                                    <span class="badge bg-dark border border-secondary text-light rounded-pill px-3">
+                                        LVL @(user.LevelId ?? 1)
+                                    </span>
+                                </td>
+
+                                <td class="py-3 pe-4 text-end align-middle font-monospace text-success fw-bold">
+                                    @user.TotalXp XP
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (!sortedUsers.Any())
+            {
+                <div class="text-center p-5 text-muted">
+                    Nu există date disponibile.
+                </div>
+            }
         </div>
-    </div>
+
+    </main>
 </div>

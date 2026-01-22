@@ -5,7 +5,35 @@
 
 @{
     var currentUser = await UserManager.GetUserAsync(User);
-    var displayName = currentUser?.FullName ?? User.Identity?.Name;
+
+    // --- Logica pentru Avatar și Nume (Copiată și adaptată de la Admin) ---
+    string firstName = "User";
+    string fullName = "Utilizator";
+    string userEmail = "";
+    string userInitials = "U";
+
+    if (currentUser != null)
+    {
+        userEmail = currentUser.Email;
+        if (!string.IsNullOrEmpty(currentUser.FullName))
+        {
+            fullName = currentUser.FullName;
+            // Luăm prenumele (primul cuvânt) pentru salut
+            firstName = currentUser.FullName.Split(' ')[0];
+            // Luăm inițiala
+            userInitials = firstName.Substring(0, 1).ToUpper();
+        }
+        else
+        {
+            // Fallback la Username dacă nu are FullName setat
+            fullName = User.Identity?.Name ?? "User";
+            firstName = fullName;
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                userInitials = firstName.Substring(0, 1).ToUpper();
+            }
+        }
+    }
 }
 
 <ul class="navbar-nav flex-grow-1">
@@ -27,16 +55,41 @@
 </ul>
 
 <ul class="navbar-nav ms-auto">
-    <li class="nav-item">
-        <a class="nav-link fw-bold" asp-area="Identity" asp-page="/Account/Manage/Index" title="Vezi profilul">
-            <i class="fas fa-user me-1"></i> Salut, @displayName!
+    <li class="nav-item dropdown">
+
+        <a class="nav-link dropdown-toggle fw-bold text-white d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="me-2">Salut, @firstName!</span>
+            <div class="rounded-circle bg-white text-primary d-flex justify-content-center align-items-center" style="width: 32px; height: 32px; font-size: 0.9rem; font-weight: bold;">
+                @userInitials
+            </div>
         </a>
-    </li>
-    <li class="nav-item">
-        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button type="submit" class="nav-link btn btn-link text-white border-0" style="text-decoration: none;">
-                <i class="fas fa-sign-out-alt me-1"></i> Logout
-            </button>
-        </form>
+
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-modern" aria-labelledby="navbarDropdownUser">
+
+            <li class="user-menu-header">
+                <div class="user-avatar-circle" style="background-color: #3b82f6;">
+                    @userInitials
+                </div>
+                <h6 class="fw-bold text-dark mb-0">@fullName</h6>
+                <small class="text-muted">@userEmail</small>
+                <div class="mt-2">
+                    <span class="badge bg-primary rounded-pill text-uppercase" style="font-size: 0.65rem;">Angajat</span>
+                </div>
+            </li>
+
+            <li class="py-2">
+                <a class="dropdown-item dropdown-item-modern" asp-area="Identity" asp-page="/Account/Manage/Index">
+                    <i class="fas fa-user-cog"></i> Profilul Meu
+                </a>
+            </li>
+
+            <li class="border-top bg-light">
+                <form class="form-inline m-0" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                    <button type="submit" class="dropdown-item dropdown-item-modern text-danger fw-bold w-100 bg-transparent border-0">
+                        <i class="fas fa-sign-out-alt"></i> Deconectare
+                    </button>
+                </form>
+            </li>
+        </ul>
     </li>
 </ul>
