@@ -4,62 +4,76 @@
     Layout = "_Layout";
     ViewData["Title"] = "CLASAMENT";
 
-    // 1. Sortăm toți utilizatorii după XP (descrescător)
+    // Sortăm utilizatorii după XP
     var sortedUsers = Model.OrderByDescending(u => u.TotalXp).ToList();
 
-    // Helper simplu pentru inițiale
+    // Helper pentru inițiale
     string GetInitials(string name)
     {
         if (string.IsNullOrEmpty(name)) return "U";
         var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         return parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : parts[0].Substring(0, 1).ToUpper();
     }
+
+    // Helper iconițe medalie (doar pt tabel)
+    string GetRankIcon(int index)
+    {
+        if (index == 0) return "<i class='bi bi-trophy-fill'></i>";
+        if (index == 1) return "<i class='bi bi-medal-fill'></i>";
+        if (index == 2) return "<i class='bi bi-award-fill'></i>";
+        return $"#{index + 1}";
+    }
+
+    // Helper clase culori
+    string GetRankClass(int index)
+    {
+        if (index == 0) return "rank-1";
+        if (index == 1) return "rank-2";
+        if (index == 2) return "rank-3";
+        return "";
+    }
 }
 
 <div class="dashboard-wrapper fade-in">
 
+   
 
     <main class="dashboard-main">
 
         <header class="hud-header-panel">
             <div>
                 <h2 class="hud-welcome">CLASAMENT GENERAL</h2>
-                <small >IERARHIE BAZATĂ PE PUNCTE DE EXPERIENȚĂ (XP)</small>
+                <small>IERARHIE BAZATĂ PE EXPERIENȚĂ (XP)</small>
             </div>
             <div class="hud-date">
                 <i class="bi bi-calendar-check me-2"></i>@DateTime.Now.ToString("dd.MM.yyyy")
             </div>
         </header>
 
-        <div class="tech-card p-0 overflow-hidden">
+        <div class="cyber-table-card">
             <div class="table-responsive">
-                <table class="table table-borderless table-hover mb-0" style="color: #e2e8f0;">
-                    <thead style="background: rgba(0,0,0,0.3); border-bottom: 2px solid var(--hud-cyan);">
+                <table class="cyber-table">
+                    <thead>
                         <tr>
-                            <th class="py-3 ps-4 text-info font-monospace" style="width: 80px;">RANK</th>
-                            <th class="py-3 text-info font-monospace">UTILIZATOR</th>
-                            <th class="py-3 text-center text-info font-monospace">NIVEL</th>
-                            <th class="py-3 pe-4 text-end text-info font-monospace">XP TOTAL</th>
+                            <th class="text-center">RANK</th>
+                            <th>UTILIZATOR</th>
+                            <th class="text-center">NIVEL</th>
+                            <th class="text-end">XP TOTAL</th>
                         </tr>
                     </thead>
                     <tbody>
                         @for (int i = 0; i < sortedUsers.Count; i++)
                         {
                             var user = sortedUsers[i];
+                            var rankClass = GetRankClass(i);
 
-                            // Culori pentru primele 3 locuri (fără medalii complexe, doar text colorat)
-                            var rankColor = i == 0 ? "text-warning" : (i == 1 ? "text-info" : (i == 2 ? "text-danger" : "text-muted"));
-
-                            // Fundal alternant subtil
-                            var rowBg = i % 2 == 0 ? "rgba(255,255,255,0.02)" : "transparent";
-
-                            <tr style="background-color: @rowBg; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                <td class="py-3 ps-4 align-middle fw-bold @rankColor" style="font-size: 1.2rem;">
-                                    #@(i + 1)
+                            <tr class="@rankClass">
+                                <td class="rank-cell">
+                                    @Html.Raw(GetRankIcon(i))
                                 </td>
 
-                                <td class="py-3 align-middle">
-                                    <div class="d-flex align-items-center gap-3">
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 15px;">
                                         <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);">
                                             @GetInitials(user.FullName)
                                         </div>
@@ -70,14 +84,14 @@
                                     </div>
                                 </td>
 
-                                <td class="py-3 text-center align-middle">
-                                    <span class="badge bg-dark border border-secondary text-light rounded-pill px-3">
+                                <td class="text-center">
+                                    <span class="badge bg-dark border border-secondary text-info rounded-pill px-3">
                                         LVL @(user.LevelId ?? 1)
                                     </span>
                                 </td>
 
-                                <td class="py-3 pe-4 text-end align-middle font-monospace text-success fw-bold">
-                                    @user.TotalXp XP
+                                <td style="font-family: 'Courier New', monospace; font-weight: 700; color: var(--hud-green); text-align: right; font-size: 1.1rem;">
+                                    @user.TotalXp <span class="small text-muted">XP</span>
                                 </td>
                             </tr>
                         }
@@ -88,7 +102,7 @@
             @if (!sortedUsers.Any())
             {
                 <div class="text-center p-5 text-muted">
-                    Nu există date disponibile.
+                    Nu există date în clasament.
                 </div>
             }
         </div>

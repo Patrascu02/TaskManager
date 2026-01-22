@@ -10,7 +10,6 @@
     Layout = "_Layout";
     ViewData["Title"] = "COMMAND_CENTER";
 
-    // User Data
     var currentUser = await UserManager.GetUserAsync(User);
     string displayName = currentUser?.FullName;
     if (string.IsNullOrEmpty(displayName)) displayName = currentUser?.UserName?.Split('@')[0] ?? "OPERATIVE";
@@ -22,12 +21,10 @@
         userInitials = parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : parts[0].Substring(0, 1).ToUpper();
     }
 
-    // Stats
     int currentLevel = (ViewBag.CurrentLevel as int?) ?? 1;
     int currentXp = (ViewBag.CurrentXp as int?) ?? 0;
     int xpProgress = currentXp % 100;
 
-    // Badges
     var myBadges = ViewBag.MyBadges as IEnumerable<UserBadge>;
     if (myBadges == null) { myBadges = new List<UserBadge>(); }
 
@@ -38,8 +35,6 @@
 <div class="dashboard-wrapper fade-in">
 
     <aside class="cyber-sidebar">
-        <div class="scan-line"></div>
-
         <div class="profile-hud">
             <div class="avatar-hex">
                 <span class="avatar-text">@userInitials</span>
@@ -52,7 +47,7 @@
             </div>
         </div>
 
-        <div class="p-3 mb-4" style="background: rgba(0,0,0,0.4); border: 1px dashed rgba(255,255,255,0.1);">
+        <div class="p-3 mb-4" style="background: rgba(0,0,0,0.2); border: 1px dashed rgba(255,255,255,0.2); border-radius: 8px;">
             <div class="d-flex justify-content-between text-info small font-monospace mb-1">
                 <span>LVL.@currentLevel</span>
                 <span>XP:@currentXp</span>
@@ -84,7 +79,7 @@
                 @foreach (var ub in myBadges.Take(4))
                 {
                     var icon = ub.Badge?.Icon ?? "bi-star-fill";
-                    <div class="p-2 border border-secondary bg-dark text-warning" title="@ub.Badge?.Name">
+                    <div class="p-2 border border-secondary bg-dark text-warning rounded" title="@ub.Badge?.Name">
                         <i class="bi @icon"></i>
                     </div>
                 }
@@ -96,7 +91,7 @@
         <header class="hud-header-panel">
             <div>
                 <h2 class="hud-welcome">DASHBOARD USER</h2>
-                <small >SYSTEM ONLINE // USER: @displayName.ToUpper()</small>
+                <small class="font-monospace">SYSTEM ONLINE // USER: @displayName.ToUpper()</small>
             </div>
             <div class="hud-date">
                 <i class="bi bi-clock-history me-2"></i>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")
@@ -112,7 +107,7 @@
 
                 @if (!tasksNew.Any())
                 {
-                    <div class="p-4 border border-dashed border-secondary text-center text-muted font-monospace">
+                    <div class="empty-state-tech">
                         NO INCOMING DATA STREAMS
                     </div>
                 }
@@ -125,12 +120,12 @@
             <div class="col-lg-6">
                 <div class="hud-col-header" style="border-left-color: #10b981;">
                     <h6 class="hud-col-title text-success"><i class="bi bi-cpu-fill me-2"></i> ACTIVE PROCESSES</h6>
-                    <span class="hud-badge-count bg-success text-white">@tasksInProgress.Count</span>
+                    <span class="hud-badge-count bg-success text-dark">@tasksInProgress.Count</span>
                 </div>
 
                 @if (!tasksInProgress.Any())
                 {
-                    <div class="p-4 border border-dashed border-secondary text-center text-muted font-monospace">
+                    <div class="empty-state-tech">
                         NO ACTIVE PROCESSES
                     </div>
                 }
@@ -146,15 +141,13 @@
 @{
     Microsoft.AspNetCore.Html.IHtmlContent RenderTechTask(TaskAssignment assignment)
     {
-        // Prio logic
         int p = assignment.Task.Priority;
         string prioClass = p == 1 ? "prio-1" : (p == 2 ? "prio-2" : "prio-3");
         string prioName = p == 1 ? "CRITICAL" : (p == 2 ? "MODERATE" : "STANDARD");
 
-        // Date
         bool overdue = assignment.Task.DueDate.HasValue && assignment.Task.DueDate.Value < DateTime.Now;
         string dateStr = assignment.Task.DueDate.HasValue ? assignment.Task.DueDate.Value.ToString("dd.MM.yy") : "N/A";
-        string dateColor = overdue ? "text-danger" : "text-info";
+        string dateColor = overdue ? "text-danger fw-bold" : "text-info";
 
         <div class="tech-card">
             <div class="d-flex justify-content-between mb-2">
@@ -177,7 +170,7 @@
                 @if (assignment.Status == 0)
                 {
                     <a href="/Tasks/VoteDifficulty/@assignment.TaskAssignmentId" class="btn-tech text-decoration-none">
-                        START <i class="bi bi-chevron-right"></i>
+                        INITIALIZE <i class="bi bi-chevron-right"></i>
                     </a>
                 }
                 else

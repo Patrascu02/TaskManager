@@ -9,7 +9,7 @@
     --hud-bg: #0f172a; /* Deep Space Blue */
     --hud-panel: rgba(30, 41, 59, 0.6);
     --hud-border: rgba(6, 182, 212, 0.4);
-    --hud-cyan: #06b6d4;
+    --hud-cyan: #06b6d4; /* TURCOAZ NEON */
     --hud-teal: #14b8a6;
     --hud-green: #10b981;
     --hud-alert: #f43f5e;
@@ -23,35 +23,21 @@ html, body {
     overflow-x: hidden;
 }
 
-/* === 1. FUNDAL TECH GLOBAL (MODIFICAT) === */
+/* === 1. FUNDAL TECH GLOBAL (Deschis) === */
 body {
     font-family: 'Poppins', sans-serif;
-    /* AICI E SCHIMBAREA: Fundal Deschis (Albastru deschis / Azur) */
+    /* Fundal Azur Deschis */
     background-color: #f0f9ff;
     background: linear-gradient(to bottom, #f0f9ff, #e0f2fe);
-    /* Textul de bază devine închis ca să se vadă pe fundal */
     color: #334155;
-    /* Pattern-ul de grilă adaptat pt fundal deschis (linii mai vizibile) */
+    /* Grilă tehnică subtilă */
     background-image: linear-gradient(rgba(14, 116, 144, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(14, 116, 144, 0.15) 1px, transparent 1px);
     background-size: 40px 40px;
     display: flex;
     flex-direction: column;
 }
 
-    /* PĂSTRĂM SCANLINE-UL GLOBAL (Efect TV) */
-    body::after {
-        content: " ";
-        display: block;
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-        z-index: 2;
-        background-size: 100% 2px, 3px 100%;
-        pointer-events: none;
-    }
+/* Fără scanline (lăsăm curat) */
 
 main {
     flex: 1;
@@ -59,11 +45,7 @@ main {
     z-index: 3;
 }
 
-/* ==================================================================================
-   RESTUL RĂMÂNE EXACT LA FEL (DARK TECH) PENTRU A PLUTI PESTE FUNDALUL DESCHIS
-================================================================================== */
-
-/* === 2. NAVBAR TECH (Rămâne Dark) === */
+/* === 2. NAVBAR TECH (Dark) === */
 .custom-navbar {
     background: rgba(15, 23, 42, 0.9);
     border-bottom: 1px solid var(--hud-cyan);
@@ -87,21 +69,21 @@ main {
     min-height: 90vh;
 }
 
-/* === 4. SIDEBAR - COMMAND PANEL (MODIFICAT - Fără colț tăiat) === */
+/* === 4. SIDEBAR - COMMAND PANEL (Dark) === */
 .cyber-sidebar {
     width: 340px;
-    background: rgba(15, 23, 42, 0.85); /* Dark Sidebar */
+    background: rgba(15, 23, 42, 0.85);
     backdrop-filter: blur(10px);
     border-right: 2px solid var(--hud-border);
     padding: 2rem 1.5rem;
     display: flex;
     flex-direction: column;
     position: relative;
-    /* AM SCOS linia cu clip-path: polygon(...) */
-    /* Adăugăm colțuri rotunjite doar pe partea dreaptă */
+    /* Colțuri rotunjite dreapta, fără tăietură */
     border-radius: 0 16px 16px 0;
     color: white;
 }
+
     .cyber-sidebar::before {
         content: '';
         position: absolute;
@@ -235,110 +217,166 @@ main {
     overflow-y: auto;
 }
 
-/* === HEADER PANEL - TIP CARD (NOU) === */
+/* === HEADER PANEL (MODIFICAT - Text Neon) === */
 .hud-header-panel {
-    /* Fundal Foarte Întunecat și Solid */
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(15, 23, 42, 0.85); /* Fundal Dark */
     backdrop-filter: blur(10px);
-    /* Bordură */
     border: 1px solid var(--hud-border);
-    border-left: 5px solid var(--hud-cyan);
     border-radius: 12px;
-    /* Spațiere */
     padding: 1.5rem 2rem;
     margin-bottom: 30px;
-    /* Umbră */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    /* Layout */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-left: 5px solid var(--hud-cyan);
 }
-align-items: flex-end;
-/* IMPORTANT: Titlul devine închis pentru contrast cu fundalul deschis */
+
+/* TITLUL - TURCOAZ NEON (Așa cum ai cerut) */
 .hud-welcome {
     font-size: 2rem;
-    font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 2px;
+    font-weight: 800;
     margin: 0;
-    /* CULOARE: ALB PUR + GLOW PUTERNIC */
-    color: #ffffff !important;
-    text-shadow: 0 0 20px rgba(6, 182, 212, 0.8);
-}   text-shadow: 0 0 15px rgba(6, 182, 212, 0.6); /* Glow Cyan */
-
-
-.hud-header-panel small {
-    /* CULOARE: CYAN DESCHIS (Să se vadă clar pe negru) */
-    color: #a5f3fc !important;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    display: block;
-    margin-top: 5px;
+    /* CULOAREA SCHIMBATĂ AICI */
+    color: var(--hud-cyan) !important;
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.6); /* Glow Neon */
 }
 
+/* SUBTITLUL - Tot Turcoaz */
+.hud-header-panel small {
+    display: block;
+    margin-top: 5px;
+    color: var(--hud-cyan) !important;
+    opacity: 0.8; /* Puțin mai șters */
+    font-family: 'Courier New', monospace;
+}
 
-
+/* DATA - Tot Turcoaz */
 .hud-date {
     font-family: 'Courier New', monospace;
-    /* Text CYAN pe fundal NEGRU */
     color: var(--hud-cyan);
-    background: rgba(0, 0, 0, 0.3); /* Fundal închis la dată */
     border: 1px solid var(--hud-cyan);
     padding: 8px 20px;
+    background: rgba(0, 0, 0, 0.3);
     border-radius: 6px;
     font-weight: 700;
     box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
 }
 
-/* --- COLUMNS (Rămân Dark) --- */
+/* --- COLUMNS (Dark Solid) --- */
 .hud-col-header {
-    background: rgba(30, 41, 59, 0.9);
+    background: #1e293b !important; /* Solid Dark Slate */
     border-left: 4px solid var(--hud-cyan);
-    padding: 10px 15px;
+    padding: 12px 20px;
     margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .hud-col-title {
     color: var(--hud-cyan);
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     margin: 0;
     letter-spacing: 1px;
+    font-size: 0.95rem;
 }
 
 .hud-badge-count {
     background: var(--hud-cyan);
-    color: black;
-    padding: 2px 8px;
-    font-weight: bold;
-    font-size: 0.8rem;
+    color: #0f172a;
+    padding: 2px 10px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    border-radius: 6px;
 }
 
-/* --- COMPLEX TASK CARD (Rămân Dark) --- */
+/* --- TABEL CYBER (Pentru Leaderboard) --- */
+.cyber-table-card {
+    background: rgba(30, 41, 59, 0.9); /* Dark Slate */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    backdrop-filter: blur(10px);
+}
+
+.cyber-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #e2e8f0;
+}
+
+    .cyber-table thead {
+        background: rgba(15, 23, 42, 0.95);
+        border-bottom: 2px solid var(--hud-cyan);
+    }
+
+    .cyber-table th {
+        padding: 1.2rem 1rem;
+        text-align: left;
+        font-family: 'Courier New', monospace;
+        color: var(--hud-cyan);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+    }
+
+    .cyber-table td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        vertical-align: middle;
+    }
+
+    .cyber-table tbody tr:hover {
+        background: rgba(6, 182, 212, 0.15);
+        transform: scale(1.005);
+        transition: 0.2s;
+    }
+
+/* Rank Colors in Table */
+.rank-cell {
+    font-family: 'Courier New', monospace;
+    font-weight: 800;
+    font-size: 1.2rem;
+    width: 80px;
+    text-align: center;
+}
+
+.rank-1 .rank-cell {
+    color: #facc15;
+    text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+}
+
+.rank-2 .rank-cell {
+    color: #38bdf8;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.rank-3 .rank-cell {
+    color: #fb923c;
+    text-shadow: 0 0 10px rgba(251, 146, 60, 0.5);
+}
+
+/* --- CARDURI TASK (Fără colț tăiat, 3D Hover) --- */
 .tech-card {
-    background: rgba(30, 41, 59, 0.85); /* Dark Card */
+    background: #253248 !important; /* Solid Dark */
     border: 1px solid rgba(255,255,255,0.1);
     margin-bottom: 20px;
     position: relative;
     padding: 1.5rem;
-    /* Colțuri rotunjite (fără tăieturi) */
-    border-radius: 12px;
-    /* Umbră inițială subtilă */
+    border-radius: 12px; /* Rotunjit */
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    /* Tranziție fină pentru efectul 3D */
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    /* Ascundem overflow pentru bara colorată din stânga */
     overflow: hidden;
 }
 
-    /* Bara colorată din stânga (Priority line) */
     .tech-card::before {
         content: '';
         position: absolute;
@@ -351,21 +389,16 @@ align-items: flex-end;
     }
 
     .tech-card:hover {
-        /* 1. Ridicare în sus (Lift) */
-        transform: translateY(-10px) scale(1.02);
-        /* 2. Fundalul devine puțin mai solid/luminos */
-        background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 1));
-        /* 3. Umbră puternică dedesubt (pentru a simula înălțimea) + Glow colorat */
-        box-shadow: 0 20px 40px rgba(0,0,0,0.4), /* Umbra de adâncime */
-        0 0 20px rgba(6, 182, 212, 0.2); /* Glow Cyan */
-        /* 4. Bordura se aprinde */
+        transform: translateY(-5px) scale(1.01);
+        background: #1e293b !important; /* Mai închis la hover */
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 15px rgba(6, 182, 212, 0.2);
         border-color: var(--hud-cyan);
-        z-index: 10; /* Aduce cardul în fața celorlalte */
+        z-index: 10;
     }
 
         .tech-card:hover::before {
             background: var(--hud-cyan);
-            box-shadow: 0 0 15px var(--hud-cyan); /* Bara stângă strălucește */
+            box-shadow: 0 0 10px var(--hud-cyan);
         }
 
 .tech-line {
@@ -446,7 +479,19 @@ align-items: flex-end;
         box-shadow: 0 0 15px var(--hud-green);
     }
 
-/* Animations */
+/* Empty State */
+.empty-state-tech {
+    background: rgba(30, 41, 59, 0.6);
+    border: 2px dashed rgba(148, 163, 184, 0.4);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    color: #475569;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+}
+
+/* Scanline Animation (Păstrată doar la stats hover) */
 .scan-line {
     position: absolute;
     top: -100%;
@@ -478,7 +523,7 @@ align-items: flex-end;
 
     .cyber-sidebar {
         width: 100%;
-        clip-path: none;
+        border-radius: 0;
         border-right: none;
         border-bottom: 2px solid var(--hud-cyan);
     }
@@ -502,220 +547,113 @@ align-items: flex-end;
 
 
     /* =========================================
-   7. LEADERBOARD STYLES (TECH HUD)
+   8. NAVBAR USER ZONE & DROPDOWN
    ========================================= */
 
-    /* --- PODIUM (TOP 3) --- */
-    .podium-container {
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-        gap: 20px;
-        margin-bottom: 3rem;
-        padding-top: 20px;
-    }
-
-    .podium-card {
-        background: rgba(30, 41, 59, 0.9); /* Dark background */
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px 12px 0 0;
-        text-align: center;
-        padding: 2rem 1.5rem;
-        position: relative;
-        clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 100%, 0 100%, 0 10%);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        transition: transform 0.3s;
-        flex: 1;
-    }
-
-        .podium-card:hover {
-            transform: translateY(-10px);
-            z-index: 5;
-        }
-
-    /* Rank Colors */
-    .rank-1 { /* GOLD */
-        border-top: 4px solid #facc15;
-        box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);
-        height: 380px; /* Cel mai înalt */
-        order: 2; /* Centru */
-    }
-
-        .rank-1 .rank-badge {
-            background: linear-gradient(135deg, #facc15, #ca8a04);
-            color: black;
-        }
-
-    .rank-2 { /* SILVER / CYAN */
-        border-top: 4px solid #38bdf8;
-        box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
-        height: 340px;
-        order: 1; /* Stânga */
-    }
-
-        .rank-2 .rank-badge {
-            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
-            color: black;
-        }
-
-    .rank-3 { /* BRONZE */
-        border-top: 4px solid #fb923c;
-        box-shadow: 0 0 20px rgba(251, 146, 60, 0.2);
-        height: 320px;
-        order: 3; /* Dreapta */
-    }
-
-        .rank-3 .rank-badge {
-            background: linear-gradient(135deg, #fb923c, #ea580c);
-            color: black;
-        }
-
-    /* Avatar Podium */
-    .podium-avatar-box {
-        width: 100px;
-        height: 100px;
-        margin: 0 auto 15px;
-        position: relative;
-    }
-
-    .podium-avatar {
-        width: 100%;
-        height: 100%;
-        background: rgba(255,255,255,0.1);
-        clip-path: circle(50% at 50% 50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: white;
-    }
-
-    .rank-badge {
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 900;
-        font-size: 1.2rem;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-
-    /* Text Podium */
-    .podium-name {
-        color: white;
-        font-weight: 700;
-        font-size: 1.1rem;
-        margin-bottom: 5px;
-    }
-
-    .podium-xp {
+    /* Stil pentru Numele Utilizatorului în Navbar */
+    .nav-user-link {
+        color: var(--hud-cyan) !important;
         font-family: 'Courier New', monospace;
-        color: var(--hud-cyan);
         font-weight: 700;
-        font-size: 1.2rem;
-    }
-
-    .podium-level {
-        font-size: 0.8rem;
-        color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    /* --- LISTA RESTUL JUCĂTORILOR (ROW CARDS) --- */
-    .leaderboard-row {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        transition: all 0.3s;
         display: flex;
         align-items: center;
-        background: rgba(30, 41, 59, 0.85); /* Dark background */
-        border: 1px solid rgba(255,255,255,0.05);
-        border-left: 3px solid rgba(255,255,255,0.2);
-        padding: 1rem 1.5rem;
-        margin-bottom: 10px;
-        border-radius: 8px;
+        gap: 10px;
+    }
+
+        .nav-user-link:hover, .nav-user-link[aria-expanded="true"] {
+            background: rgba(6, 182, 212, 0.1);
+            border-color: var(--hud-cyan);
+            text-shadow: 0 0 8px var(--hud-cyan);
+        }
+
+    /* Avatar mic în navbar */
+    .nav-avatar-small {
+        width: 30px;
+        height: 30px;
+        background: var(--hud-bg);
+        border: 1px solid var(--hud-cyan);
+        color: var(--hud-cyan);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: bold;
+        border-radius: 4px; /* Puțin pătrat, stil tech */
+        box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
+    }
+
+    /* Meniul Dropdown (Cutia care se deschide) */
+    .cyber-dropdown-menu {
+        background-color: rgba(15, 23, 42, 0.95) !important; /* Dark Blue */
+        border: 1px solid var(--hud-cyan) !important;
+        border-radius: 0 0 10px 10px !important; /* Rotunjit doar jos */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5) !important;
+        margin-top: 10px !important;
+        padding: 0 !important;
+        overflow: hidden;
+        min-width: 220px;
+    }
+
+    /* Elementele din Dropdown */
+    .cyber-dropdown-item {
+        color: #e2e8f0 !important;
+        padding: 12px 20px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        /* Hover pe elemente */
+        .cyber-dropdown-item:hover {
+            background-color: var(--hud-cyan) !important;
+            color: #000 !important; /* Text negru pe fundal turcoaz */
+            padding-left: 25px; /* Mică animație de mișcare */
+            font-weight: 600;
+        }
+
+    /* Butonul de Logout (care e un form) */
+    .cyber-logout-btn {
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: none;
+        color: var(--hud-alert) !important; /* Roșu pentru logout */
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        padding: 12px 20px;
         transition: all 0.2s;
     }
 
-        .leaderboard-row:hover {
-            transform: translateX(5px);
-            background: rgba(30, 41, 59, 1);
-            border-left-color: var(--hud-cyan);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        .cyber-logout-btn:hover {
+            background: rgba(244, 63, 94, 0.1);
+            text-shadow: 0 0 10px var(--hud-alert);
+            padding-left: 25px;
         }
 
-    .lb-rank {
-        width: 40px;
-        font-size: 1.2rem;
-        font-weight: 800;
-        color: #64748b;
+    /* Butoane Login/Register (dacă nu ești logat) */
+    .nav-btn-outline {
+        border: 1px solid var(--hud-cyan);
+        color: var(--hud-cyan) !important;
+        padding: 5px 15px;
+        border-radius: 4px;
         font-family: 'Courier New', monospace;
-    }
-
-    .lb-user {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .lb-avatar-small {
-        width: 40px;
-        height: 40px;
-        background: rgba(255,255,255,0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 6px;
         font-weight: 700;
-        color: white;
+        transition: all 0.3s;
+        margin-left: 10px;
     }
 
-    .lb-name {
-        color: white;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .lb-role {
-        font-size: 0.75rem;
-        color: #94a3b8;
-    }
-
-    .lb-stats {
-        text-align: right;
-        min-width: 100px;
-    }
-
-    .lb-xp {
-        color: var(--hud-cyan);
-        font-weight: 700;
-        font-family: 'Courier New';
-        display: block;
-    }
-
-    .lb-lvl {
-        color: #64748b;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-    }
-
-    /* Responsive Podium */
-    @media (max-width: 768px) {
-        .podium-container {
-            flex-direction: column;
-            align-items: center;
+        .nav-btn-outline:hover {
+            background: var(--hud-cyan);
+            color: #000 !important;
+            box-shadow: 0 0 15px var(--hud-cyan);
         }
-
-        .podium-card {
-            width: 100%;
-            height: auto !important;
-            order: initial !important;
-            margin-bottom: 15px;
-        }
-    }
 }
