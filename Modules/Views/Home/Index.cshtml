@@ -1,35 +1,86 @@
 ﻿@{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "BINE AI VENIT";
+    Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<div class="home-wrapper d-flex flex-column justify-content-center align-items-center text-center">
+<div class="fade-in" style="background-color: #0f172a; min-height: 90vh; border-radius: 12px; margin-top: 1rem; padding: 2rem;">
 
-    <h1 class="display-3 fw-bold mb-3 fade-in">
-        Welcome to <span class="text-primary">TaskManager</span>
-    </h1>
+    <div class="container text-center pt-4 pb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
 
-    <div class="alert alert-warning alert-dismissible fade show fade-in-delay-2" role="alert">
-        <strong>Attention!</strong> You are not logged in. Some features are limited.
+                <div class="mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center p-4 rounded-circle"
+                         style="background: rgba(6, 182, 212, 0.1); border: 2px solid var(--hud-cyan); box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);">
+                        <i class="bi bi-layers-half text-info" style="font-size: 3.5rem;"></i>
+                    </div>
+                </div>
+
+                <h1 class="display-4 fw-bold text-white font-monospace mb-3">
+                    TASK_MANAGER
+                </h1>
+
+                <p class="lead text-white-50 font-monospace mb-5">
+                    Platformă integrată pentru gestionarea eficientă a sarcinilor și coordonarea echipei.<br>
+                    <span class="text-info opacity-75">Organizare. Colaborare. Rezultate.</span>
+                </p>
+
+                <a asp-area="Identity" asp-page="/Account/Login"
+                   class="btn btn-lg btn-tech px-5 py-3 fs-6 fw-bold font-monospace shadow-lg"
+                   style="min-width: 200px;">
+                    INTRĂ ÎN CONT
+                </a>
+
+            </div>
+        </div>
     </div>
 
-    <p class="lead text-muted mb-4 fade-in-delay-3">
-        Explore a preview of the application and see how tasks, users, and gamification are organized.
-    </p>
+    <div class="container pb-4">
+        <div class="row g-4">
 
-    <div class="preview-box shadow-sm mt-5 p-4 rounded fade-in-delay-4">
-        <h4 class="fw-semibold mb-3">Application Preview</h4>
-        <p class="text-muted small">
-            You can view the structure, see badges, levels, and leaderboard mockups without logging in.
-        </p>
+            <div class="col-md-4">
+                <div class="tech-card h-100 p-4 text-center" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);">
+                    <div class="mb-3 text-info">
+                        <i class="bi bi-list-check display-5"></i>
+                    </div>
+                    <h5 class="text-white font-monospace fw-bold">ORGANIZARE</h5>
+                    <p class="text-white-50 small mb-0 font-monospace">
+                        Păstrează toate sarcinile într-un singur loc. Stabilește priorități și termene limită clare.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="tech-card h-100 p-4 text-center" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);">
+                    <div class="mb-3 text-warning">
+                        <i class="bi bi-people-fill display-5"></i>
+                    </div>
+                    <h5 class="text-white font-monospace fw-bold">ECHIPĂ</h5>
+                    <p class="text-white-50 small mb-0 font-monospace">
+                        Colaborează ușor cu colegii. Alocă sarcini și urmărește statusul acestora în timp real.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="tech-card h-100 p-4 text-center" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);">
+                    <div class="mb-3 text-success">
+                        <i class="bi bi-graph-up-arrow display-5"></i>
+                    </div>
+                    <h5 class="text-white font-monospace fw-bold">MONITORIZARE</h5>
+                    <p class="text-white-50 small mb-0 font-monospace">
+                        Vizualizează progresul proiectelor tale printr-un dashboard intuitiv.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="text-center border-top border-secondary pt-4 mt-4 pb-2">
+        <small class="text-white-50 font-monospace">
+            &copy; @DateTime.Now.Year TASK_MANAGER. TOATE DREPTURILE REZERVATE.
+        </small>
     </div>
 
 </div>
-
-@section Scripts {
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll(".fade-in, .fade-in-delay-2, .fade-in-delay-3, .fade-in-delay-4")
-                .forEach(el => el.classList.add("visible"));
-        });
-    </script>
-}

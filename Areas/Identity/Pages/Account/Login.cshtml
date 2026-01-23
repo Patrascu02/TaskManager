@@ -2,65 +2,69 @@
 @model LoginModel
 
 @{
-    ViewData["Title"] = "Autentificare";
+    ViewData["Title"] = "AUTENTIFICARE";
+    Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row justify-content-center align-items-center min-vh-75 fade-in-up">
-    <div class="col-lg-10 col-xl-9">
-        <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">
-            <div class="row g-0">
+<div class="fade-in pt-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
 
-                <div class="col-md-6 bg-white bg-opacity-65 backdrop-blur p-5 position-relative">
-                    <div class="mb-5">
-                        <h2 class="fw-bold text-gradient mb-2">Bine ai revenit!</h2>
-                        <p class="text-muted small">Platformă privată. Introdu datele de acces.</p>
+                <div class="tech-card p-4 shadow-lg" style="border: 1px solid var(--hud-cyan);">
+
+                    <div class="text-center mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-3"
+                             style="background: rgba(6, 182, 212, 0.1); border: 1px solid var(--hud-cyan);">
+                            <i class="bi bi-shield-lock-fill text-info" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h3 class="text-white font-monospace fw-bold">ACCES SISTEM</h3>
+                        <p class="text-white-50 small font-monospace">INTRODUCEȚI CREDENȚIALELE</p>
                     </div>
 
                     <form id="account" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger bg-danger bg-opacity-10 border-danger text-danger font-monospace text-center small mb-4" role="alert"></div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.Email" class="form-control bg-white border-0 shadow-sm" placeholder="name@example.com" style="border-radius: 12px;" />
-                            <label asp-for="Input.Email" class="text-muted ps-4">Email</label>
-                            <span asp-validation-for="Input.Email" class="text-danger small ms-2"></span>
+                            <input asp-for="Input.Email" class="form-control bg-dark text-info border-secondary font-monospace" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                            <label asp-for="Input.Email" class="text-muted">EMAIL</label>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
                         </div>
 
-                        <div class="form-floating mb-3">
-                            <input asp-for="Input.Password" class="form-control bg-white border-0 shadow-sm" placeholder="Parolă" style="border-radius: 12px;" />
-                            <label asp-for="Input.Password" class="text-muted ps-4">Parolă</label>
-                            <span asp-validation-for="Input.Password" class="text-danger small ms-2"></span>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input" asp-for="Input.RememberMe" />
-                                <label class="form-check-label small text-muted" asp-for="Input.RememberMe">Ține-mă minte</label>
+                        <div class="input-group mb-3">
+                            <div class="form-floating flex-grow-1">
+                                <input asp-for="Input.Password" id="passwordInput" class="form-control bg-dark text-info border-secondary font-monospace"
+                                       style="border-right: none;" autocomplete="current-password" aria-required="true" placeholder="password" type="password" />
+                                <label asp-for="Input.Password" class="text-muted">PAROLĂ</label>
                             </div>
-                            <a id="forgot-password" asp-page="./ForgotPassword" class="small text-primary text-decoration-none fw-bold">Ai uitat parola?</a>
+                            <span class="input-group-text bg-dark border-secondary" style="border-left: none; cursor: pointer;" onclick="togglePassword()">
+                                <i class="bi bi-eye text-info" id="eyeIcon"></i>
+                            </span>
+                        </div>
+                        <span asp-validation-for="Input.Password" class="text-danger small d-block mb-3"></span>
+
+                        <div class="form-check mb-4">
+                            <label asp-for="Input.RememberMe" class="form-check-label text-white-50 small font-monospace">
+                                <input class="form-check-input bg-dark border-secondary" asp-for="Input.RememberMe" />
+                                @Html.DisplayNameFor(m => m.Input.RememberMe).ToUpper()
+                            </label>
                         </div>
 
-                        <button id="login-submit" type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg hover-lift">
-                            <i class="bi bi-box-arrow-in-right me-2"></i> Intră în cont
-                        </button>
+                        <div class="d-grid">
+                            <button id="login-submit" type="submit" class="btn btn-lg btn-tech fw-bold font-monospace">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> CONECTARE
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <p class="mb-0">
+                                <a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none text-info small font-monospace hover-glow">
+                                    AI UITAT PAROLA?
+                                </a>
+                            </p>
+                        </div>
                     </form>
-                </div>
-
-                <div class="col-md-6 d-none d-md-flex flex-column justify-content-center align-items-center text-white text-center p-5 position-relative bg-primary">
-                    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(29, 78, 216, 0.8)); z-index: 1;"></div>
-
-                    <div class="position-relative" style="z-index: 2;">
-                        <div class="bg-white bg-opacity-25 rounded-circle p-4 d-inline-block mb-4 shadow-sm backdrop-blur">
-                            <i class="bi bi-shield-lock-fill display-4"></i>
-                        </div>
-                        <h3 class="fw-bold mb-3">Acces Restricționat</h3>
-                        <p class="opacity-75 mb-4 px-3">
-                            Această aplicație este destinată exclusiv membrilor organizației.
-                        </p>
-
-                        <div class="badge bg-white bg-opacity-10 border border-white border-opacity-25 p-3 rounded-pill fw-light">
-                            <i class="bi bi-info-circle me-2"></i> Conturile sunt create de Administrator.
-                        </div>
-                    </div>
                 </div>
 
             </div>
@@ -70,12 +74,21 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-}
-<style>
-    .bg-opacity-65 {
-        background-color: rgba(255, 255, 255, 0.65) !important;
-    }
 
-    .backdrop-blur {
-        backdrop-filter: blur(10px);
-    }</style>
+    <script>
+        function togglePassword() {
+            var input = document.getElementById("passwordInput");
+            var icon = document.getElementById("eyeIcon");
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            }
+        }
+    </script>
+}

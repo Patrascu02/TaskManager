@@ -1,6 +1,6 @@
 ﻿<nav class="navbar navbar-expand-lg custom-navbar sticky-top navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+        <a class="navbar-brand text-info font-monospace" asp-controller="Home" asp-action="Index">
             <i class="bi bi-cpu-fill me-2"></i>TASK_MANAGER
         </a>
 
@@ -8,16 +8,14 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse justify-content-end" id="navGuest">
-            <ul class="navbar-nav">
+        <div class="collapse navbar-collapse" id="navGuest">
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link cyber-auth-btn me-2" asp-area="Identity" asp-page="/Account/Register">
-                        <i class="bi bi-person-plus-fill me-1"></i> ÎNREGISTRARE
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link cyber-auth-btn" asp-area="Identity" asp-page="/Account/Login">
-                        <i class="bi bi-box-arrow-in-right me-1"></i> AUTENTIFICARE
+                    <a class="nav-link btn btn-outline-info text-info font-monospace px-4 py-1 ms-3 border-info"
+                       style="border-radius: 0; transition: all 0.3s;"
+                       asp-area="Identity"
+                       asp-page="/Account/Login">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> AUTENTIFICARE
                     </a>
                 </li>
             </ul>
