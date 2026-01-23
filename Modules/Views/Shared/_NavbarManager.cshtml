@@ -4,12 +4,6 @@
 @{
     var user = await UserManager.GetUserAsync(User);
     string displayName = user?.FullName ?? "MANAGER";
-    string initials = "M";
-    if (!string.IsNullOrEmpty(displayName))
-    {
-        var parts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        initials = parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : parts[0].Substring(0, 1).ToUpper();
-    }
 }
 
 <nav class="navbar navbar-expand-lg custom-navbar sticky-top navbar-dark">
@@ -24,23 +18,40 @@
 
         <div class="collapse navbar-collapse" id="navManager">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link font-monospace" asp-controller="Home" asp-action="Index">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link font-monospace" asp-controller="Users" asp-action="Team">Echipa Mea</a></li>
-                <li class="nav-item"><a class="nav-link font-monospace" asp-controller="Tasks" asp-action="Assign">Alocare Sarcini</a></li>
+                <li class="nav-item">
+                    <a class="nav-link font-monospace" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-speedometer2 text-info"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-monospace" asp-controller="Users" asp-action="Team">
+                        <i class="bi bi-people-fill text-success"></i> Echipa Mea
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-monospace" asp-controller="Gamification" asp-action="Leaderboard">
+                        <i class="bi bi-trophy text-danger"></i> Clasament
+                    </a>
+                </li>
             </ul>
 
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle cyber-nav-link" href="#" id="mDrop" role="button" data-bs-toggle="dropdown">
-                        <div class="nav-avatar-box bg-warning border-warning text-dark">@initials</div>
-                        <span>SALUT, @displayName?.ToUpper()!</span>
+                        <span class="text-warning">SALUT, @displayName?.ToUpper()!</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end cyber-dropdown-menu">
-                        <li><a class="dropdown-item cyber-dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="bi bi-person-gear"></i> Profilul Meu</a></li>
+                        <li>
+                            <a class="dropdown-item cyber-dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
+                                <i class="bi bi-person-gear"></i> Profilul Meu
+                            </a>
+                        </li>
                         <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.1);"></li>
                         <li>
                             <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                                <button type="submit" class="cyber-logout-btn"><i class="bi bi-power"></i> DECONECTARE</button>
+                                <button type="submit" class="cyber-logout-btn">
+                                    <i class="bi bi-power"></i> DECONECTARE
+                                </button>
                             </form>
                         </li>
                     </ul>

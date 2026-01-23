@@ -5,6 +5,70 @@
     Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
+<style>
+    /* 1. Oprește efectul 3D la hover (Cerinta anterioara) */
+    .cyber-table tbody tr {
+        transition: background-color 0.2s ease !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+        .cyber-table tbody tr:hover {
+            transform: none !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            z-index: auto !important;
+            box-shadow: none !important;
+        }
+
+    /* 2. Stiluri pentru Bulina de Realocare (Cyber Radio) */
+    .reassign-option {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        padding: 2px 0;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .reassign-radio {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #64748b; /* Gri initial */
+        border-radius: 50%;
+        margin-right: 10px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+        .reassign-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: var(--hud-cyan);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.2s;
+        }
+
+    /* Efect Hover pe rândul numelui */
+    .reassign-option:hover .reassign-radio {
+        border-color: var(--hud-cyan);
+        box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+    }
+
+        .reassign-option:hover .reassign-radio::after {
+            transform: scale(1); /* Apare punctul din mijloc */
+        }
+
+    .reassign-option:hover .reassign-name {
+        color: var(--hud-cyan) !important;
+        text-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+    }
+</style>
+
 <div class="fade-in pt-4">
 
     <header class="hud-header-panel mb-4 mt-4">
@@ -12,7 +76,7 @@
             <h2 class="hud-welcome">SARCINI</h2>
             <small>GESTIONEAZĂ LISTA DE TASK-URI ȘI PRIORITĂȚI</small>
         </div>
-        <a asp-action="Create" class="btn-tech text-decoration-none">
+        <a asp-action="Assign" class="btn-tech text-decoration-none">
             <i class="bi bi-plus-lg me-2"></i> SARCINĂ NOUĂ
         </a>
     </header>
@@ -33,6 +97,7 @@
                 <thead>
                     <tr>
                         <th class="ps-4">TITLU & DESCRIERE</th>
+                        <th class="ps-4">ECHIPĂ (REALOCARE)</th>
                         <th class="text-center">PRIORITATE</th>
                         <th class="text-center">TERMEN LIMITĂ</th>
                         <th class="pe-4 text-end">ACȚIUNI</th>
@@ -41,61 +106,93 @@
                 <tbody id="taskTableBody">
                     @foreach (var item in Model)
                     {
-                        // Logică vizuală
-                        bool isOverdue = item.DueDate.HasValue && item.DueDate.Value < DateTime.Now;
-                        string dateColor = isOverdue ? "text-danger fw-bold" : "text-info";
+                        // --- Logică Data & Countdown ---
+                        bool hasDate = item.DueDate.HasValue;
+                        string dateColor = (hasDate && item.DueDate.Value < DateTime.Now) ? "text-danger fw-bold" : "text-info";
+                        string timeString = "-";
+                        string timeClass = "";
 
-                        string priorityClass = "";
-                        string priorityLabel = "";
+                        if (hasDate)
+                        {
+                            var ts = item.DueDate.Value - DateTime.Now;
+                            if (ts.TotalSeconds < 0)
+                            {
+                                timeString = "EXPIRAT";
+                                timeClass = "text-danger fw-bold";
+                            }
+                            else if (ts.TotalDays >= 1)
+                            {
+                                timeString = $"{ts.Days}z {ts.Hours}h RĂMASE";
+                                timeClass = "text-success opacity-75";
+                            }
+                            else
+                            {
+                                timeString = $"{ts.Hours}h {ts.Minutes}m RĂMASE";
+                                timeClass = "text-warning fw-bold";
+                            }
+                        }
 
-                        if (item.Priority == 1) { priorityClass = "border-danger text-danger"; priorityLabel = "CRITIC"; }
-                        else if (item.Priority == 2) { priorityClass = "border-warning text-warning"; priorityLabel = "MEDIU"; }
-                        else { priorityClass = "border-success text-success"; priorityLabel = "NORMAL"; }
+                        // --- Logică Prioritate ---
+                        string priorityClass = item.Priority == 1 ? "border-danger text-danger" : (item.Priority == 2 ? "border-warning text-warning" : "border-success text-success");
+                        string priorityLabel = item.Priority == 1 ? "CRITIC" : (item.Priority == 2 ? "MEDIU" : "NORMAL");
 
                         <tr>
-                            <td class="ps-4" style="max-width: 300px;">
+                            <td class="ps-4" style="max-width: 250px;">
                                 <div class="fw-bold text-white mb-1">@item.Title</div>
-                                <div class="text-white-50 small text-truncate" style="font-size: 0.85rem;">
-                                    @item.Description
-                                </div>
+                                <div class="text-white-50 small text-truncate">@item.Description</div>
                             </td>
 
-                            <td class="text-center">
-                                <span class="badge border @priorityClass bg-transparent font-monospace px-3 py-2">
-                                    @priorityLabel
-                                </span>
-                            </td>
-
-                            <td class="text-center font-monospace @dateColor">
-                                @if (item.DueDate.HasValue)
+                            <td class="ps-4" style="min-width: 200px;">
+                                @if (item.Assignments != null && item.Assignments.Any())
                                 {
-                                    <span><i class="bi bi-calendar-event me-1"></i> @item.DueDate.Value.ToString("dd.MM.yyyy")</span>
-                                    if (isOverdue)
-                                    {
+                                    <div class="d-flex flex-column gap-2">
+                                        @foreach (var assign in item.Assignments)
+                                        {
+                                            <a asp-action="Reassign" asp-route-id="@assign.TaskAssignmentId"
+                                               class="reassign-option"
+                                               title="Realocă task-ul lui @assign.User?.FullName">
 
-                                        <div class="small text-danger mt-1">!! EXPIRAT !!</div>
-                                    }
+                                                <div class="reassign-radio"></div>
+
+                                                <span class="reassign-name text-white small font-monospace">
+                                                    @assign.User?.FullName
+                                                </span>
+                                            </a>
+                                        }
+                                    </div>
                                 }
                                 else
                                 {
+                                    <span class="text-muted small font-monospace fst-italic ms-1">- Nealocat -</span>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge border @priorityClass bg-transparent font-monospace px-3 py-2">@priorityLabel</span>
+                            </td>
+
+                            <td class="text-center font-monospace">
+                                @if (hasDate)
+                                {
+                                    <div class="@dateColor mb-1">
+                                        <i class="bi bi-calendar-event me-1"></i> @item.DueDate.Value.ToString("dd.MM.yyyy")
+                                    </div>
+                                    <div class="@timeClass small" style="font-size: 0.75rem;">
+                                        <i class="bi bi-hourglass-split"></i> @timeString
+                                    </div>
+                                }
+                                else
+                                {
+
                                     <span class="text-muted">-</span>
                                 }
                             </td>
 
                             <td class="pe-4 text-end">
                                 <div class="btn-group">
-                                    <a asp-action="Edit" asp-route-id="@item.TaskId" class="btn btn-sm btn-outline-info me-2 rounded-0" title="Editează">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a asp-action="Details" asp-route-id="@item.TaskId" class="btn btn-sm btn-outline-warning me-2 rounded-0" title="Detalii">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-danger rounded-0"
-                                            onclick="confirmDelete('@item.TaskId', '@item.Title')"
-                                            title="Șterge">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    <a asp-action="Edit" asp-route-id="@item.TaskId" class="btn btn-sm btn-outline-info me-2 rounded-0" title="Editează"><i class="fas fa-edit"></i></a>
+                                    <a asp-action="Details" asp-route-id="@item.TaskId" class="btn btn-sm btn-outline-warning me-2 rounded-0" title="Detalii"><i class="fas fa-eye"></i></a>
+                                    <button class="btn btn-sm btn-outline-danger rounded-0" onclick="confirmDelete('@item.TaskId', '@item.Title')" title="Șterge"><i class="fas fa-trash-alt"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -124,24 +221,12 @@
                         <i class="fas fa-exclamation-triangle fa-3x text-danger"></i>
                     </div>
                 </div>
-
                 <h4 class="fw-bold text-white mb-2 font-monospace">EȘTI SIGUR?</h4>
-
-                <p class="text-white-50 mb-4">
-                    Ești pe cale să ștergi sarcina: <br>
-                    <strong id="deleteTaskTitle" class="text-info fs-5"></strong><br>
-                    <span class="small text-danger">Această acțiune este ireversibilă.</span>
-                </p>
-
+                <p class="text-white-50 mb-4">Vrei să ștergi sarcina: <strong id="deleteTaskTitle" class="text-info"></strong>?</p>
                 <div class="d-flex justify-content-center gap-2">
-                    <button type="button" class="btn btn-outline-light px-4 font-monospace" data-bs-dismiss="modal">
-                        ANULEAZĂ
-                    </button>
-
+                    <button type="button" class="btn btn-outline-light px-4 font-monospace" data-bs-dismiss="modal">ANULEAZĂ</button>
                     <form id="deleteForm" method="post">
-                        <button type="submit" class="btn btn-danger px-4 fw-bold font-monospace">
-                            DA, ȘTERGE
-                        </button>
+                        <button type="submit" class="btn btn-danger px-4 fw-bold font-monospace">DA, ȘTERGE</button>
                     </form>
                 </div>
             </div>
@@ -155,14 +240,13 @@
         document.getElementById('searchTask').addEventListener('keyup', function() {
             var value = this.value.toLowerCase();
             var rows = document.querySelectorAll("#taskTableBody tr");
-
             rows.forEach(function(row) {
                 var text = row.innerText.toLowerCase();
                 row.style.display = text.indexOf(value) > -1 ? "" : "none";
             });
         });
 
-        // SOLUȚIE PENTRU BLOCARE ECRAN (Mutare în body)
+        // Fix Modal (Mutare în body)
         var deleteModalElement = document.getElementById('deleteModal');
         if (deleteModalElement) {
             document.body.appendChild(deleteModalElement);
@@ -171,8 +255,6 @@
         function confirmDelete(taskId, taskTitle) {
             document.getElementById('deleteTaskTitle').textContent = taskTitle;
             document.getElementById('deleteForm').action = '/Tasks/Delete/' + taskId;
-
-            // Folosim metoda sigură getOrCreateInstance
             var myModal = bootstrap.Modal.getOrCreateInstance(deleteModalElement);
             myModal.show();
         }

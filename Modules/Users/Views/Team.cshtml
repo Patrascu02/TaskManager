@@ -1,131 +1,182 @@
-﻿@using Microsoft.AspNetCore.Identity
-@using TaskManager.Modules.Users.Models
-@model IList<ApplicationUser>
+﻿@using TaskManager.Modules.Users.Models
+@model IEnumerable<ApplicationUser>
 
 @{
-    ViewData["Title"] = "Echipa Mea";
-    Layout = "_Layout";
+    ViewData["Title"] = "ECHIPA MEA";
+    Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid py-5 fade-in-up">
-
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h2 class="display-5 fw-bold text-gradient">
-                <i class="bi bi-people-fill me-2"></i>Echipa Mea
-            </h2>
-            <p class="text-muted fs-5">Vizualizează membrii echipei și detaliile lor.</p>
-        </div>
-
-        <div class="d-flex gap-3">
-            <div class="card border-0 shadow-sm bg-white bg-opacity-60 backdrop-blur px-4 py-2 d-flex align-items-center flex-row">
-                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
-                    <i class="bi bi-person-check-fill fs-5"></i>
-                </div>
-                <div>
-                    <span class="d-block small text-muted fw-bold">MEMBRI</span>
-                    <span class="h5 fw-bold mb-0">@Model.Count</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @if (Model != null && Model.Any())
-    {
-        <div class="row g-4">
-            @foreach (var user in Model)
-            {
-                // LOGICA C# - INSIGNA PRINCIPALĂ (TITLU)
-                string displayBadgeTitle = user.CurrentBadge?.Name;
-                if (string.IsNullOrEmpty(displayBadgeTitle) && user.Badges != null && user.Badges.Any())
-                {
-                    var lastBadge = user.Badges.Select(ub => ub.Badge).LastOrDefault();
-                    displayBadgeTitle = lastBadge?.Name;
-                }
-                displayBadgeTitle = displayBadgeTitle ?? "-";
-
-                <div class="col-md-6 col-xl-3">
-                    <div class="card h-100 border-0 shadow-lg hover-lift position-relative overflow-hidden" style="border-radius: 20px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);">
-
-                        <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10"
-                             style="background: linear-gradient(135deg, #ffffff 0%, #3b82f6 100%); pointer-events: none;"></div>
-
-                        <div class="card-body p-4 text-center position-relative z-index-1">
-
-                            <div class="mb-3 d-inline-block position-relative">
-                                <div class="bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-lg mx-auto"
-                                     style="width: 80px; height: 80px; font-size: 2rem; font-weight: bold;">
-                                    @(user.FullName?.Substring(0, 1) ?? user.UserName?.Substring(0, 1) ?? "U")
-                                </div>
-                                <div class="position-absolute bottom-0 end-0 p-1 bg-white rounded-circle">
-                                    <div class="bg-success rounded-circle" style="width: 15px; height: 15px; border: 2px solid white;"></div>
-                                </div>
-                            </div>
-
-                            <h5 class="fw-bold text-dark mb-1">@(user.FullName ?? "Utilizator")</h5>
-                            <p class="text-muted small mb-3">@user.Email</p>
-
-                            <div class="mb-4">
-                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 rounded-pill px-3">
-                                    <i class="bi bi-patch-check-fill me-1"></i>
-                                    @displayBadgeTitle
-                                </span>
-                            </div>
-
-                            <div class="d-flex justify-content-around border-top border-light pt-3">
-                                <div>
-                                    <small class="text-muted d-block" style="font-size: 0.7rem;">LEVEL</small>
-                                    <span class="fw-bold text-dark">@(user.LevelId ?? 1)</span>
-                                </div>
-                                <div>
-                                    <small class="text-muted d-block" style="font-size: 0.7rem;">XP TOTAL</small>
-                                    <span class="fw-bold text-warning">@(user.TotalXp ?? 0)</span>
-                                </div>
-                            </div>
-
-                            <div class="mt-4">
-                                <a href="mailto:@user.Email" class="btn btn-outline-primary rounded-pill w-100 btn-sm fw-bold">
-                                    <i class="bi bi-envelope me-2"></i> Contactează
-                                </a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="text-center py-5">
-            <div class="bg-light rounded-circle p-4 d-inline-block mb-3">
-                <i class="bi bi-people fs-1 text-muted opacity-50"></i>
-            </div>
-            <h5 class="fw-bold text-muted">Niciun membru în echipă.</h5>
-        </div>
-    }
-</div>
-
 <style>
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
     }
 
-    .hover-lift {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .team-card {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(6, 182, 212, 0.3); /* Cyan sters */
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
     }
 
-        .hover-lift:hover {
+        .team-card:hover {
+            border-color: var(--hud-cyan);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
         }
 
-    .backdrop-blur {
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        /* Linia decorativă de sus */
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--hud-cyan), transparent);
+        }
+
+    /* Avatar Hexagonal */
+    .hex-avatar-container {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .z-index-1 {
-        z-index: 1;
+    .hex-avatar {
+        width: 100%;
+        height: 100%;
+        background-color: rgba(6, 182, 212, 0.1);
+        clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid rgba(6, 182, 212, 0.5); /* Contur */
+        color: var(--hud-cyan);
+        font-family: 'Courier New', monospace;
+        font-size: 1.8rem;
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+    }
+
+    .role-badge {
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 1px solid;
+    }
+
+    .contact-row {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 15px;
     }
 </style>
+
+<div class="fade-in pt-4">
+
+    <header class="hud-header-panel mb-4 mt-4">
+        <div>
+            <h2 class="hud-welcome">ECHIPA MEA</h2>
+            <small>MEMBRII DEPARTAMENTULUI ȘI STATUSUL LOR</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-dark border border-info text-info font-monospace p-2">
+                <i class="bi bi-people-fill me-2"></i>TOTAL: @Model.Count()
+            </span>
+        </div>
+    </header>
+
+    <div class="team-grid">
+        @foreach (var user in Model)
+        {
+            // Calcul Initiale
+            string initials = "U";
+            string fullName = "Unknown";
+
+            if (!string.IsNullOrEmpty(user.FirstName) && !string.IsNullOrEmpty(user.LastName))
+            {
+                initials = user.FirstName.Substring(0, 1) + user.LastName.Substring(0, 1);
+                fullName = $"{user.FirstName} {user.LastName}";
+            }
+            else
+            {
+                // Fallback dacă nu are nume setat
+                initials = (!string.IsNullOrEmpty(user.Email) && user.Email.Length >= 2)
+                ? user.Email.Substring(0, 2).ToUpper()
+                : "US";
+                fullName = user.Email ?? "No Email";
+            }
+
+            // Deoarece ApplicationUser nu are proprietatea 'Role' direct,
+            // și controllerul filtrează doar rolul 'User', presupunem că sunt Useri.
+            string roleColor = "border-info text-info";
+            string roleIcon = "bi-person";
+            string roleName = "TEAM MEMBER";
+
+            <div class="team-card p-4">
+
+                <div class="text-center mb-3">
+                    <div class="hex-avatar-container mb-3">
+                        <div class="hex-avatar">
+                            @initials.ToUpper()
+                        </div>
+                    </div>
+
+                    <h5 class="text-white font-monospace fw-bold mb-1">@fullName</h5>
+
+                    <div class="d-flex justify-content-center gap-2 mt-2">
+                        <span class="role-badge @roleColor font-monospace">
+                            <i class="bi @roleIcon me-1"></i> @roleName
+                        </span>
+                        @if (user.LevelId.HasValue)
+                        {
+                            <span class="role-badge border-warning text-warning font-monospace" title="Nivel Curent">
+                                <i class="bi bi-star-fill me-1"></i> LVL @user.LevelId
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                <div class="contact-row d-flex align-items-center justify-content-between mb-3">
+                    <div class="text-truncate w-100 text-center">
+                        <small class="text-muted d-block font-monospace" style="font-size: 0.65rem;">EMAIL CORPORATIV</small>
+                        <span class="text-white-50 small font-monospace text-truncate d-block" title="@user.Email">
+                            @user.Email
+                        </span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="mailto:@user.Email" class="btn btn-sm btn-outline-secondary font-monospace border-secondary text-white-50">
+                        <i class="bi bi-envelope me-2"></i>TRIMITE EMAIL
+                    </a>
+
+                    <a asp-controller="Tasks" asp-action="Assign" class="btn btn-sm btn-tech fw-bold font-monospace">
+                        <i class="bi bi-list-task me-2"></i>ALOCĂ TASK
+                    </a>
+                </div>
+
+            </div>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <div class="text-secondary mb-3 opacity-50"><i class="bi bi-people fa-4x"></i></div>
+            <h6 class="text-secondary font-monospace">NU EXISTĂ MEMBRI ÎN ECHIPĂ.</h6>
+        </div>
+    }
+
+</div>

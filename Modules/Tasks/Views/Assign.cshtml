@@ -6,7 +6,7 @@
 
 <div class="container mt-4">
     <div class="card shadow-lg border-0">
-        <div class="card-header bg-success text-white py-3">
+        <div class="card-header bg-dark text-info py-3 border-bottom border-info">
             <h3 class="mb-0"><i class="bi bi-person-plus-fill"></i> Alocă Task Nou</h3>
             <p class="mb-0 small text-white-50">Creează o sarcină și distribuie-o membrilor echipei.</p>
         </div>
@@ -17,7 +17,7 @@
 
                 <div class="row">
                     <div class="col-md-7 border-end">
-                        <h5 class="text-success mb-3"><i class="bi bi-card-text"></i> Detalii Sarcină</h5>
+                        <h5 class="text-info mb-3"><i class="bi bi-card-text"></i> Detalii Sarcină</h5>
 
                         <div class="mb-3">
                             <label asp-for="Title" class="form-label fw-bold"></label>
@@ -49,7 +49,7 @@
                     </div>
 
                     <div class="col-md-5 ps-md-4">
-                        <h5 class="text-success mb-3"><i class="bi bi-people-fill"></i> Selectează Executanți</h5>
+                        <h5 class="text-info mb-3"><i class="bi bi-people-fill"></i> Selectează Executanți</h5>
                         <div class="alert alert-light border small text-muted">
                             <i class="bi bi-info-circle"></i> Bifează utilizatorii care vor primi acest task. Poți selecta mai mulți.
                         </div>
@@ -88,7 +88,8 @@
 
                 <div class="d-flex justify-content-end gap-2">
                     <a asp-controller="Tasks" asp-action="Index" class="btn btn-secondary px-4">Anulează</a>
-                    <button type="submit" class="btn btn-success btn-lg px-5 shadow-sm">
+
+                    <button type="submit" class="btn btn-info px-5 shadow-sm fw-bold">
                         <i class="bi bi-send-check"></i> Alocă Task
                     </button>
                 </div>

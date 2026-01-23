@@ -1,63 +1,65 @@
 ﻿@model TaskManager.Modules.Tasks.Models.TaskAssignment
 
 @{
-    ViewData["Title"] = "Realocare Task";
-    Layout = "_Layout";
+    ViewData["Title"] = "REALOCARE SARCINĂ";
+    Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row justify-content-center align-items-center min-vh-75 fade-in-up">
-    <div class="col-md-6 col-lg-5">
+<div class="fade-in pt-4">
 
-        <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 24px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);">
-            <div class="card-body p-5">
+    <header class="hud-header-panel mb-4 mt-4">
+        <div>
+            <h2 class="hud-welcome">REALOCARE SARCINĂ</h2>
+            <small>MODIFICĂ MEMBRUL ECHIPEI RESPONSABIL</small>
+        </div>
+        <a asp-action="Index" class="btn-tech text-decoration-none">
+            <i class="bi bi-arrow-left me-2"></i> ÎNAPOI LA LISTĂ
+        </a>
+    </header>
 
-                <div class="text-center mb-4">
-                    <div class="bg-primary text-white rounded-circle p-3 d-inline-block mb-3 shadow-sm">
-                        <i class="bi bi-person-gear display-4"></i>
-                    </div>
-                    <h2 class="fw-bold text-gradient">Schimbă Responsabilul</h2>
-                    <p class="text-muted">Task: <strong>@Model.Task?.Title</strong></p>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="tech-card p-4">
+
+                <div class="mb-4 text-center">
+                    <h5 class="text-white font-monospace">@Model.Task.Title</h5>
+                    <p class="text-white-50 small">@Model.Task.Description</p>
                 </div>
 
-                <div class="alert bg-white border-0 shadow-sm rounded-3 d-flex align-items-center mb-4">
-                    <div class="me-3">
-                        <span class="text-muted small text-uppercase fw-bold">Acum la:</span>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div class="bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px; font-weight: bold;">
-                            @Model.User?.FullName?.Substring(0, 1)
+                <div class="d-flex justify-content-between align-items-center mb-4 p-3 border border-secondary rounded bg-dark">
+                    <div class="text-center w-50 border-end border-secondary">
+                        <small class="text-danger fw-bold font-monospace d-block mb-1">UTILIZATOR CURENT</small>
+                        <div class="text-white">
+                            <i class="bi bi-person-x-fill text-danger me-2"></i> @Model.User.FullName
                         </div>
-                        <span class="fw-bold text-dark">@Model.User?.FullName</span>
+                    </div>
+                    <div class="text-center w-50">
+                        <i class="bi bi-arrow-right-circle-fill fa-2x text-info"></i>
                     </div>
                 </div>
 
                 <form asp-action="Reassign" method="post">
                     <input type="hidden" name="id" value="@Model.TaskAssignmentId" />
 
-                    <div class="form-floating mb-4">
-                        <select name="newUserId" class="form-select border-0 shadow-sm bg-light fw-bold" asp-items="ViewBag.Users" style="height: 60px;">
-                        </select>
-                        <label class="text-muted ps-3">Alocă către alt coleg</label>
+                    <div class="mb-4">
+                        <label class="form-label text-success fw-bold font-monospace small">NOUL RESPONSABIL</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-success"><i class="bi bi-person-check-fill"></i></span>
+                            <select name="newUserId" class="form-select bg-dark text-light border-secondary font-monospace" asp-items="ViewBag.Users"></select>
+                        </div>
+                        <small class="text-muted font-monospace mt-2 d-block">
+                            * Lista afișează doar utilizatorii care nu lucrează deja la acest task.
+                        </small>
                     </div>
 
-                    <div class="d-grid gap-3">
-                        <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-lg hover-lift fw-bold">
-                            <i class="bi bi-check-circle-fill me-2"></i> Salvează Modificarea
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-tech fw-bold font-monospace">
+                            <i class="bi bi-arrow-repeat me-2"></i> CONFIRMĂ REALOCAREA
                         </button>
-                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill fw-bold border-0">
-                            Renunță
-                        </a>
                     </div>
                 </form>
 
             </div>
         </div>
-
     </div>
 </div>
-
-<style>
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    }
-</style>
