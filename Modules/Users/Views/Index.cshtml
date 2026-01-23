@@ -74,9 +74,7 @@
                                     </div>
                                 </div>
                             </td>
-
                             <td class="text-white-50 small font-monospace">@item.Email</td>
-
                             <td>
                                 @if (item.Role == "Admin")
                                 {
@@ -97,13 +95,11 @@
                                     </span>
                                 }
                             </td>
-
                             <td class="pe-4 text-end">
                                 <div class="btn-group">
                                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info me-2 rounded-0" title="Editează">
                                         <i class="fas fa-edit"></i>
                                     </a>
-
                                     <button type="button"
                                             class="btn btn-sm btn-outline-danger rounded-0"
                                             onclick="confirmDelete('@item.Id', '@item.Email')"
@@ -140,7 +136,6 @@
                 </div>
 
                 <h4 class="fw-bold text-white mb-2 font-monospace">EȘTI SIGUR?</h4>
-
                 <p class="text-white-50 mb-4">
                     Ești pe cale să ștergi utilizatorul <strong id="deleteUserName" class="text-info"></strong>.<br>
                     Această acțiune este ireversibilă.
@@ -150,7 +145,6 @@
                     <button type="button" class="btn btn-outline-light px-4 font-monospace" data-bs-dismiss="modal">
                         ANULEAZĂ
                     </button>
-
                     <form id="deleteForm" method="post">
                         <button type="submit" class="btn btn-danger px-4 fw-bold font-monospace">
                             DA, ȘTERGE
@@ -164,45 +158,31 @@
 
 @section Scripts {
     <script>
-        // 1. Funcție Căutare
+        // Căutare
         document.getElementById('searchUser').addEventListener('keyup', function() {
             var value = this.value.toLowerCase();
             var rows = document.querySelectorAll("#userTableBody tr");
-
             rows.forEach(function(row) {
                 var text = row.innerText.toLowerCase();
                 row.style.display = text.indexOf(value) > -1 ? "" : "none";
             });
         });
 
-        // 2. Funcție Deschidere Modal Ștergere (REPARATĂ)
-        // Definim elementul modal o singură dată în afara funcției
+        // SOLUȚIE PENTRU BLOCARE ECRAN:
+        // Mutăm modalul în <body> imediat ce se încarcă scriptul.
+        // Astfel evităm orice problemă de z-index sau CSS overflow din containerele părinte.
         var deleteModalElement = document.getElementById('deleteModal');
-        var deleteModal = null; // Variabilă pentru instanță
+        if (deleteModalElement) {
+            document.body.appendChild(deleteModalElement);
+        }
 
         function confirmDelete(userId, userEmail) {
-            // Setăm datele în modal
             document.getElementById('deleteUserName').textContent = userEmail;
             document.getElementById('deleteForm').action = '/Users/Delete/' + userId;
 
-            // Folosim o metodă sigură pentru a obține sau crea instanța modalului
-            // Asta previne crearea de instanțe multiple care blochează ecranul
-            if (!deleteModal) {
-                deleteModal = new bootstrap.Modal(deleteModalElement, {
-                    backdrop: true,
-                    keyboard: true
-                });
-            }
-            deleteModal.show();
+            // Folosim metoda sigură getOrCreateInstance
+            var myModal = bootstrap.Modal.getOrCreateInstance(deleteModalElement);
+            myModal.show();
         }
-
-        // 3. Failsafe: Curățare forțată a ecranului la închidere
-        // Dacă cumva rămâne fundalul negru, acest cod îl șterge manual când modalul dispare
-        deleteModalElement.addEventListener('hidden.bs.modal', function () {
-            const backdrops = document.querySelectorAll('.modal-backdrop');
-            backdrops.forEach(backdrop => backdrop.remove());
-            document.body.classList.remove('modal-open');
-            document.body.style = ''; // Resetează stilurile adăugate pe body
-        });
     </script>
 }

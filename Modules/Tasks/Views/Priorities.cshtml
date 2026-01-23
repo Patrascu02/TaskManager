@@ -1,84 +1,80 @@
 ﻿@{
-    ViewData["Title"] = "Legendă Priorități";
+    ViewData["Title"] = "LEGENDĂ PRIORITĂȚI";
     Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container fade-in mt-4">
+<div class="fade-in pt-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <header class="hud-header-panel mb-4 mt-4">
         <div>
-            <h2 class="fw-bold text-dark mb-0">
-                <i class="fas fa-info-circle me-2 text-primary"></i>Legendă Priorități
-            </h2>
-            <p class="text-muted mb-0">Definițiile nivelurilor de urgență din sistem.</p>
+            <h2 class="hud-welcome">LEGENDĂ PRIORITĂȚI</h2>
+            <small>DEFINIȚIILE NIVELURILOR DE URGENȚĂ DIN SISTEM</small>
         </div>
-        <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-bold">
-            <i class="fas fa-arrow-left me-2"></i> Înapoi la Task-uri
-        </a>
-    </div>
+    </header>
 
-    <div class="alert alert-light border shadow-sm d-flex align-items-center mb-4 rounded-3">
-        <div class="fs-1 text-primary me-3">
+    <div class="tech-card p-3 mb-4 d-flex align-items-center" style="border-left: 4px solid var(--hud-cyan);">
+        <div class="fs-2 text-info me-3">
             <i class="fas fa-layer-group"></i>
         </div>
         <div>
-            <h5 class="alert-heading fw-bold mb-1">Standardizare</h5>
-            <p class="mb-0 text-muted small">
+            <h5 class="fw-bold text-white mb-1 font-monospace">STANDARDIZARE</h5>
+            <p class="mb-0 text-white-50 small font-monospace">
                 Aceste niveluri sunt predefinite în sistem (Hardcoded) pentru a asigura consistența raportării.
                 Toți utilizatorii trebuie să respecte aceste definiții atunci când creează sarcini noi.
             </p>
         </div>
     </div>
 
-    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 12px;">
+    <div class="cyber-table-card">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
+            <table class="cyber-table align-middle mb-0">
+                <thead>
                     <tr>
-                        <th class="ps-4 py-3 text-uppercase text-muted small fw-bold" style="width: 100px;">ID</th>
-                        <th class="py-3 text-uppercase text-muted small fw-bold" style="width: 150px;">Nivel</th>
-                        <th class="py-3 text-uppercase text-muted small fw-bold" style="width: 150px;">Indicator Vizual</th>
-                        <th class="pe-4 py-3 text-uppercase text-muted small fw-bold">Descriere și Impact</th>
+                        <th class="ps-4" style="width: 100px;">ID</th>
+                        <th style="width: 150px;">NIVEL</th>
+                        <th style="width: 180px;">INDICATOR VIZUAL</th>
+                        <th class="pe-4">DESCRIERE ȘI IMPACT</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="ps-4 fw-bold text-muted">1</td>
-                        <td><span class="fw-bold text-dark">Scăzut</span></td>
+                        <td class="ps-4 fw-bold text-white-50 font-monospace">1</td>
+                        <td><span class="fw-bold text-success font-monospace">SCĂZUT</span></td>
                         <td>
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 px-3 py-2 rounded-pill">
-                                <i class="fas fa-coffee me-1"></i> Low
+                            <span class="badge border border-success text-success bg-transparent px-3 py-2 rounded-pill font-monospace">
+                                <i class="fas fa-coffee me-1"></i> LOW
                             </span>
                         </td>
-                        <td class="pe-4 text-muted">
+                        <td class="pe-4 text-white-50 small font-monospace">
                             Sarcini de rutină, administrative sau idei de viitor.
                             Nu au un termen limită critic și nu blochează activitatea echipei.
                         </td>
                     </tr>
 
                     <tr>
-                        <td class="ps-4 fw-bold text-muted">2</td>
-                        <td><span class="fw-bold text-dark">Mediu</span></td>
+                        <td class="ps-4 fw-bold text-white-50 font-monospace">2</td>
+                        <td><span class="fw-bold text-warning font-monospace">MEDIU</span></td>
                         <td>
-                            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10 px-3 py-2 rounded-pill">
-                                <i class="fas fa-bolt me-1"></i> Medium
+                            <span class="badge border border-warning text-warning bg-transparent px-3 py-2 rounded-pill font-monospace">
+                                <i class="fas fa-bolt me-1"></i> MEDIUM
                             </span>
                         </td>
-                        <td class="pe-4 text-muted">
+                        <td class="pe-4 text-white-50 small font-monospace">
                             Sarcini standard de proiect. Trebuie finalizate în ritmul normal de lucru
-                            pentru a respecta roadmap-ul. Aceasta este prioritatea implicită (Default).
+                            pentru a respecta roadmap-ul.
+                            <span class="text-info">Aceasta este prioritatea implicită (Default).</span>
                         </td>
                     </tr>
 
-                    <tr class="bg-danger bg-opacity-10">
-                        <td class="ps-4 fw-bold text-danger">3</td>
-                        <td><span class="fw-bold text-danger">Ridicat</span></td>
+                    <tr>
+                        <td class="ps-4 fw-bold text-white-50 font-monospace">3</td>
+                        <td><span class="fw-bold text-danger font-monospace">RIDICAT</span></td>
                         <td>
-                            <span class="badge bg-danger text-white px-3 py-2 rounded-pill shadow-sm">
-                                <i class="fas fa-fire me-1"></i> High
+                            <span class="badge border border-danger text-danger bg-transparent px-3 py-2 rounded-pill font-monospace shadow-sm">
+                                <i class="fas fa-fire me-1"></i> HIGH
                             </span>
                         </td>
-                        <td class="pe-4 text-dark fw-bold">
+                        <td class="pe-4 text-white fw-bold small font-monospace" style="text-shadow: 0 0 5px rgba(244, 63, 94, 0.3);">
                             Urgențe majore, bug-uri critice sau blocaje care opresc producția.
                             Necesită atenție imediată și realocare de resurse.
                         </td>

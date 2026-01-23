@@ -41,7 +41,7 @@
                 <tbody id="taskTableBody">
                     @foreach (var item in Model)
                     {
-                        // Logică vizuală pentru dată și prioritate
+                        // Logică vizuală
                         bool isOverdue = item.DueDate.HasValue && item.DueDate.Value < DateTime.Now;
                         string dateColor = isOverdue ? "text-danger fw-bold" : "text-info";
 
@@ -114,7 +114,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="background-color: #1e293b; border: 1px solid var(--hud-border); color: #e2e8f0;">
             <div class="modal-body p-4 text-center">
@@ -162,29 +162,19 @@
             });
         });
 
-        // --- FIX PENTRU MODAL BLOCAT (Același cod ca la Users) ---
+        // SOLUȚIE PENTRU BLOCARE ECRAN (Mutare în body)
         var deleteModalElement = document.getElementById('deleteModal');
-        var deleteModalInstance = null;
+        if (deleteModalElement) {
+            document.body.appendChild(deleteModalElement);
+        }
 
         function confirmDelete(taskId, taskTitle) {
             document.getElementById('deleteTaskTitle').textContent = taskTitle;
-            var form = document.getElementById('deleteForm');
+            document.getElementById('deleteForm').action = '/Tasks/Delete/' + taskId;
 
-            // Ruta pentru Tasks Controller Delete
-            form.action = '/Tasks/Delete/' + taskId;
-
-            if (!deleteModalInstance) {
-                deleteModalInstance = new bootstrap.Modal(deleteModalElement);
-            }
-            deleteModalInstance.show();
+            // Folosim metoda sigură getOrCreateInstance
+            var myModal = bootstrap.Modal.getOrCreateInstance(deleteModalElement);
+            myModal.show();
         }
-
-        // Curățare forțată a backdrop-ului la închidere
-        deleteModalElement.addEventListener('hidden.bs.modal', function () {
-            const backdrops = document.querySelectorAll('.modal-backdrop');
-            backdrops.forEach(backdrop => backdrop.remove());
-            document.body.classList.remove('modal-open');
-            document.body.style = '';
-        });
     </script>
 }
