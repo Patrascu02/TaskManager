@@ -1,104 +1,107 @@
-﻿@{
+﻿@model TaskManager.Modules.Home.Models.AdminDashboardViewModel
+
+@{
     Layout = "_Layout";
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container mt-4">
+<div class="dashboard-wrapper fade-in">
 
-    <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap">
-        <div>
-            <h2 class="fw-bold text-dark mb-1">
-                <i class="fas fa-tachometer-alt me-2" style="color: #10b981;"></i>Admin Dashboard
-            </h2>
-            <p class="text-muted mb-0">Monitorizare în timp real și administrare sistem.</p>
-        </div>
+    <main class="dashboard-main">
 
-        <div class="d-flex align-items-center bg-white shadow-sm rounded-pill px-4 py-2 mt-3 mt-md-0 border">
-            <div class="me-3 text-end border-end pe-3">
-                <div class="fw-bold text-dark" style="font-size: 1.1rem;">@ViewBag.CurrentTime</div>
-                <div class="text-muted small text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Ora Server</div>
+        <header class="hud-header-panel">
+            <div>
+                <h2 class="hud-welcome">ADMIN DASHBOARD</h2>
+                <small>MONITORIZARE ÎN TIMP REAL ȘI ADMINISTRARE SISTEM</small>
             </div>
-            <div class="text-start">
-                <div class="fw-bold text-success"><i class="far fa-calendar-alt me-1"></i> @ViewBag.CurrentDate</div>
-                <div class="text-muted small text-uppercase" style="font-size: 0.7rem;">Data Curentă</div>
+            <div class="d-flex flex-column align-items-end gap-1">
+                <div class="hud-date" style="border-color: var(--hud-cyan); color: var(--hud-cyan);">
+                    <i class="bi bi-clock me-2"></i>@ViewBag.CurrentTime
+                </div>
+                <div style="font-family: 'Courier New'; font-size: 0.8rem; color: #94a3b8;">
+                    <i class="bi bi-calendar-event me-1"></i> @ViewBag.CurrentDate
+                </div>
             </div>
-        </div>
-    </div>
+        </header>
 
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-md">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-circle p-3 d-flex justify-content-center align-items-center me-3" style="background-color: rgba(16, 185, 129, 0.1); width: 64px; height: 64px;">
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-4">
+                <div class="tech-card h-100 d-flex align-items-center">
+                    <div class="me-3 d-flex align-items-center justify-content-center"
+                         style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 50%;">
                         <i class="fas fa-server fa-2x text-success"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted text-uppercase mb-1 small fw-bold">Server Status</h6>
-                        <h4 class="mb-0 fw-bold text-success">ONLINE</h4>
-                        <small class="text-muted">Uptime stabil</small>
+                        <h6 class="text-white-50 font-monospace mb-1" style="font-size: 0.8rem;">SERVER STATUS</h6>
+                        <h4 class="mb-0 fw-bold text-success" style="text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);">ONLINE</h4>
+                        <small class="text-secondary font-monospace" style="font-size: 0.75rem;">UPTIME STABIL</small>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-md">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-circle p-3 d-flex justify-content-center align-items-center me-3" style="background-color: rgba(14, 116, 144, 0.1); width: 64px; height: 64px;">
+            <div class="col-md-4">
+                <div class="tech-card h-100 d-flex align-items-center">
+                    <div class="me-3 d-flex align-items-center justify-content-center"
+                         style="width: 60px; height: 60px; background: rgba(6, 182, 212, 0.1); border: 1px solid var(--hud-cyan); border-radius: 50%;">
                         <i class="fas fa-users fa-2x text-info"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted text-uppercase mb-1 small fw-bold">Utilizatori</h6>
-                        <h4 class="mb-0 fw-bold" style="color: #0e7490;">@Model.TotalUsers</h4>
-                        <a asp-controller="Users" asp-action="Index" class="text-decoration-none small text-info fw-bold">Gestionează &rarr;</a>
+                        <h6 class="text-white-50 font-monospace mb-1" style="font-size: 0.8rem;">UTILIZATORI</h6>
+                        <h4 class="mb-0 fw-bold text-info">@Model.TotalUsers</h4>
+                        <a asp-controller="Users" asp-action="Index" class="text-decoration-none small text-info fw-bold font-monospace hover-glow">
+                            GESTIONEAZĂ <i class="bi bi-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-md">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-circle p-3 d-flex justify-content-center align-items-center me-3" style="background-color: rgba(245, 158, 11, 0.1); width: 64px; height: 64px;">
+            <div class="col-md-4">
+                <div class="tech-card h-100 d-flex align-items-center">
+                    <div class="me-3 d-flex align-items-center justify-content-center"
+                         style="width: 60px; height: 60px; background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 50%;">
                         <i class="fas fa-tasks fa-2x text-warning"></i>
                     </div>
                     <div>
-                        <h6 class="text-muted text-uppercase mb-1 small fw-bold">Task-uri Active</h6>
+                        <h6 class="text-white-50 font-monospace mb-1" style="font-size: 0.8rem;">TASK-URI ACTIVE</h6>
                         <h4 class="mb-0 fw-bold text-warning">@Model.ActiveTasks</h4>
-                        <small class="text-muted">din @Model.TotalTasks totale</small>
+                        <small class="text-secondary font-monospace" style="font-size: 0.75rem;">DIN @Model.TotalTasks TOTALE</small>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <h5 class="mb-3 text-dark fw-bold border-bottom pb-2">Detalii Tehnice Sistem</h5>
+        <h5 class="mb-3 text-dark fw-bold font-monospace ps-2 border-start border-4 border-danger">
+            DETALII TEHNICE SISTEM
+        </h5>
 
-    <div class="card border-0 shadow-md mb-4">
-        <div class="card-body p-4">
+        <div class="tech-card p-4">
             <div class="row">
-                <div class="col-md-4 border-end">
+                <div class="col-md-4 border-end border-secondary">
                     <div class="d-flex align-items-center mb-2">
                         <i class="fab fa-windows fa-lg text-primary me-2"></i>
-                        <span class="text-muted text-uppercase small fw-bold">Sistem Operare</span>
+                        <span class="text-white-50 text-uppercase small fw-bold font-monospace">Sistem Operare</span>
                     </div>
-                    <p class="fw-bold text-dark mb-0">@ViewBag.OSDescription</p>
+                    <p class="fw-bold text-white mb-0 text-shadow-sm">@ViewBag.OSDescription</p>
                 </div>
-                <div class="col-md-4 border-end">
+
+                <div class="col-md-4 border-end border-secondary">
                     <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-code fa-lg text-danger me-2"></i>
-                        <span class="text-muted text-uppercase small fw-bold">Framework .NET</span>
+                        <span class="text-white-50 text-uppercase small fw-bold font-monospace">Framework .NET</span>
                     </div>
-                    <p class="fw-bold text-dark mb-0">@ViewBag.FrameworkDescription</p>
+                    <p class="fw-bold text-white mb-0 text-shadow-sm">@ViewBag.FrameworkDescription</p>
                 </div>
+
                 <div class="col-md-4">
                     <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-microchip fa-lg text-secondary me-2"></i>
-                        <span class="text-muted text-uppercase small fw-bold">Arhitectură Procesor</span>
+                        <span class="text-white-50 text-uppercase small fw-bold font-monospace">Arhitectură Procesor</span>
                     </div>
-                    <p class="fw-bold text-dark mb-0">@ViewBag.ProcessArchitecture</p>
+                    <p class="fw-bold text-white mb-0 text-shadow-sm">@ViewBag.ProcessArchitecture</p>
                 </div>
             </div>
         </div>
-    </div>
+
+    </main>
 </div>

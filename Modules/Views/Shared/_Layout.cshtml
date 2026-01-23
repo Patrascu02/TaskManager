@@ -9,53 +9,38 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TaskManager</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark custom-navbar mb-3">
-            <div class="container">
-                <a class="navbar-brand text-white" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-check-double me-2"></i>TaskManager
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        var currentUser = await UserManager.GetUserAsync(User);
-                        if (currentUser != null)
-                        {
-                            if (await UserManager.IsInRoleAsync(currentUser, "Admin"))
-                            {
-                                @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarAdmin.cshtml")
-                            }
-                            else if (await UserManager.IsInRoleAsync(currentUser, "Manager"))
-                            {
-                                @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarManager.cshtml")
-                            }
-                            else
-                            {
-                                @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarUser.cshtml")
-                            }
-                        }
-                    }
-                    else
-                    {
-                        @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarGuest.cshtml")
-                    }
-                </div>
-            </div>
-        </nav>
+        @if (SignInManager.IsSignedIn(User))
+        {
+            var currentUser = await UserManager.GetUserAsync(User);
+            if (currentUser != null)
+            {
+                if (await UserManager.IsInRoleAsync(currentUser, "Admin"))
+                {
+                    @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarAdmin.cshtml")
+                }
+                else if (await UserManager.IsInRoleAsync(currentUser, "Manager"))
+                {
+                    @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarManager.cshtml")
+                }
+                else
+                {
+                    @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarUser.cshtml")
+                }
+            }
+        }
+        else
+        {
+            @await Html.PartialAsync("~/Modules/Views/Shared/_NavbarGuest.cshtml")
+        }
     </header>
 
     <main role="main" class="pb-3">
@@ -63,12 +48,6 @@
             @RenderBody()
         </div>
     </main>
-
-    <footer class="text-center p-3 text-muted mt-auto border-top bg-white">
-        <div class="container">
-            &copy; 2026 - TaskManager
-        </div>
-    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

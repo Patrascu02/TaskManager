@@ -1,139 +1,100 @@
 ﻿@model IEnumerable<TaskManager.Modules.Tasks.Models.UserTask>
 
 @{
-    ViewData["Title"] = "Management Task-uri";
-    Layout = "_Layout";
+    ViewData["Title"] = "GESTIUNE SARCINI";
+    Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid py-5 fade-in-up">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h2 class="display-5 fw-bold text-gradient">
-                📋 Task Manager
-            </h2>
-            <p class="text-muted fs-5">Gestionează sarcinile și echipa.</p>
-        </div>
-        <div>
-            <a asp-action="Assign" class="btn btn-primary btn-lg rounded-pill shadow-lg hover-lift fw-bold px-4">
-                ➕ Task Nou
-            </a>
-        </div>
-    </div>
+<div class="fade-in pt-4">
 
-    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 24px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);">
+    <header class="hud-header-panel mb-4 mt-4">
+        <div>
+            <h2 class="hud-welcome">SARCINI</h2>
+            <small>GESTIONEAZĂ LISTA DE TASK-URI ȘI PRIORITĂȚI</small>
+        </div>
+        <a asp-action="Create" class="btn-tech text-decoration-none">
+            <i class="bi bi-plus-lg me-2"></i> SARCINĂ NOUĂ
+        </a>
+    </header>
+
+    <div class="cyber-table-card">
+
+        <div class="p-3 border-bottom border-secondary" style="background: rgba(0,0,0,0.2);">
+            <div class="input-group" style="max-width: 350px;">
+                <span class="input-group-text border-secondary bg-dark text-info">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="searchTask" class="form-control bg-dark text-light border-secondary font-monospace" placeholder="CAUTĂ SARCINĂ...">
+            </div>
+        </div>
+
         <div class="table-responsive">
-            <table class="table align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
-                <thead class="bg-light bg-opacity-50">
+            <table class="cyber-table align-middle mb-0">
+                <thead>
                     <tr>
-                        <th class="py-4 ps-4 text-uppercase text-muted small fw-bold border-0">📌 Sarcina</th>
-                        <th class="py-4 text-uppercase text-muted small fw-bold border-0">⚡ Prioritate</th>
-                        <th class="py-4 text-uppercase text-muted small fw-bold border-0">👥 Echipă</th>
-                        <th class="py-4 text-uppercase text-muted small fw-bold border-0">📅 Deadline</th>
-                        <th class="py-4 text-uppercase text-muted small fw-bold border-0">🚦 Status</th>
-                        <th class="py-4 pe-4 text-end text-uppercase text-muted small fw-bold border-0">⚙️ Acțiuni</th>
+                        <th class="ps-4">TITLU & DESCRIERE</th>
+                        <th class="text-center">PRIORITATE</th>
+                        <th class="text-center">TERMEN LIMITĂ</th>
+                        <th class="pe-4 text-end">ACȚIUNI</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="taskTableBody">
                     @foreach (var item in Model)
                     {
-                        // --- LOGICĂ ---
-                        string badgeClass = item.Priority == 1 ? "bg-danger text-danger border-danger" : (item.Priority == 2 ? "bg-warning text-dark border-warning" : "bg-success text-success border-success");
-                        string priorityEmoji = item.Priority == 1 ? "🔥" : (item.Priority == 2 ? "⚡" : "☕");
-                        string priorityText = item.Priority == 1 ? "High" : (item.Priority == 2 ? "Medium" : "Low");
+                        // Logică vizuală pentru dată și prioritate
+                        bool isOverdue = item.DueDate.HasValue && item.DueDate.Value < DateTime.Now;
+                        string dateColor = isOverdue ? "text-danger fw-bold" : "text-info";
 
-                        DateTime? deadline = item.DueDate;
-                        string timerClass = "text-muted";
-                        string timeText = "Fără termen";
-                        string clockEmoji = "🕒";
+                        string priorityClass = "";
+                        string priorityLabel = "";
 
-                        if (deadline.HasValue)
-                        {
-                            var timeRemaining = deadline.Value - DateTime.Now;
-                            if (timeRemaining.TotalSeconds < 0) { timerClass = "text-danger fw-bold"; timeText = "Expirat!"; clockEmoji = "⚠️"; }
-                            else if (timeRemaining.TotalDays < 1) { timerClass = "text-warning fw-bold"; timeText = $"{timeRemaining.Hours}h {timeRemaining.Minutes}m"; clockEmoji = "⏳"; }
-                            else { timerClass = "text-success fw-bold"; timeText = $"{timeRemaining.Days} zile"; }
-                        }
+                        if (item.Priority == 1) { priorityClass = "border-danger text-danger"; priorityLabel = "CRITIC"; }
+                        else if (item.Priority == 2) { priorityClass = "border-warning text-warning"; priorityLabel = "MEDIU"; }
+                        else { priorityClass = "border-success text-success"; priorityLabel = "NORMAL"; }
 
-                        <tr class="table-row-hover position-relative">
-
-                            <td class="ps-4 py-3 border-bottom border-light">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-white shadow-sm rounded-4 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; font-size: 1.5rem;">
-                                        📄
-                                    </div>
-                                    <div style="max-width: 250px;">
-                                        <div class="fw-bold text-dark mb-1">@item.Title</div>
-                                        <div class="text-muted small text-truncate">
-                                            @(item.Description?.Length > 40 ? item.Description.Substring(0, 40) + "..." : item.Description)
-                                        </div>
-                                    </div>
+                        <tr>
+                            <td class="ps-4" style="max-width: 300px;">
+                                <div class="fw-bold text-white mb-1">@item.Title</div>
+                                <div class="text-white-50 small text-truncate" style="font-size: 0.85rem;">
+                                    @item.Description
                                 </div>
                             </td>
 
-                            <td class="py-3 border-bottom border-light">
-                                <span class="badge @badgeClass bg-opacity-10 border border-opacity-25 rounded-pill px-3 py-2 shadow-sm">
-                                    @priorityEmoji @priorityText
+                            <td class="text-center">
+                                <span class="badge border @priorityClass bg-transparent font-monospace px-3 py-2">
+                                    @priorityLabel
                                 </span>
                             </td>
 
-                            <td class="py-3 border-bottom border-light">
-                                @if (item.Assignments != null && item.Assignments.Any())
+                            <td class="text-center font-monospace @dateColor">
+                                @if (item.DueDate.HasValue)
                                 {
-                                    <div class="d-flex flex-column gap-2">
-                                        @foreach (var assign in item.Assignments)
-                                        {
-                                            <div class="d-flex align-items-center bg-white bg-opacity-75 rounded-3 pe-2 p-1 shadow-sm border border-light w-auto d-inline-flex">
-                                                <div class="avatar-circle bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2 shadow-sm">
-                                                    @assign.User?.FullName?.Substring(0, 1)
-                                                </div>
-                                                <span class="small fw-bold text-dark me-3">@assign.User?.FullName</span>
-                                                <a asp-action="Reassign" asp-route-id="@assign.TaskAssignmentId" class="btn-checkbox-action" title="Reasignează">
-                                                    🔄
-                                                </a>
-                                            </div>
-                                        }
-                                    </div>
+                                    <span><i class="bi bi-calendar-event me-1"></i> @item.DueDate.Value.ToString("dd.MM.yyyy")</span>
+                                    if (isOverdue)
+                                    {
+
+                                        <div class="small text-danger mt-1">!! EXPIRAT !!</div>
+                                    }
                                 }
                                 else
                                 {
-                                    <span class="badge bg-light text-muted border rounded-pill px-3">Nealocat</span>
+                                    <span class="text-muted">-</span>
                                 }
                             </td>
 
-                            <td class="py-3 border-bottom border-light">
-                                <div class="d-flex flex-column">
-                                    <span class="fw-bold text-dark small mb-1">
-                                        @(deadline.HasValue? deadline.Value.ToString("dd MMM yyyy") : "-")
-                                    </span>
-                                    <span class="small @timerClass d-flex align-items-center">
-                                        <span class="me-1">@clockEmoji</span> @timeText
-                                    </span>
-                                </div>
-                            </td>
-
-                            <td class="py-3 border-bottom border-light">
-                                @if (item.IsActive)
-                                {
-                                    <span class="d-flex align-items-center text-primary fw-bold small">
-                                        <span class="status-dot bg-primary me-2"></span> Activ
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="d-flex align-items-center text-muted fw-bold small">
-                                        <span class="status-dot bg-secondary me-2"></span> Inactiv
-                                    </span>
-                                }
-                            </td>
-
-                            <td class="pe-4 py-3 text-end border-bottom border-light">
-                                <div class="d-flex justify-content-end gap-2">
-
+                            <td class="pe-4 text-end">
+                                <div class="btn-group">
+                                    <a asp-action="Edit" asp-route-id="@item.TaskId" class="btn btn-sm btn-outline-info me-2 rounded-0" title="Editează">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.TaskId" class="btn btn-sm btn-outline-warning me-2 rounded-0" title="Detalii">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                     <button type="button"
-                                            class="btn-emoji-action btn-danger-soft"
-                                            title="Șterge"
-                                            onclick="openDeleteModal(@item.TaskId)">
-                                        🗑️
+                                            class="btn btn-sm btn-outline-danger rounded-0"
+                                            onclick="confirmDelete('@item.TaskId', '@item.Title')"
+                                            title="Șterge">
+                                        <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
                             </td>
@@ -146,167 +107,84 @@
         @if (!Model.Any())
         {
             <div class="text-center py-5">
-                <div class="bg-light rounded-circle p-4 d-inline-block mb-3" style="font-size: 3rem;">📭</div>
-                <h5 class="fw-bold text-muted">Nu există sarcini active.</h5>
+                <div class="text-secondary mb-3"><i class="bi bi-clipboard-x fa-3x"></i></div>
+                <h6 class="text-secondary font-monospace">NU EXISTĂ SARCINI ÎN LISTĂ.</h6>
             </div>
         }
     </div>
 </div>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px);">
-            <div class="modal-body p-5 text-center">
-
-                <div class="mb-4">
-                    <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                        <span style="font-size: 40px;">⚠️</span>
+        <div class="modal-content" style="background-color: #1e293b; border: 1px solid var(--hud-border); color: #e2e8f0;">
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3">
+                    <div class="d-inline-flex align-items-center justify-content-center"
+                         style="width: 80px; height: 80px; background: rgba(244, 63, 94, 0.1); border-radius: 50%; border: 1px solid #f43f5e;">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger"></i>
                     </div>
                 </div>
 
-                <h3 class="fw-bold text-dark mb-2">Ești sigur?</h3>
-                <p class="text-muted mb-4">
-                    Această acțiune va șterge task-ul permanent.<br>Nu vei putea anula această operațiune.
+                <h4 class="fw-bold text-white mb-2 font-monospace">EȘTI SIGUR?</h4>
+
+                <p class="text-white-50 mb-4">
+                    Ești pe cale să ștergi sarcina: <br>
+                    <strong id="deleteTaskTitle" class="text-info fs-5"></strong><br>
+                    <span class="small text-danger">Această acțiune este ireversibilă.</span>
                 </p>
 
-                <form id="deleteForm" method="post" asp-action="Delete">
-                    <input type="hidden" name="id" id="deleteTaskId" />
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-outline-light px-4 font-monospace" data-bs-dismiss="modal">
+                        ANULEAZĂ
+                    </button>
 
-                    <div class="d-flex justify-content-center gap-3">
-                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">
-                            Anulează
+                    <form id="deleteForm" method="post">
+                        <button type="submit" class="btn btn-danger px-4 fw-bold font-monospace">
+                            DA, ȘTERGE
                         </button>
-                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-lg hover-scale">
-                            🗑️ Da, Șterge
-                        </button>
-                    </div>
-                </form>
-
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    function openDeleteModal(id) {
-        // Setăm ID-ul în input-ul ascuns din modal
-        document.getElementById('deleteTaskId').value = id;
+@section Scripts {
+    <script>
+        // Căutare Live
+        document.getElementById('searchTask').addEventListener('keyup', function() {
+            var value = this.value.toLowerCase();
+            var rows = document.querySelectorAll("#taskTableBody tr");
 
-        // Deschidem modalul Bootstrap
-        var myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        myModal.show();
-    }
-</script>
+            rows.forEach(function(row) {
+                var text = row.innerText.toLowerCase();
+                row.style.display = text.indexOf(value) > -1 ? "" : "none";
+            });
+        });
 
-<style>
-    /* Efect Hover Tabel */
-    .table-row-hover {
-        transition: all 0.2s ease-in-out;
-    }
+        // --- FIX PENTRU MODAL BLOCAT (Același cod ca la Users) ---
+        var deleteModalElement = document.getElementById('deleteModal');
+        var deleteModalInstance = null;
 
-        .table-row-hover:hover {
-            background-color: rgba(255, 255, 255, 0.6);
-            transform: scale(1.002);
-            z-index: 1;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        function confirmDelete(taskId, taskTitle) {
+            document.getElementById('deleteTaskTitle').textContent = taskTitle;
+            var form = document.getElementById('deleteForm');
+
+            // Ruta pentru Tasks Controller Delete
+            form.action = '/Tasks/Delete/' + taskId;
+
+            if (!deleteModalInstance) {
+                deleteModalInstance = new bootstrap.Modal(deleteModalElement);
+            }
+            deleteModalInstance.show();
         }
 
-    /* Avatare & Iconițe */
-    .avatar-circle {
-        width: 28px;
-        height: 28px;
-        font-size: 0.8rem;
-        font-weight: 700;
-    }
-
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    }
-
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    /* Buton Checkbox */
-    .btn-checkbox-action {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        border: 2px solid #cbd5e1;
-        background-color: transparent;
-        border-radius: 6px;
-        color: #64748b;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        font-size: 1.1rem;
-        line-height: 1;
-    }
-
-        .btn-checkbox-action:hover {
-            background-color: #3b82f6;
-            border-color: #3b82f6;
-            color: white !important;
-            transform: scale(1.1);
-            box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);
-        }
-
-    /* Butoane Acțiuni */
-    .btn-emoji-action {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        border: 0;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        font-size: 1.2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-        .btn-emoji-action:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-    .btn-warning-soft {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-
-        .btn-warning-soft:hover {
-            background-color: #ffc107;
-        }
-
-    .btn-info-soft {
-        background-color: #cff4fc;
-        color: #055160;
-    }
-
-        .btn-info-soft:hover {
-            background-color: #0dcaf0;
-        }
-
-    .btn-danger-soft {
-        background-color: #f8d7da;
-        color: #842029;
-    }
-
-        .btn-danger-soft:hover {
-            background-color: #dc3545;
-        }
-
-    .hover-scale:hover {
-        transform: scale(1.05);
-    }
-
-    tbody tr:last-child td {
-        border-bottom: 0 !important;
-    }
-</style>
+        // Curățare forțată a backdrop-ului la închidere
+        deleteModalElement.addEventListener('hidden.bs.modal', function () {
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style = '';
+        });
+    </script>
+}

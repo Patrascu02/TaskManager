@@ -4,22 +4,14 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
-    // Luăm userul curent pentru a afișa numele și inițialele
     var user = await UserManager.GetUserAsync(User);
     string displayName = user?.FullName ?? User.Identity?.Name;
-    string initials = "OP"; // Default Operative
+    string initials = "OP";
 
     if (!string.IsNullOrEmpty(displayName))
     {
         var parts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length >= 2)
-        {
-            initials = $"{parts[0][0]}{parts[1][0]}".ToUpper();
-        }
-        else if (parts.Length == 1)
-        {
-            initials = parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
-        }
+        initials = parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
     }
 }
 
@@ -27,25 +19,23 @@
     @if (SignInManager.IsSignedIn(User))
     {
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle nav-user-link" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <div class="nav-avatar-small">@initials</div>
-                <span>SALUT, @displayName.ToUpper()!</span>
+            <a class="nav-link dropdown-toggle cyber-nav-link" href="#" id="cyberUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="nav-avatar-box">@initials</div>
+                <span>SALUT, @displayName?.ToUpper()!</span>
             </a>
 
-            <ul class="dropdown-menu dropdown-menu-end cyber-dropdown-menu" aria-labelledby="userDropdown">
+            <ul class="dropdown-menu dropdown-menu-end cyber-dropdown-menu" aria-labelledby="cyberUserDropdown">
 
                 <li>
                     <a class="dropdown-item cyber-dropdown-item" asp-area="" asp-controller="Home" asp-action="UserDashboard">
                         <i class="bi bi-speedometer2"></i> DASHBOARD
                     </a>
                 </li>
-
                 <li>
                     <a class="dropdown-item cyber-dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
                         <i class="bi bi-person-gear"></i> CONTUL MEU
                     </a>
                 </li>
-
                 <li>
                     <a class="dropdown-item cyber-dropdown-item" asp-area="" asp-controller="Gamification" asp-action="Leaderboard">
                         <i class="bi bi-trophy"></i> CLASAMENT
@@ -67,10 +57,10 @@
     else
     {
         <li class="nav-item">
-            <a class="nav-link nav-btn-outline" asp-area="Identity" asp-page="/Account/Register">ÎNREGISTRARE</a>
+            <a class="nav-link cyber-auth-btn" asp-area="Identity" asp-page="/Account/Register">ÎNREGISTRARE</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link nav-btn-outline" asp-area="Identity" asp-page="/Account/Login">AUTENTIFICARE</a>
+            <a class="nav-link cyber-auth-btn" asp-area="Identity" asp-page="/Account/Login">AUTENTIFICARE</a>
         </li>
     }
 </ul>

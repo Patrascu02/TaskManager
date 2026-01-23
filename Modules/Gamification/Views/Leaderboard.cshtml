@@ -15,28 +15,19 @@
         return parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}".ToUpper() : parts[0].Substring(0, 1).ToUpper();
     }
 
-    // Helper iconițe medalie (doar pt tabel)
-    string GetRankIcon(int index)
-    {
-        if (index == 0) return "<i class='bi bi-trophy-fill'></i>";
-        if (index == 1) return "<i class='bi bi-medal-fill'></i>";
-        if (index == 2) return "<i class='bi bi-award-fill'></i>";
-        return $"#{index + 1}";
-    }
-
-    // Helper clase culori
+    // Helper pentru clasa de rank (culori top 3 - DOAR PENTRU CULOAREA TEXTULUI)
     string GetRankClass(int index)
     {
-        if (index == 0) return "rank-1";
-        if (index == 1) return "rank-2";
-        if (index == 2) return "rank-3";
+        if (index == 0) return "rank-1"; // Gold
+        if (index == 1) return "rank-2"; // Cyan/Silver
+        if (index == 2) return "rank-3"; // Bronze
         return "";
     }
 }
 
 <div class="dashboard-wrapper fade-in">
 
-   
+    
 
     <main class="dashboard-main">
 
@@ -69,12 +60,12 @@
 
                             <tr class="@rankClass">
                                 <td class="rank-cell">
-                                    @Html.Raw(GetRankIcon(i))
+                                    #@(i + 1)
                                 </td>
 
                                 <td>
-                                    <div style="display: flex; align-items: center; gap: 15px;">
-                                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);">
+                                    <div class="user-cell">
+                                        <div class="table-avatar">
                                             @GetInitials(user.FullName)
                                         </div>
                                         <div>
@@ -90,7 +81,7 @@
                                     </span>
                                 </td>
 
-                                <td style="font-family: 'Courier New', monospace; font-weight: 700; color: var(--hud-green); text-align: right; font-size: 1.1rem;">
+                                <td class="xp-cell">
                                     @user.TotalXp <span class="small text-muted">XP</span>
                                 </td>
                             </tr>

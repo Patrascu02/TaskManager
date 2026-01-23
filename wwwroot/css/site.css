@@ -515,6 +515,117 @@ main {
     }
 }
 
+/* =========================================
+   8. NAVBAR USER ZONE & DROPDOWN
+   ========================================= */
+
+/* Stil pentru Numele Utilizatorului în Navbar */
+.nav-user-link {
+    color: var(--hud-cyan) !important;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .nav-user-link:hover, .nav-user-link[aria-expanded="true"] {
+        background: rgba(6, 182, 212, 0.1);
+        border-color: var(--hud-cyan);
+        text-shadow: 0 0 8px var(--hud-cyan);
+    }
+
+/* Avatar mic în navbar */
+.nav-avatar-small {
+    width: 30px;
+    height: 30px;
+    background: var(--hud-bg);
+    border: 1px solid var(--hud-cyan);
+    color: var(--hud-cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 4px; /* Puțin pătrat, stil tech */
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
+}
+
+/* Meniul Dropdown (Cutia care se deschide) */
+.cyber-dropdown-menu {
+    background-color: rgba(15, 23, 42, 0.95) !important; /* Dark Blue */
+    border: 1px solid var(--hud-cyan) !important;
+    border-radius: 0 0 10px 10px !important; /* Rotunjit doar jos */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5) !important;
+    margin-top: 10px !important;
+    padding: 0 !important;
+    overflow: hidden;
+    min-width: 220px;
+}
+
+/* Elementele din Dropdown */
+.cyber-dropdown-item {
+    color: #e2e8f0 !important;
+    padding: 12px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    /* Hover pe elemente */
+    .cyber-dropdown-item:hover {
+        background-color: var(--hud-cyan) !important;
+        color: #000 !important; /* Text negru pe fundal turcoaz */
+        padding-left: 25px; /* Mică animație de mișcare */
+        font-weight: 600;
+    }
+
+/* Butonul de Logout (care e un form) */
+.cyber-logout-btn {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--hud-alert) !important; /* Roșu pentru logout */
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    padding: 12px 20px;
+    transition: all 0.2s;
+}
+
+    .cyber-logout-btn:hover {
+        background: rgba(244, 63, 94, 0.1);
+        text-shadow: 0 0 10px var(--hud-alert);
+        padding-left: 25px;
+    }
+
+/* Butoane Login/Register (dacă nu ești logat) */
+.nav-btn-outline {
+    border: 1px solid var(--hud-cyan);
+    color: var(--hud-cyan) !important;
+    padding: 5px 15px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    transition: all 0.3s;
+    margin-left: 10px;
+}
+
+    .nav-btn-outline:hover {
+        background: var(--hud-cyan);
+        color: #000 !important;
+        box-shadow: 0 0 15px var(--hud-cyan);
+    }
+
 /* --- RESPONSIVE --- */
 @media (max-width: 991px) {
     .dashboard-wrapper {
@@ -544,116 +655,4 @@ main {
     .hud-stats-grid {
         display: none;
     }
-
-
-    /* =========================================
-   8. NAVBAR USER ZONE & DROPDOWN
-   ========================================= */
-
-    /* Stil pentru Numele Utilizatorului în Navbar */
-    .nav-user-link {
-        color: var(--hud-cyan) !important;
-        font-family: 'Courier New', monospace;
-        font-weight: 700;
-        font-size: 0.9rem;
-        padding: 8px 15px;
-        border: 1px solid transparent;
-        border-radius: 6px;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-        .nav-user-link:hover, .nav-user-link[aria-expanded="true"] {
-            background: rgba(6, 182, 212, 0.1);
-            border-color: var(--hud-cyan);
-            text-shadow: 0 0 8px var(--hud-cyan);
-        }
-
-    /* Avatar mic în navbar */
-    .nav-avatar-small {
-        width: 30px;
-        height: 30px;
-        background: var(--hud-bg);
-        border: 1px solid var(--hud-cyan);
-        color: var(--hud-cyan);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.8rem;
-        font-weight: bold;
-        border-radius: 4px; /* Puțin pătrat, stil tech */
-        box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
-    }
-
-    /* Meniul Dropdown (Cutia care se deschide) */
-    .cyber-dropdown-menu {
-        background-color: rgba(15, 23, 42, 0.95) !important; /* Dark Blue */
-        border: 1px solid var(--hud-cyan) !important;
-        border-radius: 0 0 10px 10px !important; /* Rotunjit doar jos */
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5) !important;
-        margin-top: 10px !important;
-        padding: 0 !important;
-        overflow: hidden;
-        min-width: 220px;
-    }
-
-    /* Elementele din Dropdown */
-    .cyber-dropdown-item {
-        color: #e2e8f0 !important;
-        padding: 12px 20px;
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.9rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-        /* Hover pe elemente */
-        .cyber-dropdown-item:hover {
-            background-color: var(--hud-cyan) !important;
-            color: #000 !important; /* Text negru pe fundal turcoaz */
-            padding-left: 25px; /* Mică animație de mișcare */
-            font-weight: 600;
-        }
-
-    /* Butonul de Logout (care e un form) */
-    .cyber-logout-btn {
-        width: 100%;
-        text-align: left;
-        background: none;
-        border: none;
-        color: var(--hud-alert) !important; /* Roșu pentru logout */
-        font-family: 'Courier New', monospace;
-        font-weight: 700;
-        padding: 12px 20px;
-        transition: all 0.2s;
-    }
-
-        .cyber-logout-btn:hover {
-            background: rgba(244, 63, 94, 0.1);
-            text-shadow: 0 0 10px var(--hud-alert);
-            padding-left: 25px;
-        }
-
-    /* Butoane Login/Register (dacă nu ești logat) */
-    .nav-btn-outline {
-        border: 1px solid var(--hud-cyan);
-        color: var(--hud-cyan) !important;
-        padding: 5px 15px;
-        border-radius: 4px;
-        font-family: 'Courier New', monospace;
-        font-weight: 700;
-        transition: all 0.3s;
-        margin-left: 10px;
-    }
-
-        .nav-btn-outline:hover {
-            background: var(--hud-cyan);
-            color: #000 !important;
-            box-shadow: 0 0 15px var(--hud-cyan);
-        }
 }

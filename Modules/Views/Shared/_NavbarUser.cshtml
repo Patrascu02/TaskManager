@@ -1,95 +1,62 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using TaskManager.Modules.Users.Models
 @inject UserManager<ApplicationUser> UserManager
-@inject SignInManager<ApplicationUser> SignInManager
-
 @{
-    var currentUser = await UserManager.GetUserAsync(User);
-
-    // --- Logica pentru Avatar și Nume (Copiată și adaptată de la Admin) ---
-    string firstName = "User";
-    string fullName = "Utilizator";
-    string userEmail = "";
-    string userInitials = "U";
-
-    if (currentUser != null)
-    {
-        userEmail = currentUser.Email;
-        if (!string.IsNullOrEmpty(currentUser.FullName))
-        {
-            fullName = currentUser.FullName;
-            // Luăm prenumele (primul cuvânt) pentru salut
-            firstName = currentUser.FullName.Split(' ')[0];
-            // Luăm inițiala
-            userInitials = firstName.Substring(0, 1).ToUpper();
-        }
-        else
-        {
-            // Fallback la Username dacă nu are FullName setat
-            fullName = User.Identity?.Name ?? "User";
-            firstName = fullName;
-            if (!string.IsNullOrEmpty(firstName))
-            {
-                userInitials = firstName.Substring(0, 1).ToUpper();
-            }
-        }
-    }
+    var user = await UserManager.GetUserAsync(User);
+    string displayName = user?.FullName ?? User.Identity?.Name;
 }
 
-<ul class="navbar-nav flex-grow-1">
-    <li class="nav-item">
-        <a class="nav-link" asp-controller="Home" asp-action="UserDashboard">
-            <i class="fas fa-home me-1"></i> Dashboard
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" asp-controller="Gamification" asp-action="MyProgress">
-            <i class="fas fa-trophy me-1"></i> My Progress
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" asp-controller="Gamification" asp-action="Leaderboard">
-            <i class="fas fa-medal me-1"></i> Leaderboard
-        </a>
-    </li>
-</ul>
-
-<ul class="navbar-nav ms-auto">
-    <li class="nav-item dropdown">
-
-        <a class="nav-link dropdown-toggle fw-bold text-white d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <span class="me-2">Salut, @firstName!</span>
-            <div class="rounded-circle bg-white text-primary d-flex justify-content-center align-items-center" style="width: 32px; height: 32px; font-size: 0.9rem; font-weight: bold;">
-                @userInitials
-            </div>
+<nav class="navbar navbar-expand-lg custom-navbar sticky-top navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="UserDashboard">
+            <i class="bi bi-cpu-fill me-2"></i>TASK_MANAGER
         </a>
 
-        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-modern" aria-labelledby="navbarDropdownUser">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navUser">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <li class="user-menu-header">
-                <div class="user-avatar-circle" style="background-color: #3b82f6;">
-                    @userInitials
-                </div>
-                <h6 class="fw-bold text-dark mb-0">@fullName</h6>
-                <small class="text-muted">@userEmail</small>
-                <div class="mt-2">
-                    <span class="badge bg-primary rounded-pill text-uppercase" style="font-size: 0.65rem;">Angajat</span>
-                </div>
-            </li>
+        <div class="collapse navbar-collapse" id="navUser">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link font-monospace" asp-controller="Home" asp-action="UserDashboard">
+                        <i class="bi bi-speedometer2 text-info"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-monospace" asp-controller="Gamification" asp-action="MyProgress">
+                        <i class="bi bi-graph-up-arrow text-warning"></i> Progres
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-monospace" asp-controller="Gamification" asp-action="Leaderboard">
+                        <i class="bi bi-trophy text-danger"></i> Clasament
+                    </a>
+                </li>
+            </ul>
 
-            <li class="py-2">
-                <a class="dropdown-item dropdown-item-modern" asp-area="Identity" asp-page="/Account/Manage/Index">
-                    <i class="fas fa-user-cog"></i> Profilul Meu
-                </a>
-            </li>
-
-            <li class="border-top bg-light">
-                <form class="form-inline m-0" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                    <button type="submit" class="dropdown-item dropdown-item-modern text-danger fw-bold w-100 bg-transparent border-0">
-                        <i class="fas fa-sign-out-alt"></i> Deconectare
-                    </button>
-                </form>
-            </li>
-        </ul>
-    </li>
-</ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle cyber-nav-link" href="#" id="uDrop" role="button" data-bs-toggle="dropdown">
+                        <span>SALUT, @displayName?.ToUpper()!</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end cyber-dropdown-menu">
+                        <li>
+                            <a class="dropdown-item cyber-dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
+                                <i class="bi bi-person-gear"></i> Profilul Meu
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.1);"></li>
+                        <li>
+                            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                <button type="submit" class="cyber-logout-btn">
+                                    <i class="bi bi-power"></i> DECONECTARE
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

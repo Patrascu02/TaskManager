@@ -1,25 +1,26 @@
-﻿<ul class="navbar-nav ms-auto">
-    <li class="nav-item">
-        <a class="nav-link btn btn-glass-primary ms-2 px-4 rounded-pill fw-bold" asp-area="Identity" asp-page="/Account/Login">
-            <i class="fas fa-sign-in-alt me-2"></i> Autentificare
+﻿<nav class="navbar navbar-expand-lg custom-navbar sticky-top navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-cpu-fill me-2"></i>TASK_MANAGER
         </a>
-    </li>
-</ul>
 
-<style>
-    /* Stil specific pentru butonul din navbar */
-    .btn-glass-primary {
-        background: rgba(255, 255, 255, 0.2);
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        backdrop-filter: blur(5px);
-        transition: all 0.3s ease;
-    }
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navGuest">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        .btn-glass-primary:hover {
-            background: white;
-            color: var(--primary-color) !important;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-</style>
+        <div class="collapse navbar-collapse justify-content-end" id="navGuest">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link cyber-auth-btn me-2" asp-area="Identity" asp-page="/Account/Register">
+                        <i class="bi bi-person-plus-fill me-1"></i> ÎNREGISTRARE
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link cyber-auth-btn" asp-area="Identity" asp-page="/Account/Login">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> AUTENTIFICARE
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

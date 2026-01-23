@@ -37,7 +37,7 @@
                             <h2 class="fw-bold text-white mb-1 text-shadow-cyber">@Model.FullName</h2>
                             <div class="d-flex align-items-center justify-content-center justify-content-md-start">
                                 <span class="badge cyber-badge-level me-2">LEVEL @currentLevel</span>
-                                <small class="text-cyan-light letter-spacing-2 text-uppercase">Target ID: Employee</small>
+                                <small class="text-cyan-light letter-spacing-2 text-uppercase">Role: Employee</small>
                             </div>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
                 <div class="panel-header-cyber mb-4">
                     <h5 class="fw-bold text-white mb-0 d-flex align-items-center">
                         <i class="bi bi-activity text-primary icon-glow me-3"></i>
-                        <span>System Logs</span>
+                        <span>Task history</span>
                     </h5>
                 </div>
 
@@ -143,7 +143,7 @@
                                     </div>
                                 </div>
                                 <div class="log-value-neon">
-                                    +@entry.ChangeAmount
+                                    +@entry.ChangeAmount xp
                                 </div>
                             </div>
                         }

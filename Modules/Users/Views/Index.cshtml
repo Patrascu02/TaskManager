@@ -1,47 +1,48 @@
 ﻿@model IEnumerable<TaskManager.Modules.Users.Models.UserViewModel>
 
 @{
-    ViewData["Title"] = "Gestiune Utilizatori";
+    ViewData["Title"] = "GESTIUNE UTILIZATORI";
     Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container fade-in mt-4">
+<div class="fade-in pt-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <header class="hud-header-panel mb-4 mt-4">
         <div>
-            <h2 class="fw-bold text-dark mb-0">
-                <i class="fas fa-users-cog me-2 text-primary"></i>Utilizatori
-            </h2>
-            <p class="text-muted mb-0">Gestionează echipa și rolurile.</p>
+            <h2 class="hud-welcome">UTILIZATORI</h2>
+            <small>GESTIONEAZĂ ECHIPA ȘI ROLURILE</small>
         </div>
-        <a asp-action="Create" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm fw-bold">
-            <i class="fas fa-user-plus me-2"></i> Adaugă User
+        <a asp-action="Create" class="btn-tech text-decoration-none">
+            <i class="bi bi-person-plus-fill me-2"></i> ADAUGĂ USER
         </a>
-    </div>
+    </header>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4">
-            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+        <div class="alert alert-success border border-success bg-opacity-10 bg-success text-white mb-4 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
         </div>
     }
 
-    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 12px;">
-        <div class="card-header bg-white border-0 py-3">
-            <div class="input-group" style="max-width: 300px;">
-                <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                <input type="text" id="searchUser" class="form-control bg-light border-start-0" placeholder="Caută utilizator...">
+    <div class="cyber-table-card">
+
+        <div class="p-3 border-bottom border-secondary" style="background: rgba(0,0,0,0.2);">
+            <div class="input-group" style="max-width: 350px;">
+                <span class="input-group-text border-secondary bg-dark text-info">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="searchUser" class="form-control bg-dark text-light border-secondary font-monospace" placeholder="CAUTĂ UTILIZATOR...">
             </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
+            <table class="cyber-table align-middle mb-0">
+                <thead>
                     <tr>
-                        <th class="ps-4 py-3 text-uppercase text-muted small fw-bold">Utilizator</th>
-                        <th class="py-3 text-uppercase text-muted small fw-bold">Email</th>
-                        <th class="py-3 text-uppercase text-muted small fw-bold">Rol</th>
-                        <th class="pe-4 py-3 text-end text-uppercase text-muted small fw-bold">Acțiuni</th>
+                        <th class="ps-4">UTILIZATOR</th>
+                        <th>EMAIL</th>
+                        <th>ROL</th>
+                        <th class="pe-4 text-end">ACȚIUNI</th>
                     </tr>
                 </thead>
                 <tbody id="userTableBody">
@@ -64,44 +65,47 @@
                         <tr>
                             <td class="ps-4">
                                 <div class="d-flex align-items-center">
-                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
-                                         style="width: 40px; height: 40px; font-weight: bold; font-size: 0.9rem;">
+                                    <div class="d-flex align-items-center justify-content-center me-3 text-info font-monospace fw-bold"
+                                         style="width: 40px; height: 40px; background: rgba(6, 182, 212, 0.1); border: 1px solid var(--hud-cyan); border-radius: 4px;">
                                         @initials
                                     </div>
                                     <div>
-                                        <div class="fw-bold text-dark">@displayName</div>
+                                        <div class="fw-bold text-white">@displayName</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-muted small fw-bold">@item.Email</td>
+
+                            <td class="text-white-50 small font-monospace">@item.Email</td>
+
                             <td>
                                 @if (item.Role == "Admin")
                                 {
-                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill border border-danger border-opacity-10">
-                                        <i class="fas fa-user-shield me-1"></i> Admin
+                                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger">
+                                        <i class="fas fa-user-shield me-1"></i> ADMIN
                                     </span>
                                 }
                                 else if (item.Role == "Manager")
                                 {
-                                    <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill border border-warning border-opacity-10">
-                                        <i class="fas fa-user-tie me-1"></i> Manager
+                                    <span class="badge bg-warning bg-opacity-25 text-warning border border-warning">
+                                        <i class="fas fa-user-tie me-1"></i> MANAGER
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill border border-info border-opacity-10">
-                                        <i class="fas fa-user me-1"></i> User
+                                    <span class="badge bg-info bg-opacity-25 text-info border border-info">
+                                        <i class="fas fa-user me-1"></i> USER
                                     </span>
                                 }
                             </td>
+
                             <td class="pe-4 text-end">
                                 <div class="btn-group">
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-light text-primary shadow-sm me-2 rounded" title="Editează">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info me-2 rounded-0" title="Editează">
                                         <i class="fas fa-edit"></i>
                                     </a>
 
                                     <button type="button"
-                                            class="btn btn-sm btn-light text-danger shadow-sm rounded"
+                                            class="btn btn-sm btn-outline-danger rounded-0"
                                             onclick="confirmDelete('@item.Id', '@item.Email')"
                                             title="Șterge">
                                         <i class="fas fa-trash-alt"></i>
@@ -113,11 +117,12 @@
                 </tbody>
             </table>
         </div>
+
         @if (!Model.Any())
         {
             <div class="text-center py-5">
-                <div class="text-muted mb-3"><i class="fas fa-users-slash fa-3x"></i></div>
-                <h6 class="text-muted">Nu există utilizatori înregistrați.</h6>
+                <div class="text-secondary mb-3"><i class="fas fa-users-slash fa-3x"></i></div>
+                <h6 class="text-secondary font-monospace">NU EXISTĂ UTILIZATORI ÎNREGISTRAȚI.</h6>
             </div>
         }
     </div>
@@ -125,28 +130,30 @@
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-content" style="background-color: #1e293b; border: 1px solid var(--hud-border); color: #e2e8f0;">
             <div class="modal-body p-4 text-center">
                 <div class="mb-3">
-                    <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <div class="d-inline-flex align-items-center justify-content-center"
+                         style="width: 80px; height: 80px; background: rgba(244, 63, 94, 0.1); border-radius: 50%; border: 1px solid #f43f5e;">
                         <i class="fas fa-exclamation-triangle fa-3x text-danger"></i>
                     </div>
                 </div>
 
-                <h4 class="fw-bold text-dark mb-2">Ești sigur?</h4>
-                <p class="text-muted mb-4">
-                    Ești pe cale să ștergi utilizatorul <strong id="deleteUserName" class="text-dark"></strong>.<br>
+                <h4 class="fw-bold text-white mb-2 font-monospace">EȘTI SIGUR?</h4>
+
+                <p class="text-white-50 mb-4">
+                    Ești pe cale să ștergi utilizatorul <strong id="deleteUserName" class="text-info"></strong>.<br>
                     Această acțiune este ireversibilă.
                 </p>
 
                 <div class="d-flex justify-content-center gap-2">
-                    <button type="button" class="btn btn-light px-4 fw-bold" data-bs-dismiss="modal">
-                        Anulează
+                    <button type="button" class="btn btn-outline-light px-4 font-monospace" data-bs-dismiss="modal">
+                        ANULEAZĂ
                     </button>
 
                     <form id="deleteForm" method="post">
-                        <button type="submit" class="btn btn-danger px-4 fw-bold">
-                            Da, Șterge-l
+                        <button type="submit" class="btn btn-danger px-4 fw-bold font-monospace">
+                            DA, ȘTERGE
                         </button>
                     </form>
                 </div>
@@ -157,7 +164,7 @@
 
 @section Scripts {
     <script>
-        // Funcție Căutare
+        // 1. Funcție Căutare
         document.getElementById('searchUser').addEventListener('keyup', function() {
             var value = this.value.toLowerCase();
             var rows = document.querySelectorAll("#userTableBody tr");
@@ -168,19 +175,34 @@
             });
         });
 
-        // Funcție Deschidere Modal Ștergere
+        // 2. Funcție Deschidere Modal Ștergere (REPARATĂ)
+        // Definim elementul modal o singură dată în afara funcției
+        var deleteModalElement = document.getElementById('deleteModal');
+        var deleteModal = null; // Variabilă pentru instanță
+
         function confirmDelete(userId, userEmail) {
-            // Setăm numele utilizatorului în textul modalului
+            // Setăm datele în modal
             document.getElementById('deleteUserName').textContent = userEmail;
+            document.getElementById('deleteForm').action = '/Users/Delete/' + userId;
 
-            // Setăm acțiunea formularului către ruta corectă de delete
-            // Ruta este: /Users/Delete/{id}
-            var form = document.getElementById('deleteForm');
-            form.action = '/Users/Delete/' + userId;
-
-            // Deschidem modalul Bootstrap
-            var myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            myModal.show();
+            // Folosim o metodă sigură pentru a obține sau crea instanța modalului
+            // Asta previne crearea de instanțe multiple care blochează ecranul
+            if (!deleteModal) {
+                deleteModal = new bootstrap.Modal(deleteModalElement, {
+                    backdrop: true,
+                    keyboard: true
+                });
+            }
+            deleteModal.show();
         }
+
+        // 3. Failsafe: Curățare forțată a ecranului la închidere
+        // Dacă cumva rămâne fundalul negru, acest cod îl șterge manual când modalul dispare
+        deleteModalElement.addEventListener('hidden.bs.modal', function () {
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style = ''; // Resetează stilurile adăugate pe body
+        });
     </script>
 }
