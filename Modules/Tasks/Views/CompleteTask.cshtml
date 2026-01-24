@@ -1,37 +1,68 @@
 ﻿@model TaskManager.Modules.Tasks.Models.TaskAssignment
+
 @{
-    ViewData["Title"] = "Finalizare Task";
+    ViewData["Title"] = "FINALIZARE SARCINĂ";
+    Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-5" style="max-width: 600px;">
-    <div class="card shadow">
-        <div class="card-header bg-success text-white">
-            Pasul 2: Finalizare & Feedback
-        </div>
-        <div class="card-body">
-            <h4>@Model.Task.Title</h4>
-            <p class="text-muted">Felicitări pentru finalizare! Cum a fost în realitate?</p>
+<div class="fade-in pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
 
-            <form asp-action="SubmitCompletion" method="post">
-                <input type="hidden" name="assignmentId" value="@Model.TaskAssignmentId" />
+            <div class="tech-card p-4">
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Dificultate Reală (Post-Task):</label>
-                    <select name="finalDifficulty" class="form-select">
-                        <option value="1">1 - A fost mult mai ușor decât credeam</option>
-                        <option value="2">2 - A fost rezonabil</option>
-                        <option value="3">3 - A fost dificil</option>
-                        <option value="4">4 - A fost extrem de greu</option>
-                    </select>
+                <div class="text-center mb-4 border-bottom border-secondary pb-3">
+                    <h4 class="text-white font-monospace">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>RAPORT FINALIZARE
+                    </h4>
+                    <p class="text-info font-monospace mb-0">@Model.Task.Title</p>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Feedback (Comparativ cu votul inițial):</label>
-                    <textarea name="feedbackText" class="form-control" rows="3" placeholder="Ex: Am crezut că e ușor, dar baza de date a complicat lucrurile..."></textarea>
-                </div>
+                <form asp-action="SubmitCompletion" method="post">
+                    <input type="hidden" name="assignmentId" value="@Model.TaskAssignmentId" />
 
-                <button type="submit" class="btn btn-success w-100 btn-lg">Marchează ca Finalizat (+XP)</button>
-            </form>
+                    <div class="mb-4">
+                        <label class="form-label text-white-50 font-monospace small">NOTE DE EXECUȚIE (OPȚIONAL)</label>
+                        <textarea name="feedbackText" class="form-control bg-dark text-light border-secondary font-monospace" rows="3" placeholder="Cum a decurs task-ul?"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-warning fw-bold font-monospace small">
+                            <i class="bi bi-controller me-1"></i> EVALUEAZĂ DIFICULTATEA REALĂ
+                        </label>
+
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-warning">
+                                <i class="bi bi-bar-chart-steps"></i>
+                            </span>
+                            <select name="finalDifficulty" class="form-select bg-dark text-light border-secondary font-monospace" required>
+                                <option value="" selected disabled>-- Selectează Nivelul --</option>
+                                <option value="1">NIVEL 1 - UȘOR</option>
+                                <option value="2">NIVEL 2 - DECENT</option>
+                                <option value="3">NIVEL 3 - MEDIU</option>
+                                <option value="4">NIVEL 4 - GREU</option>
+                                <option value="5">NIVEL 5 - EXTREM</option>
+                            </select>
+                        </div>
+                        <div class="form-text text-white-50 small font-monospace mt-2">
+                            * Selectează dificultatea resimțită. Sistemul va calcula XP-ul în funcție de sincronizarea cu estimarea managerului.
+                        </div>
+                    </div>
+
+                    <div class="d-grid pt-2">
+                        <button type="submit" class="btn btn-success fw-bold font-monospace shadow-lg">
+                            <i class="bi bi-send-check me-2"></i> TRIMITE ȘI ÎNCHIDE TASK
+                        </button>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted small font-monospace">
+                            ANULEAZĂ
+                        </a>
+                    </div>
+                </form>
+
+            </div>
         </div>
     </div>
 </div>

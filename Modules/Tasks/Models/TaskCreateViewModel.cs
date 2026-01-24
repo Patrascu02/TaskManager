@@ -7,27 +7,25 @@ namespace TaskManager.Modules.Tasks.Models
 {
     public class TaskCreateViewModel
     {
-        [Required(ErrorMessage = "Te rog introdu un titlu.")]
-        [Display(Name = "Titlu Task")]
-        public string Title { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Titlul este obligatoriu")]
+        public string Title { get; set; } = "";
 
-        [Display(Name = "Descriere")]
-        public string? Description { get; set; }
+        [Required(ErrorMessage = "Descrierea este obligatorie")]
+        public string Description { get; set; } = "";
 
-        [Required(ErrorMessage = "Selectează o dată limită.")]
-        [Display(Name = "Termen Limită")]
-        [DataType(DataType.Date)]
-        public DateTime? DueDate { get; set; }
+        [Required]
+        public DateTime DueDate { get; set; }
 
-        [Display(Name = "Prioritate")]
-        public int Priority { get; set; } = 2; // 2 = Medium (Default)
+        // URGENȚA
+        [Required]
+        public int Priority { get; set; }
 
-        // --- PARTEA DE ALOCARE ---
+        // DIFICULTATEA (XP MANAGER)
+        [Required]
+        [Range(1, 5, ErrorMessage = "Alege o dificultate estimată (1-5)")]
+        public int ManagerDifficulty { get; set; }
 
-        [Display(Name = "Asignează către")]
         public List<string> SelectedUserIds { get; set; } = new List<string>();
-
-        // Aceasta este lista care populează checkbox-urile din View
         public MultiSelectList? UsersList { get; set; }
     }
 }

@@ -99,6 +99,7 @@
         </header>
 
         <div class="row g-4">
+
             <div class="col-lg-6">
                 <div class="hud-col-header">
                     <h6 class="hud-col-title"><i class="bi bi-broadcast me-2"></i> INCOMING TASKS</h6>
@@ -111,9 +112,44 @@
                         NO INCOMING DATA STREAMS
                     </div>
                 }
-                @foreach (var task in tasksNew)
+
+                @foreach (var assignment in tasksNew)
                 {
-                    @RenderTechTask(task)
+                    // LOGICA DE AFIȘARE DIRECT AICI (Evităm funcția locală)
+                    int p = assignment.Task.Priority;
+                    string prioClass = p == 1 ? "prio-1" : (p == 2 ? "prio-2" : "prio-3");
+                    string prioName = p == 1 ? "CRITICAL" : (p == 2 ? "MODERATE" : "STANDARD");
+
+                    bool overdue = assignment.Task.DueDate.HasValue && assignment.Task.DueDate.Value < DateTime.Now;
+                    string dateStr = assignment.Task.DueDate.HasValue ? assignment.Task.DueDate.Value.ToString("dd.MM.yy") : "N/A";
+                    string dateColor = overdue ? "text-danger fw-bold" : "text-info";
+
+                    <div class="tech-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="tag-prio @prioClass">@prioName PRIORITY</span>
+                            @if (overdue)
+                            {
+                                <span class="text-danger small font-monospace fw-bold">!! OVERDUE !!</span>
+                            }
+                        </div>
+
+                        <h6 class="tech-title">@assignment.Task.Title</h6>
+                        <div class="tech-line"></div>
+                        <p class="tech-desc text-truncate-2">
+                            @(assignment.Task.Description?.Length > 70 ? assignment.Task.Description.Substring(0, 70) + "..." : assignment.Task.Description)
+                        </p>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <small class="font-monospace @dateColor"><i class="bi bi-calendar-event"></i> @dateStr</small>
+
+                            <form asp-controller="Tasks" asp-action="StartTask" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@assignment.Task.TaskId" />
+                                <button type="submit" class="btn-tech text-decoration-none border-0" style="cursor:pointer;">
+                                    INITIALIZE <i class="bi bi-play-fill"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 }
             </div>
 
@@ -129,58 +165,44 @@
                         NO ACTIVE PROCESSES
                     </div>
                 }
-                @foreach (var task in tasksInProgress)
+
+                @foreach (var assignment in tasksInProgress)
                 {
-                    @RenderTechTask(task)
+                    // LOGICA DE AFIȘARE DIRECT AICI
+                    int p = assignment.Task.Priority;
+                    string prioClass = p == 1 ? "prio-1" : (p == 2 ? "prio-2" : "prio-3");
+                    string prioName = p == 1 ? "CRITICAL" : (p == 2 ? "MODERATE" : "STANDARD");
+
+                    bool overdue = assignment.Task.DueDate.HasValue && assignment.Task.DueDate.Value < DateTime.Now;
+                    string dateStr = assignment.Task.DueDate.HasValue ? assignment.Task.DueDate.Value.ToString("dd.MM.yy") : "N/A";
+                    string dateColor = overdue ? "text-danger fw-bold" : "text-info";
+
+                    <div class="tech-card">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="tag-prio @prioClass">@prioName PRIORITY</span>
+                            @if (overdue)
+                            {
+                                <span class="text-danger small font-monospace fw-bold">!! OVERDUE !!</span>
+                            }
+                        </div>
+
+                        <h6 class="tech-title">@assignment.Task.Title</h6>
+                        <div class="tech-line"></div>
+                        <p class="tech-desc text-truncate-2">
+                            @(assignment.Task.Description?.Length > 70 ? assignment.Task.Description.Substring(0, 70) + "..." : assignment.Task.Description)
+                        </p>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <small class="font-monospace @dateColor"><i class="bi bi-calendar-event"></i> @dateStr</small>
+
+                            <a asp-controller="Tasks" asp-action="CompleteTask" asp-route-id="@assignment.TaskAssignmentId"
+                               class="btn-tech btn-tech-success text-decoration-none">
+                                COMPLETE <i class="bi bi-check2"></i>
+                            </a>
+                        </div>
+                    </div>
                 }
             </div>
         </div>
     </main>
 </div>
-
-@{
-    Microsoft.AspNetCore.Html.IHtmlContent RenderTechTask(TaskAssignment assignment)
-    {
-        int p = assignment.Task.Priority;
-        string prioClass = p == 1 ? "prio-1" : (p == 2 ? "prio-2" : "prio-3");
-        string prioName = p == 1 ? "CRITICAL" : (p == 2 ? "MODERATE" : "STANDARD");
-
-        bool overdue = assignment.Task.DueDate.HasValue && assignment.Task.DueDate.Value < DateTime.Now;
-        string dateStr = assignment.Task.DueDate.HasValue ? assignment.Task.DueDate.Value.ToString("dd.MM.yy") : "N/A";
-        string dateColor = overdue ? "text-danger fw-bold" : "text-info";
-
-        <div class="tech-card">
-            <div class="d-flex justify-content-between mb-2">
-                <span class="tag-prio @prioClass">@prioName PRIORITY</span>
-                @if (overdue)
-                {
-                    <span class="text-danger small font-monospace fw-bold">!! OVERDUE !!</span>
-                }
-            </div>
-
-            <h6 class="tech-title">@assignment.Task.Title</h6>
-            <div class="tech-line"></div>
-            <p class="tech-desc text-truncate-2">
-                @(assignment.Task.Description?.Length > 70 ? assignment.Task.Description.Substring(0, 70) + "..." : assignment.Task.Description)
-            </p>
-
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <small class="font-monospace @dateColor"><i class="bi bi-calendar-event"></i> @dateStr</small>
-
-                @if (assignment.Status == 0)
-                {
-                    <a href="/Tasks/VoteDifficulty/@assignment.TaskAssignmentId" class="btn-tech text-decoration-none">
-                        INITIALIZE <i class="bi bi-chevron-right"></i>
-                    </a>
-                }
-                else
-                {
-                    <a href="/Tasks/CompleteTask/@assignment.TaskAssignmentId" class="btn-tech btn-tech-success text-decoration-none">
-                        COMPLETE <i class="bi bi-check2"></i>
-                    </a>
-                }
-            </div>
-        </div>
-        return null;
-    }
-}

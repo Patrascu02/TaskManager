@@ -32,18 +32,32 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="DueDate" class="form-label fw-bold"></label>
-                                <input asp-for="DueDate" class="form-control" />
-                                <span asp-validation-for="DueDate" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Priority" class="form-label fw-bold"></label>
-                                <select asp-for="Priority" class="form-select">
-                                    <option value="1"> Low (Scăzută)</option>
-                                    <option value="2" selected> Medium (Medie)</option>
-                                    <option value="3">High (Critică)</option>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Priority" class="form-label fw-bold">Urgență (Timp)</label>
+                                <select asp-for="Priority" class="form-select border-warning text-warning fw-bold bg-white">
+                                    <option value="1">Critică (Acum)</option>
+                                    <option value="2" selected>Medie (Săpt. asta)</option>
+                                    <option value="3">Normală (Când poți)</option>
                                 </select>
+                                <span asp-validation-for="Priority" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ManagerDifficulty" class="form-label fw-bold text-info">XP Estimat (Secret)</label>
+                                <select asp-for="ManagerDifficulty" class="form-select border-info text-info fw-bold bg-white">
+                                    <option value="1">Ușor (30 XP)</option>
+                                    <option value="2">Decent (35 XP)</option>
+                                    <option value="3" selected>Mediu (40 XP)</option>
+                                    <option value="4">Greu (45 XP)</option>
+                                    <option value="5">Extrem (50 XP)</option>
+                                </select>
+                                <span asp-validation-for="ManagerDifficulty" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="DueDate" class="form-label fw-bold">Termen Limită</label>
+                                <input asp-for="DueDate" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="DueDate" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -88,8 +102,7 @@
 
                 <div class="d-flex justify-content-end gap-2">
                     <a asp-controller="Tasks" asp-action="Index" class="btn btn-secondary px-4">Anulează</a>
-
-                    <button type="submit" class="btn btn-info px-5 shadow-sm fw-bold">
+                    <button type="submit" class="btn btn-info px-5 shadow-sm fw-bold text-white">
                         <i class="bi bi-send-check"></i> Alocă Task
                     </button>
                 </div>
