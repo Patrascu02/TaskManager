@@ -1,262 +1,178 @@
 ﻿@model IEnumerable<TaskManager.Modules.Tasks.Models.UserTask>
 
 @{
-    ViewData["Title"] = "GESTIUNE SARCINI";
+    ViewData["Title"] = "Task Manager";
     Layout = "~/Modules/Views/Shared/_Layout.cshtml";
 }
 
-<style>
-    /* 1. Oprește efectul 3D la hover (Cerinta anterioara) */
-    .cyber-table tbody tr {
-        transition: background-color 0.2s ease !important;
-        transform: none !important;
-        box-shadow: none !important;
-    }
+<div class="container-fluid fade-in mt-4">
 
-        .cyber-table tbody tr:hover {
-            transform: none !important;
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            z-index: auto !important;
-            box-shadow: none !important;
-        }
-
-    /* 2. Stiluri pentru Bulina de Realocare (Cyber Radio) */
-    .reassign-option {
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-        padding: 2px 0;
-        transition: all 0.2s;
-        cursor: pointer;
-    }
-
-    .reassign-radio {
-        width: 16px;
-        height: 16px;
-        border: 2px solid #64748b; /* Gri initial */
-        border-radius: 50%;
-        margin-right: 10px;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-    }
-
-        .reassign-radio::after {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background-color: var(--hud-cyan);
-            border-radius: 50%;
-            transform: scale(0);
-            transition: transform 0.2s;
-        }
-
-    /* Efect Hover pe rândul numelui */
-    .reassign-option:hover .reassign-radio {
-        border-color: var(--hud-cyan);
-        box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
-    }
-
-        .reassign-option:hover .reassign-radio::after {
-            transform: scale(1); /* Apare punctul din mijloc */
-        }
-
-    .reassign-option:hover .reassign-name {
-        color: var(--hud-cyan) !important;
-        text-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
-    }
-</style>
-
-<div class="fade-in pt-4">
-
-    <header class="hud-header-panel mb-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded" style="background: rgba(0, 0, 0, 0.4); border-left: 4px solid #0dcaf0;">
         <div>
-            <h2 class="hud-welcome">SARCINI</h2>
-            <small>GESTIONEAZĂ LISTA DE TASK-URI ȘI PRIORITĂȚI</small>
+            <h2 class="text-white font-monospace mb-0"><i class="bi bi-grid-3x3-gap-fill me-2 text-info"></i>MANAGER CONSOLE</h2>
+            <small class="text-white-50 ms-1">Gestionează sarcinile echipei</small>
         </div>
-        <a asp-action="Assign" class="btn-tech text-decoration-none">
-            <i class="bi bi-plus-lg me-2"></i> SARCINĂ NOUĂ
+        <a asp-action="Assign" class="btn btn-info fw-bold font-monospace shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> SARCINĂ NOUĂ
         </a>
-    </header>
+    </div>
 
-    <div class="cyber-table-card">
-
-        <div class="p-3 border-bottom border-secondary" style="background: rgba(0,0,0,0.2);">
-            <div class="input-group" style="max-width: 350px;">
-                <span class="input-group-text border-secondary bg-dark text-info">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" id="searchTask" class="form-control bg-dark text-light border-secondary font-monospace" placeholder="CAUTĂ SARCINĂ...">
-            </div>
-        </div>
-
-        <div class="table-responsive">
-            <table class="cyber-table align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th class="ps-4">TITLU & DESCRIERE</th>
-                        <th class="ps-4">ECHIPĂ (REALOCARE)</th>
-                        <th class="text-center">PRIORITATE</th>
-                        <th class="text-center">TERMEN LIMITĂ</th>
-                        <th class="pe-4 text-end">ACȚIUNI</th>
-                    </tr>
-                </thead>
-                <tbody id="taskTableBody">
-                    @foreach (var item in Model)
-                    {
-                        // --- Logică Data & Countdown ---
-                        bool hasDate = item.DueDate.HasValue;
-                        string dateColor = (hasDate && item.DueDate.Value < DateTime.Now) ? "text-danger fw-bold" : "text-info";
-                        string timeString = "-";
-                        string timeClass = "";
-
-                        if (hasDate)
-                        {
-                            var ts = item.DueDate.Value - DateTime.Now;
-                            if (ts.TotalSeconds < 0)
-                            {
-                                timeString = "EXPIRAT";
-                                timeClass = "text-danger fw-bold";
-                            }
-                            else if (ts.TotalDays >= 1)
-                            {
-                                timeString = $"{ts.Days}z {ts.Hours}h RĂMASE";
-                                timeClass = "text-success opacity-75";
-                            }
-                            else
-                            {
-                                timeString = $"{ts.Hours}h {ts.Minutes}m RĂMASE";
-                                timeClass = "text-warning fw-bold";
-                            }
-                        }
-
-                        // --- Logică Prioritate ---
-                        string priorityClass = item.Priority == 1 ? "border-danger text-danger" : (item.Priority == 2 ? "border-warning text-warning" : "border-success text-success");
-                        string priorityLabel = item.Priority == 1 ? "CRITIC" : (item.Priority == 2 ? "MEDIU" : "NORMAL");
-
+    <div class="card border-0 shadow-lg" style="background: #1e1e24;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
+                    <thead class="bg-dark text-info font-monospace text-uppercase small">
                         <tr>
-                            <td class="ps-4" style="max-width: 250px;">
-                                <div class="fw-bold text-white mb-1">@item.Title</div>
-                                <div class="text-white-50 small text-truncate">@item.Description</div>
-                            </td>
+                            <th class="py-3 ps-4">Sarcina</th>
+                            <th class="py-3">Prioritate</th>
+                            <th class="py-3">Status Global</th>
+                            <th class="py-3">Echipa & Progres</th>
+                            <th class="py-3">Termen / Timer</th>
+                            <th class="py-3 text-end pe-4">Acțiuni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            // Calculăm dacă e expirat
+                            bool isOverdue = item.DueDate.HasValue && item.DueDate.Value < DateTime.Now && item.IsActive;
+                            string rowClass = !item.IsActive ? "opacity-50" : ""; // Îl facem puțin transparent dacă e gata
 
-                            <td class="ps-4" style="min-width: 200px;">
-                                @if (item.Assignments != null && item.Assignments.Any())
-                                {
-                                    <div class="d-flex flex-column gap-2">
-                                        @foreach (var assign in item.Assignments)
+                            <tr class="@rowClass border-bottom border-secondary">
+
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold text-white lead" style="font-size: 1.1rem;">@item.Title</span>
+                                        <small class="text-white-50 text-truncate" style="max-width: 250px;">@item.Description</small>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @if (item.Priority == 1)
+                                    {
+                                        <span class="badge bg-danger text-dark fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i>CRITIC</span>
+                                    }
+                                    else if (item.Priority == 2)
+                                    {
+
+                                        <span class="badge bg-warning text-dark fw-bold">MEDIU</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-info text-dark fw-bold">NORMAL</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (!item.IsActive)
+                                    {
+                                        <span class="badge bg-success border border-success p-2 font-monospace">
+                                            <i class="bi bi-check-all me-1"></i> FINALIZAT
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-primary border border-primary p-2 font-monospace">
+                                            <i class="bi bi-activity me-1"></i> ACTIV
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        @if (item.Assignments != null && item.Assignments.Any())
                                         {
-                                            <a asp-action="Reassign" asp-route-id="@assign.TaskAssignmentId"
-                                               class="reassign-option"
-                                               title="Realocă task-ul lui @assign.User?.FullName">
+                                            foreach (var assign in item.Assignments)
+                                            {
+                                                string statusUser = assign.Status == 2 ? "text-success" : (assign.Status == 1 ? "text-warning" : "text-muted");
+                                                string iconUser = assign.Status == 2 ? "bi-check-circle-fill" : (assign.Status == 1 ? "bi-hourglass-split" : "bi-circle");
 
-                                                <div class="reassign-radio"></div>
-
-                                                <span class="reassign-name text-white small font-monospace">
-                                                    @assign.User?.FullName
-                                                </span>
-                                            </a>
+                                                <small class="font-monospace @statusUser">
+                                                    <i class="bi @iconUser me-1"></i> @(assign.User?.FullName ?? "Unknown")
+                                                </small>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-white-50 small">Neasignat</span>
                                         }
                                     </div>
-                                }
-                                else
-                                {
-                                    <span class="text-muted small font-monospace fst-italic ms-1">- Nealocat -</span>
-                                }
-                            </td>
+                                </td>
 
-                            <td class="text-center">
-                                <span class="badge border @priorityClass bg-transparent font-monospace px-3 py-2">@priorityLabel</span>
-                            </td>
+                                <td>
+                                    @if (!item.IsActive)
+                                    {
+                                        <span class="text-success fw-bold font-monospace small">
+                                            <i class="bi bi-flag-fill"></i> TASK ÎNCHIS
+                                        </span>
+                                    }
+                                    else if (item.DueDate.HasValue)
+                                    {
+                                        if (isOverdue)
+                                        {
+                                            <span class="text-danger fw-bold font-monospace">
+                                                <i class="bi bi-alarm-fill me-1"></i> EXPIRAT
+                                            </span>
+                                            <div class="small text-danger">@item.DueDate.Value.ToString("dd.MM HH:mm")</div>
+                                        }
+                                        else
+                                        {
+                                            var timeSpan = item.DueDate.Value - DateTime.Now;
+                                            string timerColor = timeSpan.TotalHours < 24 ? "text-warning" : "text-info";
 
-                            <td class="text-center font-monospace">
-                                @if (hasDate)
-                                {
-                                    <div class="@dateColor mb-1">
-                                        <i class="bi bi-calendar-event me-1"></i> @item.DueDate.Value.ToString("dd.MM.yyyy")
+                                            <span class="@timerColor fw-bold font-monospace">
+                                                <i class="bi bi-stopwatch me-1"></i>
+                                                @if (timeSpan.TotalDays >= 1)
+                                                {
+                                                    <span>@((int)timeSpan.TotalDays)z </span>
+                                                }
+                                                @timeSpan.ToString(@"hh\:mm") rămas
+                                            </span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">--</span>
+                                    }
+                                </td>
+
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        @if (item.IsActive)
+                                        {
+                                            @if (item.Assignments.Any())
+                                            {
+                                                var firstAssign = item.Assignments.First();
+                                                <a asp-action="Reassign" asp-route-id="@firstAssign.TaskAssignmentId"
+                                                   class="btn btn-sm btn-outline-warning" title="Schimbă Userul">
+                                                    <i class="bi bi-person-gear"></i>
+                                                </a>
+                                            }
+
+                                            <form asp-action="Delete" asp-route-id="@item.TaskId" method="post" style="display:inline;"
+                                                  onsubmit="return confirm('Sigur ștergi acest task?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1" title="Șterge">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="Delete" asp-route-id="@item.TaskId" method="post" style="display:inline;"
+                                                  onsubmit="return confirm('Task-ul este finalizat. Îl arhivezi (ștergi)?');">
+                                                <button type="submit" class="btn btn-sm btn-secondary ms-1" title="Arhivează">
+                                                    <i class="bi bi-archive-fill"></i>
+                                                </button>
+                                            </form>
+                                        }
                                     </div>
-                                    <div class="@timeClass small" style="font-size: 0.75rem;">
-                                        <i class="bi bi-hourglass-split"></i> @timeString
-                                    </div>
-                                }
-                                else
-                                {
-
-                                    <span class="text-muted">-</span>
-                                }
-                            </td>
-
-                            <td class="pe-4 text-end">
-                                <div class="btn-group">
-                                    <a asp-action="Edit" asp-route-id="@item.TaskId" class="btn btn-sm btn-outline-info me-2 rounded-0" title="Editează"><i class="fas fa-edit"></i></a>
-                                    <a asp-action="Details" asp-route-id="@item.TaskId" class="btn btn-sm btn-outline-warning me-2 rounded-0" title="Detalii"><i class="fas fa-eye"></i></a>
-                                    <button class="btn btn-sm btn-outline-danger rounded-0" onclick="confirmDelete('@item.TaskId', '@item.Title')" title="Șterge"><i class="fas fa-trash-alt"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-
-        @if (!Model.Any())
-        {
-            <div class="text-center py-5">
-                <div class="text-secondary mb-3"><i class="bi bi-clipboard-x fa-3x"></i></div>
-                <h6 class="text-secondary font-monospace">NU EXISTĂ SARCINI ÎN LISTĂ.</h6>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-        }
+        </div>
     </div>
 </div>
-
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background-color: #1e293b; border: 1px solid var(--hud-border); color: #e2e8f0;">
-            <div class="modal-body p-4 text-center">
-                <div class="mb-3">
-                    <div class="d-inline-flex align-items-center justify-content-center"
-                         style="width: 80px; height: 80px; background: rgba(244, 63, 94, 0.1); border-radius: 50%; border: 1px solid #f43f5e;">
-                        <i class="fas fa-exclamation-triangle fa-3x text-danger"></i>
-                    </div>
-                </div>
-                <h4 class="fw-bold text-white mb-2 font-monospace">EȘTI SIGUR?</h4>
-                <p class="text-white-50 mb-4">Vrei să ștergi sarcina: <strong id="deleteTaskTitle" class="text-info"></strong>?</p>
-                <div class="d-flex justify-content-center gap-2">
-                    <button type="button" class="btn btn-outline-light px-4 font-monospace" data-bs-dismiss="modal">ANULEAZĂ</button>
-                    <form id="deleteForm" method="post">
-                        <button type="submit" class="btn btn-danger px-4 fw-bold font-monospace">DA, ȘTERGE</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        // Căutare Live
-        document.getElementById('searchTask').addEventListener('keyup', function() {
-            var value = this.value.toLowerCase();
-            var rows = document.querySelectorAll("#taskTableBody tr");
-            rows.forEach(function(row) {
-                var text = row.innerText.toLowerCase();
-                row.style.display = text.indexOf(value) > -1 ? "" : "none";
-            });
-        });
-
-        // Fix Modal (Mutare în body)
-        var deleteModalElement = document.getElementById('deleteModal');
-        if (deleteModalElement) {
-            document.body.appendChild(deleteModalElement);
-        }
-
-        function confirmDelete(taskId, taskTitle) {
-            document.getElementById('deleteTaskTitle').textContent = taskTitle;
-            document.getElementById('deleteForm').action = '/Tasks/Delete/' + taskId;
-            var myModal = bootstrap.Modal.getOrCreateInstance(deleteModalElement);
-            myModal.show();
-        }
-    </script>
-}

@@ -163,20 +163,18 @@ namespace TaskManager.Modules.Tasks.Controllers
         // ZONA USER (Gamification & Completion)
         // =========================================================
 
-        // --- NOU: START TASK (Înlocuiește votul inițial) ---
         [Authorize(Roles = "User")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> StartTask(int id)
         {
-            // Căutăm task-ul asignat userului curent (id vine ca TaskId din formular)
+            // Căutăm task-ul (id vine ca TaskId din formular)
             var assignment = await _db.TaskAssignments
                 .FirstOrDefaultAsync(a => a.TaskId == id && a.UserId == _userManager.GetUserId(User));
 
-            // Dacă îl găsim și este "Nou" (Status 0)
             if (assignment != null && assignment.Status == 0)
             {
-                assignment.Status = 1; // Îl mutăm în "În Lucru"
+                assignment.Status = 1; // Îl trecem în 'În Lucru'
                 assignment.AssignedAt = DateTime.Now;
 
                 await _db.SaveChangesAsync();
@@ -193,7 +191,7 @@ namespace TaskManager.Modules.Tasks.Controllers
                 .Include(t => t.Task)
                 .FirstOrDefaultAsync(a => a.TaskAssignmentId == id);
 
-            // Fallback: Dacă id-ul primit e TaskId, încercăm să găsim asignarea userului curent
+            // Fallback: Dacă id-ul primit e TaskId
             if (assignment == null)
             {
                 var userId = _userManager.GetUserId(User);
@@ -217,32 +215,21 @@ namespace TaskManager.Modules.Tasks.Controllers
             if (assignment == null) return NotFound();
 
             // 1. CALCUL XP: 50 - |Diferența|
-
-            // A. Valorile brute (1-5)
             int managerVote = assignment.Task.ManagerDifficulty;
             int userVote = finalDifficulty;
 
-            // B. Convertim în XP (1=30 ... 5=50)
             int managerXp = 30 + (managerVote - 1) * 5;
             int userXp = 30 + (userVote - 1) * 5;
 
-            // C. Calculăm Diferența (Discrepanța)
             int diff = Math.Abs(managerXp - userXp);
-
-            // D. Formula Finală
             int xpFinal = 50 - diff;
 
-            // E. Mesaj Feedback
             if (diff == 0)
-            {
                 TempData["Success"] = $"Sincronizare perfectă! Ai primit maximul de {xpFinal} XP.";
-            }
             else
-            {
-                TempData["Info"] = $"XP Bază (50) - Diferență Opinie ({diff}) = {xpFinal} XP.";
-            }
+                TempData["Info"] = $"XP Bază (50) - Diferență ({diff}) = {xpFinal} XP.";
 
-            // 2. Penalizare Termen (Overdue)
+            // 2. Penalizare Termen
             bool isOverdue = assignment.Task.DueDate.HasValue && DateTime.Now > assignment.Task.DueDate.Value;
             if (isOverdue)
             {
@@ -250,7 +237,7 @@ namespace TaskManager.Modules.Tasks.Controllers
                 TempData["Warning"] = "Task expirat! XP înjumătățit.";
             }
 
-            // 3. Salvare date
+            // 3. Salvare Feedback
             _db.CompletionFeedbacks.Add(new CompletionFeedback
             {
                 TaskAssignmentId = assignmentId,
@@ -265,7 +252,7 @@ namespace TaskManager.Modules.Tasks.Controllers
             assignment.Status = 2; // Finalizat
             assignment.CompletedAt = DateTime.Now;
 
-            // Închidere task părinte
+            // Închidere task părinte dacă toți au terminat
             bool areOthersWorking = await _db.TaskAssignments
                 .AnyAsync(ta => ta.TaskId == assignment.TaskId && ta.TaskAssignmentId != assignmentId && ta.Status != 2);
 
@@ -274,7 +261,7 @@ namespace TaskManager.Modules.Tasks.Controllers
                 assignment.Task.IsActive = false;
             }
 
-            // 4. Update Profil User
+            // 4. Update Profil User & INSIGNE
             var user = await _userManager.FindByIdAsync(assignment.UserId);
             if (user != null)
             {
@@ -295,16 +282,72 @@ namespace TaskManager.Modules.Tasks.Controllers
                     TempData["Success"] += $" LEVEL UP -> {user.LevelId}!";
                 }
 
-                // Insigne
-                bool hasNoviceBadge = await _db.UserBadges.AnyAsync(ub => ub.UserId == user.Id && ub.BadgeId == 1);
-                if (!hasNoviceBadge && user.TotalXp >= 100)
+                // --- SISTEM DE INSIGNE (BADGES) ---
+
+                // Numărăm task-urile din DB (cele vechi) + 1 (cel curent care încă nu e salvat în DB cu status 2)
+                int dbCompleted = await _db.TaskAssignments.CountAsync(t => t.UserId == user.Id && t.Status == 2);
+                int totalCompleted = dbCompleted + 1;
+
+                // Numărăm task-urile punctuale
+                int dbPunctual = await _db.TaskAssignments.Include(ta => ta.Task)
+                    .CountAsync(t => t.UserId == user.Id && t.Status == 2 && t.CompletedAt <= t.Task.DueDate);
+                int totalPunctual = dbPunctual + (isOverdue ? 0 : 1);
+
+
+                // 1. NOVICE (1 Task)
+                if (totalCompleted >= 1 && !await HasBadge(user.Id, 1))
                 {
-                    _db.UserBadges.Add(new UserBadge { UserId = user.Id, BadgeId = 1, AwardedAt = DateTime.Now });
+                    await GiveBadge(user.Id, 1);
+                    TempData["Success"] += " 🏆 INSIGNĂ: NOVICE!";
+                }
+
+                // 2. HARNIC (5 Task-uri)
+                if (totalCompleted >= 5 && !await HasBadge(user.Id, 2))
+                {
+                    await GiveBadge(user.Id, 2);
+                    TempData["Success"] += " 🏆 INSIGNĂ: HARNIC!";
+                }
+
+                // 3. EXPERT (Level 5)
+                if ((user.LevelId ?? 1) >= 5 && !await HasBadge(user.Id, 3))
+                {
+                    await GiveBadge(user.Id, 3);
+                    TempData["Success"] += " 🏆 INSIGNĂ: EXPERT!";
+                }
+
+                // 4. VETERAN (20 Task-uri)
+                if (totalCompleted >= 20 && !await HasBadge(user.Id, 4))
+                {
+                    await GiveBadge(user.Id, 4);
+                    TempData["Success"] += " 🏆 INSIGNĂ: VETERAN!";
+                }
+
+                // 5. PUNCTUAL (3 Task-uri la timp)
+                if (totalPunctual >= 3 && !await HasBadge(user.Id, 5))
+                {
+                    await GiveBadge(user.Id, 5);
+                    TempData["Success"] += " 🏆 INSIGNĂ: PUNCTUAL!";
                 }
             }
 
             await _db.SaveChangesAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        // --- HELPERE PENTRU INSIGNE ---
+        private async Task<bool> HasBadge(string userId, int badgeId)
+        {
+            return await _db.UserBadges.AnyAsync(ub => ub.UserId == userId && ub.BadgeId == badgeId);
+        }
+
+        private async Task GiveBadge(string userId, int badgeId)
+        {
+            _db.UserBadges.Add(new UserBadge
+            {
+                UserId = userId,
+                BadgeId = badgeId,
+                AwardedAt = DateTime.Now
+            });
         }
     }
 }
