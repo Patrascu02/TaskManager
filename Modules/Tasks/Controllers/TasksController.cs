@@ -163,46 +163,26 @@ namespace TaskManager.Modules.Tasks.Controllers
         // ZONA USER (Gamification & Completion)
         // =========================================================
 
+        // --- NOU: START TASK (Înlocuiește votul inițial) ---
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> VoteDifficulty(int id)
-        {
-            var assignment = await _db.TaskAssignments
-                .Include(t => t.Task)
-                .FirstOrDefaultAsync(a => a.TaskAssignmentId == id);
-
-            if (assignment == null) return NotFound();
-            return View(assignment);
-        }
-
         [HttpPost]
-        [Authorize(Roles = "User")]
-        public async Task<IActionResult> SubmitVote(int assignmentId, int difficultyScore)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> StartTask(int id)
         {
-            var existingVote = await _db.DifficultyVotes
-                .FirstOrDefaultAsync(v => v.TaskAssignmentId == assignmentId);
+            // Căutăm task-ul asignat userului curent (id vine ca TaskId din formular)
+            var assignment = await _db.TaskAssignments
+                .FirstOrDefaultAsync(a => a.TaskId == id && a.UserId == _userManager.GetUserId(User));
 
-            if (existingVote != null)
-            {
-                existingVote.VoteValue = (byte)difficultyScore;
-                _db.Update(existingVote);
-            }
-            else
-            {
-                _db.DifficultyVotes.Add(new DifficultyVote
-                {
-                    TaskAssignmentId = assignmentId,
-                    VoteValue = (byte)difficultyScore
-                });
-            }
-
-            var assignment = await _db.TaskAssignments.FindAsync(assignmentId);
+            // Dacă îl găsim și este "Nou" (Status 0)
             if (assignment != null && assignment.Status == 0)
             {
-                assignment.Status = 1;
+                assignment.Status = 1; // Îl mutăm în "În Lucru"
+                assignment.AssignedAt = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+                TempData["Info"] = "Sarcina a fost preluată!";
             }
 
-            await _db.SaveChangesAsync();
-            TempData["Success"] = "Vot înregistrat!";
             return RedirectToAction("Index", "Home");
         }
 
@@ -212,6 +192,16 @@ namespace TaskManager.Modules.Tasks.Controllers
             var assignment = await _db.TaskAssignments
                 .Include(t => t.Task)
                 .FirstOrDefaultAsync(a => a.TaskAssignmentId == id);
+
+            // Fallback: Dacă id-ul primit e TaskId, încercăm să găsim asignarea userului curent
+            if (assignment == null)
+            {
+                var userId = _userManager.GetUserId(User);
+                assignment = await _db.TaskAssignments
+                    .Include(t => t.Task)
+                    .FirstOrDefaultAsync(a => a.TaskId == id && a.UserId == userId);
+            }
+
             if (assignment == null) return NotFound();
             return View(assignment);
         }
